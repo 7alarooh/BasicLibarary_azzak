@@ -25,23 +25,27 @@ namespace BasicLibrary
                 switch (choice)
                 {
                     case "1":
+                        Console.Clear();
                         adminMenu();
                         break;
 
                     case "2":
+                        Console.Clear();
                         userMenu();
                         break;
 
                     case "3":
                         SaveBooksToFile();
-                        ExitFlag = true;
+                        Console.WriteLine("\npress any key to exit out system");
+                        string outsystem = Console.ReadLine();
+                        Environment.Exit(0);
                         break;
 
                     default:
                         Console.WriteLine("Sorry your choice was wrong!!");
                         break;
                 }
-                Console.WriteLine("press any key to continue");
+                Console.WriteLine("press any key to continue in Home Page");
                 string cont = Console.ReadLine();
                 Console.Clear();
             } while (ExitFlag != true);
@@ -51,7 +55,7 @@ namespace BasicLibrary
             bool ExitFlag = false;
             do
             {
-                Console.WriteLine("Welcome to Library");
+                Console.WriteLine("Welcome Admin in Library");
                 Console.WriteLine("\n Enter the No. of operation you need :");
                 Console.WriteLine("\n 1 .Add New Book");
                 Console.WriteLine("\n 2 .Display All Books");
@@ -148,7 +152,7 @@ namespace BasicLibrary
                  Console.WriteLine("Enter Book ID");
                  int ID = int.Parse(Console.ReadLine());
 
-                 Console.WriteLine("Enter Book ID");
+                 Console.WriteLine("Enter the Book Quantity");
                  int quantity = int.Parse(Console.ReadLine());
 
             Books.Add(  ( name, author, ID, quantity)  );
@@ -170,6 +174,8 @@ namespace BasicLibrary
                 sb.Append("Book ").Append(BookNumber).Append(" Author : ").Append(Books[i].BAuthor);
                 sb.AppendLine();
                 sb.Append("Book ").Append(BookNumber).Append(" ID : ").Append(Books[i].ID);
+                sb.AppendLine();
+                sb.Append("Book ").Append(BookNumber).Append(" Quantity : ").Append(Books[i].quantity);
                 sb.AppendLine().AppendLine();
                 Console.WriteLine(sb.ToString());
                 sb.Clear();
