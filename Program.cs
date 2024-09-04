@@ -1,4 +1,5 @@
 ﻿using System.Text;
+using System.Xml.Linq;
 
 namespace BasicLibrary
 {
@@ -7,7 +8,7 @@ namespace BasicLibrary
 
         static List<(string BName, string BAuthor, int ID, int quantity)> Books = new List<(string BName, string BAuthor, int ID, int quantity)>();
         static string filePath = "C:\\Users\\Lenovo\\source\\repos\\azzaGitTest\\lib.txt";
-
+        static int index = 0;
         static void Main(string[] args)
         {
             bool ExitFlag = false;
@@ -195,14 +196,39 @@ namespace BasicLibrary
                 {
                     Console.WriteLine("Book Author is : " + Books[i].BAuthor);
                     flag = true;
+                    index= i;
                     break;
+
                 }
             }
 
             if (flag != true)
             { Console.WriteLine("book not found"); }
         }
-        static void BorrowBook() { }
+        static void BorrowBook() {
+            SearchForBook();
+            int quantity = Books[index].quantity;
+            if (quantity != 0)
+            {
+                Console.WriteLine("Do you want to borrow the Book?");
+                Console.WriteLine("\n press char ' y ' to borrow :");
+                string selected = Console.ReadLine();
+
+                if (selected == "y")
+                {
+                    --quantity;
+                    Books[index] = (Books[index].BName, Books[index].BAuthor, Books[index].ID, quantity);
+
+                    Console.WriteLine("you are Borrowed this "+ Books[index].BName + "  !");
+                    return;
+
+                }
+
+
+            }
+            else { Console.WriteLine("Sorry! All books are borrowed..."); }
+
+        }
         static void ReturnBook() { }
         static void LoadBooksFromFile()
         {
