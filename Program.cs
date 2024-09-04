@@ -6,7 +6,7 @@ namespace BasicLibrary
     {// testing checkout ..
 
         static List<(string BName, string BAuthor, int ID)> Books = new List<(string BName, string BAuthor, int ID)>();
-        static string filePath = "C:\\Users\\Karim\\Downloads\\OutSystem_Course\\GitHubRepos\\Data\\lib.txt";
+        static string filePath = "C:\\Users\\Lenovo\\source\\repos\\azzaGitTest\\lib.txt";
 
         static void Main(string[] args)
         {
@@ -14,39 +14,119 @@ namespace BasicLibrary
             LoadBooksFromFile();
             do
             {
-                Console.WriteLine("Welcome to Lirary");
-                Console.WriteLine("\n Enter the char of operation you need :");
-                Console.WriteLine("\n A- Add New Book");
-                Console.WriteLine("\n B- Display All Books");
-                Console.WriteLine("\n C- Search for Book by Name");
-                Console.WriteLine("\n D- Save and Exit");
+                Console.WriteLine("Welcome to Library");
+                Console.WriteLine("\n Enter the No of operation you need :");
+                Console.WriteLine("\n 1 .For Admin");
+                Console.WriteLine("\n 2 .For User");
+                Console.WriteLine("\n 3 .Save and Exit");
 
                 string choice = Console.ReadLine();
 
                 switch (choice)
                 {
-                    case "A":
-                        AddnNewBook();
+                    case "1":
+                        adminMenu();
                         break;
 
-                    case "B":
-                        ViewAllBooks();
+                    case "2":
+                        userMenu();
                         break;
 
-                    case "C":
-                        SearchForBook();
-                        break;
-
-                    case "D":
+                    case "3":
                         SaveBooksToFile();
                         ExitFlag = true;
                         break;
 
                     default:
-                        Console.WriteLine("Sorry your choice was wrong");
+                        Console.WriteLine("Sorry your choice was wrong!!");
+                        break;
+                }
+                Console.WriteLine("press any key to continue");
+                string cont = Console.ReadLine();
+                Console.Clear();
+            } while (ExitFlag != true);
+        }
+        static void adminMenu() 
+        {
+            bool ExitFlag = false;
+            do
+            {
+                Console.WriteLine("Welcome to Library");
+                Console.WriteLine("\n Enter the No. of operation you need :");
+                Console.WriteLine("\n 1 .Add New Book");
+                Console.WriteLine("\n 2 .Display All Books");
+                Console.WriteLine("\n 3 .Search for Book by Name");
+                Console.WriteLine("\n 4 .Exit");
+
+                string choice = Console.ReadLine();
+
+                switch (choice)
+                {
+                    case "1":
+                        AddnNewBook();
                         break;
 
+                    case "2":
+                        ViewAllBooks();
+                        break;
 
+                    case "3":
+                        SearchForBook();
+                        break;
+
+                    case "4":
+                        ExitFlag = true;
+                        break;
+
+                    default:
+                        Console.WriteLine("Sorry your choice was wrong !!");
+                        break;
+
+                }
+
+                Console.WriteLine("press any key to continue");
+                string cont = Console.ReadLine();
+
+                Console.Clear();
+
+            } while (ExitFlag != true);
+        }
+
+        static void userMenu() 
+        {
+            bool ExitFlag = false;
+            do
+            {
+                Console.WriteLine("Welcome User in Library");
+                Console.WriteLine("\n Enter the No of operation you need :");
+                Console.WriteLine("\n 1 .Search For Book");
+                Console.WriteLine("\n 2 .Borrow Book");
+                Console.WriteLine("\n 3 .Return Book");
+                Console.WriteLine("\n 4 .Exit");
+
+                string choice = Console.ReadLine();
+
+                switch (choice)
+                {
+                    case "1":
+                        SearchForBook();
+                        break;
+
+                    case "2":
+                        BorrowBook();
+                        break;
+
+                    case "3":
+                        ReturnBook();
+                        break;
+
+                    case "4":
+                        ExitFlag = true;
+                        break;
+
+                    default:
+                        Console.WriteLine("Sorry your choice was wrong !!");
+                        break;
 
                 }
 
@@ -113,7 +193,8 @@ namespace BasicLibrary
             if (flag != true)
             { Console.WriteLine("book not found"); }
         }
-
+        static void BorrowBook() { }
+        static void ReturnBook() { }
         static void LoadBooksFromFile()
         {
             try
