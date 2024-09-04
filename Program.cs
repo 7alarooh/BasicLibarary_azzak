@@ -1,4 +1,6 @@
-﻿using System.Text;
+﻿using System;
+using System.ComponentModel.Design;
+using System.Text;
 using System.Xml.Linq;
 
 namespace BasicLibrary
@@ -8,7 +10,7 @@ namespace BasicLibrary
 
         static List<(string BName, string BAuthor, int ID, int quantity)> Books = new List<(string BName, string BAuthor, int ID, int quantity)>();
         static string filePath = "C:\\Users\\Lenovo\\source\\repos\\azzaGitTest\\lib.txt";
-        static int index = 0;
+        static int index;
         static void Main(string[] args)
         {
             bool ExitFlag = false;
@@ -203,33 +205,68 @@ namespace BasicLibrary
             }
 
             if (flag != true)
-            { Console.WriteLine("book not found"); }
+            { Console.WriteLine("book not found");
+                index = -1;
+                    }
         }
+
+
         static void BorrowBook() {
             SearchForBook();
-            int quantity = Books[index].quantity;
-            if (quantity != 0)
+            if (index != -1)
             {
-                Console.WriteLine("Do you want to borrow the Book?");
+                int quantity = Books[index].quantity;
+                if (quantity > 0)
+                {
+                    Console.WriteLine("Do you want to borrow the Book?");
+                    Console.WriteLine("\n press char ' y ' to borrow :");
+                    string selected = Console.ReadLine();
+
+                    if (selected != "y")
+                    {
+                        Console.WriteLine("Sorry! Can not borrow this " + Books[index].BName);
+                    }
+
+                    else
+                    {
+                        --quantity;
+                        Books[index] = (Books[index].BName, Books[index].BAuthor, Books[index].ID, quantity);
+
+                        Console.WriteLine("you are Borrowed this " + Books[index].BName + "  !");
+                        return;
+
+                    }
+
+
+                }
+
+                else { Console.WriteLine("Sorry! All books are borrowed..."); }
+            }
+        }
+        static void ReturnBook() {
+            SearchForBook();
+            if (index != -1)
+            {
+                int quantity = Books[index].quantity;
+
+                Console.WriteLine("Do you want to return the Book?");
                 Console.WriteLine("\n press char ' y ' to borrow :");
                 string selected = Console.ReadLine();
 
                 if (selected == "y")
                 {
-                    --quantity;
+                    ++quantity;
                     Books[index] = (Books[index].BName, Books[index].BAuthor, Books[index].ID, quantity);
 
-                    Console.WriteLine("you are Borrowed this "+ Books[index].BName + "  !");
+                    Console.WriteLine("'" + Books[index].BName + "' Book has been returned successfully!");
                     return;
-
                 }
 
 
-            }
-            else { Console.WriteLine("Sorry! All books are borrowed..."); }
 
+                else { Console.WriteLine("Sorry! Can not return this " + Books[index].BName); }
+            }
         }
-        static void ReturnBook() { }
         static void LoadBooksFromFile()
         {
             try
