@@ -116,7 +116,123 @@ namespace BasicLibrary
                 }
             }
         }
+        //.........................registrar function.................................//
 
+        static void accountsManagement()
+        {
+            bool ExitFlag = false;
+            do
+            {
+                Console.WriteLine("- Accounts Management -");
+                Console.WriteLine("\n Enter the No. of operation you need :");
+                Console.WriteLine("\n 1 .Add new user");
+                Console.WriteLine("\n 2 .Edit user information");
+                Console.WriteLine("\n 3 .Remove user account");
+                Console.WriteLine("\n 4 .singOut");
+
+                string choice = Console.ReadLine();
+
+                switch (choice)
+                {
+                    case "1":
+                        AddNewUser();
+                        break;
+                    case "2":
+                        EditUserInformation();
+                        break;
+                    case "3":
+                        RemoveUserAccount();
+                        break;
+                    case "4":
+                        SaveBooksToFile();
+                        Console.WriteLine("\npress any key to exit out system");
+                        string outsystem = Console.ReadLine();
+                        ExitFlag = true;
+                        break;
+                    default:
+                        Console.WriteLine("Sorry your choice was wrong !!");
+                        break;
+                }
+                Console.WriteLine("press any key to continue");
+                string cont = Console.ReadLine();
+
+                Console.Clear();
+
+            } while (ExitFlag != true);
+        }
+        static void AddNewUser()
+        {
+            Console.WriteLine("Would you like to add a new User or Admin?");
+            Console.WriteLine("Enter '1' for User or '2' for Admin:");
+            string choice = Console.ReadLine();
+
+            switch (choice)
+            {
+                case "1": // Add a new User
+                    AddUser();
+                    break;
+
+                case "2": // Add a new Admin
+                    AddAdmin();
+                    break;
+
+                default:
+                    Console.WriteLine("Invalid choice. Please enter '1' for User or '2' for Admin.");
+                    break;
+            }
+        }
+
+        static void AddUser()
+        {
+            static void AddUser()
+            {
+                // Determine the next ID by finding the highest existing ID and incrementing it
+                int nextID = 1; // Start with 1 if there are no books
+                if (Users.Count > 0)
+                {
+                    // Loop through the books to find the highest existing ID
+                    foreach (var user in Users)
+                    {
+                        if (user.id >= nextID)
+                        {
+                            nextID = user.id + 1;
+                        }
+                    }
+                }
+
+                Console.WriteLine("Enter User Email:");
+                string email = Console.ReadLine();
+
+                Console.WriteLine("Enter User Password:");
+                string password = Console.ReadLine();
+
+                Console.WriteLine("Enter User Name:");
+                string name = Console.ReadLine();
+
+                // Add new user to the Users list with the auto-generated ID
+                Users.Add((nextID, email, password, name));
+                Console.WriteLine($"New user added successfully with ID: {nextID}");
+            }
+        }
+
+        static void AddAdmin()
+        {
+            Console.WriteLine("Enter Admin Email:");
+            string email = Console.ReadLine();
+
+            Console.WriteLine("Enter Admin Password:");
+            string pw = Console.ReadLine();
+
+            Console.WriteLine("Enter Admin Name:");
+            string name = Console.ReadLine();
+
+            // Add admin to the list
+            Admins.Add((email, pw, name));
+            Console.WriteLine("Admin added successfully.");
+        }
+
+        static void EditUserInformation() { }
+        static void RemoveUserAccount() { }
         //........................Admin Functions.....................................//
         static void adminMenu(string name)
         {if (name == "registrar")
@@ -178,51 +294,7 @@ namespace BasicLibrary
                 } while (ExitFlag != true);
             }
         }
-        static void accountsManagement() 
-        {
-            bool ExitFlag = false;
-            do
-            {
-                Console.WriteLine("- Accounts Management -");
-            Console.WriteLine("\n Enter the No. of operation you need :");
-            Console.WriteLine("\n 1 .Add new user");
-            Console.WriteLine("\n 2 .Edit user information");
-            Console.WriteLine("\n 3 .Remove user account");
-            Console.WriteLine("\n 4 .singOut");
-
-            string choice = Console.ReadLine();
-
-                switch (choice)
-                {
-                    case "1":
-                        AddNewUser();
-                        break;
-                    case "2":
-                        EditUserInformation();
-                        break;
-                    case "3":
-                        RemoveUserAccount();
-                        break;
-                    case "4":
-                        SaveBooksToFile();
-                        Console.WriteLine("\npress any key to exit out system");
-                        string outsystem = Console.ReadLine();
-                        ExitFlag = true;
-                        break;
-                    default:
-                        Console.WriteLine("Sorry your choice was wrong !!");
-                        break;
-                }
-                Console.WriteLine("press any key to continue");
-                string cont = Console.ReadLine();
-
-                Console.Clear();
-
-            } while (ExitFlag != true);
-        }
-        static void AddNewUser() { }
-        static void EditUserInformation() { }
-        static void RemoveUserAccount() { }
+       
         static void AddNewBook()
         {
             string name;
