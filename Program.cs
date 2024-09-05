@@ -15,10 +15,12 @@ namespace BasicLibrary
         static List<(int uid, int bid, DateTime date)> returnings = new List<(int uid, int bid, DateTime date)>();
         static string filePath = "C:\\Users\\Lenovo\\source\\repos\\azzaGitTest\\lib.txt";
         static string userFilePath = "C:\\Users\\Lenovo\\source\\repos\\azzaGitTest\\user.txt";
-        static string adminFilePath = "C:\\Users\\Lenovo\\source\\repos\\azzaGitTest\\admin.txt";
-        static string borrowingFilePath = "C:\\Users\\Lenovo\\source\\repos\\azzaGitTest\\borrowing.txt";
-        static string returningFilePath = "C:\\Users\\Lenovo\\source\\repos\\azzaGitTest\\returning.txt";
-        static int index=-1;
+          static string adminFilePath = "C:\\Users\\Lenovo\\source\\repos\\azzaGitTest\\admin.txt";
+          static string borrowingFilePath = "C:\\Users\\Lenovo\\source\\repos\\azzaGitTest\\borrowing.txt";
+          static string returningFilePath = "C:\\Users\\Lenovo\\source\\repos\\azzaGitTest\\returning.txt";
+   
+
+        static int index = -1;
         //-----------------------------------------------------------------------------//
 
         static void Main(string[] args)
@@ -100,7 +102,7 @@ namespace BasicLibrary
                         editBook();
                         break;
                     case "5":
-                        //removeBook();
+                        removeBook();
                         break;
                     case "6":
                         ExitFlag = true;
@@ -203,7 +205,6 @@ namespace BasicLibrary
 
             // to handle the book quantity
             Console.WriteLine("Enter the Book Quantity");
-             quantity = int.Parse(Console.ReadLine());
             try
             {
                 quantity = int.Parse(Console.ReadLine());
@@ -255,6 +256,7 @@ namespace BasicLibrary
 
         static void SearchForBook()
         {
+            ViewAllBooks();
             Console.WriteLine("Enter the book name you want");
             string name = Console.ReadLine();
 
@@ -283,7 +285,7 @@ namespace BasicLibrary
 
                 if (!found)
                 {
-                    Console.WriteLine("book not found");
+                    Console.WriteLine("book not found !");
                     index = -1;
                 }
             }
@@ -296,6 +298,7 @@ namespace BasicLibrary
 
         static void editBook() 
         {
+            
             // Check if there are books to edit
             if (Books.Count == 0)
             {
@@ -348,6 +351,29 @@ namespace BasicLibrary
             Books[index] = book;
             Console.WriteLine("Book details updated successfully.");
 
+        }
+        static void removeBook() 
+        {
+            SearchForBook();
+            // If a valid book index is found
+            if (index != -1)
+            {
+                // Ask for confirmation
+                Console.WriteLine($"Are you sure you want to delete the book '{Books[index].BName}' by {Books[index].BAuthor}? (y/n)");
+                string confirmation = Console.ReadLine();
+
+                if (confirmation.ToLower() == "y")
+                {
+                    // Remove the book from the list
+                    Books.RemoveAt(index);
+                    Console.WriteLine("Book has been successfully removed.");
+                }
+                else
+                {
+                    Console.WriteLine("Book removal canceled.");
+                }
+            }
+            
         }
 
         static void BorrowBook() {
@@ -441,7 +467,7 @@ namespace BasicLibrary
                 {
                     foreach (var book in Books)
                     {
-                        writer.WriteLine($"{book.BName}|{book.BAuthor}|{book.ID}|{book.quantity}");
+                        writer.WriteLine($"{book.BName}|{book.BAuthor}|{book.ID}|{book.originalQuantity}|{book.quantity}");
                     }
                 }
                 Console.WriteLine("Books saved to file successfully.");
