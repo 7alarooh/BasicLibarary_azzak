@@ -8,7 +8,7 @@ namespace BasicLibrary
     internal class Program
     {// testing checkout ....
 
-        static List<(string BName, string BAuthor, int ID, int quantity)> Books = new List<(string BName, string BAuthor, int ID, int quantity)>();
+        static List<(string BName, string BAuthor, int ID,int originalQuantity ,int quantity)> Books = new List<(string BName, string BAuthor, int ID, int originalQuantity, int quantity)>();
         static List<(int id,string email,string pw,string name)> Users =new List<(int id,string email,string pw, string name)>();
         static List<(int email, int pw, string name)> Admins = new List<(int email, int pw, string name)>();
         static List<(int uid, int bid, DateTime date)> Borrowings = new List<(int uid, int bid, DateTime date)>();
@@ -169,7 +169,7 @@ namespace BasicLibrary
             Console.WriteLine("Enter the Book Quantity");
             int quantity = int.Parse(Console.ReadLine());
 
-            Books.Add((name, author, ID, quantity));
+            Books.Add((name, author, ID, quantity, quantity));
             Console.WriteLine("Book Added Succefully");
 
         }
@@ -241,7 +241,7 @@ namespace BasicLibrary
                     else
                     {
                         --quantity;
-                        Books[index] = (Books[index].BName, Books[index].BAuthor, Books[index].ID, quantity);
+                        Books[index] = (Books[index].BName, Books[index].BAuthor, Books[index].ID, Books[index].originalQuantity, quantity);
 
                         Console.WriteLine("you are Borrowed this " + Books[index].BName + "  !");
                         return;
@@ -267,7 +267,7 @@ namespace BasicLibrary
                 if (selected == "y")
                 {
                     ++quantity;
-                    Books[index] = (Books[index].BName, Books[index].BAuthor, Books[index].ID, quantity);
+                    Books[index] = (Books[index].BName, Books[index].BAuthor, Books[index].ID, Books[index].originalQuantity, quantity);
 
                     Console.WriteLine("'" + Books[index].BName + "' Book has been returned successfully!");
                     return;
@@ -290,9 +290,9 @@ namespace BasicLibrary
                         while ((line = reader.ReadLine()) != null)
                         {
                             var parts = line.Split('|');
-                            if (parts.Length == 4)
+                            if (parts.Length == 5)
                             {
-                                Books.Add((parts[0], parts[1], int.Parse(parts[2]), int.Parse(parts[3])));
+                                Books.Add((parts[0], parts[1], int.Parse(parts[2]), int.Parse(parts[3]), int.Parse(parts[4])));
                             }
                         }
                     }
