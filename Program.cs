@@ -675,7 +675,7 @@ namespace BasicLibrary
                         break;
 
                     case "2":
-                        BorrowBook();
+                        BorrowBook(id);
                         break;
 
                     case "3":
@@ -702,7 +702,7 @@ namespace BasicLibrary
 
             } while (ExitFlag != true);
         }
-        static void BorrowBook() {
+        static void BorrowBook(int userId) {
             try
             {
                 SearchForBook();
@@ -725,7 +725,7 @@ namespace BasicLibrary
 
                             --quantity;
                             Books[index] = (Books[index].BName, Books[index].BAuthor, Books[index].ID, Books[index].originalQuantity, quantity);
-
+                            Borrowings.Add((userId, Books[index].ID, DateTime.Now));
                             Console.WriteLine("You have borrowed the " + Books[index].BName + "!");
 
 
