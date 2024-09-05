@@ -18,10 +18,9 @@ namespace BasicLibrary
         static string adminFilePath = "C:\\Users\\Lenovo\\source\\repos\\azzaGitTest\\admin.txt";
         static string borrowingFilePath = "C:\\Users\\Lenovo\\source\\repos\\azzaGitTest\\borrowing.txt";
         static string returningFilePath = "C:\\Users\\Lenovo\\source\\repos\\azzaGitTest\\returning.txt";
-
-
-
         static int index;
+        //-----------------------------------------------------------------------------//
+
         static void Main(string[] args)
         {
             bool ExitFlag = false;
@@ -74,14 +73,16 @@ namespace BasicLibrary
                 Console.WriteLine("\n 1 .Add New Book");
                 Console.WriteLine("\n 2 .Display All Books");
                 Console.WriteLine("\n 3 .Search for Book by Name");
-                Console.WriteLine("\n 4 .Exit");
+                Console.WriteLine("\n 4 .Edit a Book");
+                Console.WriteLine("\n 5 .Remove a Book");
+                Console.WriteLine("\n 6 .Exit");
 
                 string choice = Console.ReadLine();
 
                 switch (choice)
                 {
                     case "1":
-                        AddnNewBook();
+                        AddNewBook();
                         break;
 
                     case "2":
@@ -91,11 +92,15 @@ namespace BasicLibrary
                     case "3":
                         SearchForBook();
                         break;
-
                     case "4":
+                        //editBook();
+                        break;
+                    case "5":
+                        //removeBook();
+                        break;
+                    case "6":
                         ExitFlag = true;
                         break;
-
                     default:
                         Console.WriteLine("Sorry your choice was wrong !!");
                         break;
@@ -155,22 +160,69 @@ namespace BasicLibrary
 
             } while (ExitFlag != true);
         }
-        static void AddnNewBook()
+        static void AddNewBook()
         {
+            string name;
+            string author;
+            int quantity = 0;
+
+            
             Console.WriteLine("Enter Book Name");
-            string name = Console.ReadLine();
+             name = Console.ReadLine();
+            if (string.IsNullOrWhiteSpace(name))// to handle the book name
+            {
+                Console.WriteLine("Error: Book name cannot be empty.");
+                return;
+            }
 
             Console.WriteLine("Enter Book Author");
-            string author = Console.ReadLine();
+             author = Console.ReadLine();
+            if (string.IsNullOrWhiteSpace(author))//to handle the book author
+            {
+                Console.WriteLine("Error: Author name cannot be empty.");
+                return;
+            }
 
-            Console.WriteLine("Enter Book ID");
-            int ID = int.Parse(Console.ReadLine());
+            // manually generate the next book ID by checking the IDs in the Books list
+            int newID = 1; // Start with 1 if there are no books
+            if (Books.Count > 0)
+            {
+                // Loop through the books to find the highest existing ID
+                foreach (var book in Books)
+                {
+                    if (book.ID >= newID)
+                    {
+                        newID = book.ID + 1;
+                    }
+                }
+            }
 
+            // to handle the book quantity
             Console.WriteLine("Enter the Book Quantity");
-            int quantity = int.Parse(Console.ReadLine());
+             quantity = int.Parse(Console.ReadLine());
+            try
+            {
+                quantity = int.Parse(Console.ReadLine());
+                if (quantity < 0)
+                {
+                    Console.WriteLine("Error: Quantity cannot be negative.");
+                    return;
+                }
+            }
+            catch (FormatException)
+            {
+                Console.WriteLine("Error: Please enter a valid number for the Book Quantity.");
+                return;
+            }
+            catch (OverflowException)
+            {
+                Console.WriteLine("Error: The number for the Book Quantity is too large.");
+                return;
+            }
 
-            Books.Add((name, author, ID, quantity, quantity));
-            Console.WriteLine("Book Added Succefully");
+            // Add the book if everything is valid
+            Books.Add((name, author, newID, quantity, quantity));
+            Console.WriteLine($"Book added successfully with ID: {newID} !");
 
         }
 
