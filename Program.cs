@@ -56,14 +56,12 @@ namespace BasicLibrary
                     Console.Clear();
                     string user = "coustomer";
                     LoginAccess(user);
-                    adminMenu();
                     break;
 
                 case "2":
                     Console.Clear();
                     string user1 = "Admin";
                     LoginAccess(user1);
-                    userMenu();
                     break;
 
                 case "3":
@@ -79,18 +77,45 @@ namespace BasicLibrary
             }
             
         }
-        static void LoginAccess(string user)
-        { if (user == "coustomer"){
-           
-            }
+        static void LoginAccess(string userAccess)
+        { if (userAccess == "coustomer")
+            {
+                Console.Write("Enter Your Email: ");
+
+                string uEmail = Console.ReadLine();
+                var user = Users.FirstOrDefault(u => u.email == uEmail);
+                if (user != default)
+                {
+                    Console.Write("\nEnter Password: ");
+                    string enterPW = Console.ReadLine();
+                    if (enterPW == user.pw)
+                    {
+                        userMenu(user.id, user.name);
+                    }
+                }
+
+
+            } 
 
             /////
-            if (user == "admin")
+            if (userAccess == "admin")
             {
-               
+                Console.Write("Enter Your Email: ");
+
+                string aEmail = Console.ReadLine();
+                var admin = Admins.FirstOrDefault(a => a.email == aEmail);
+                if (admin != default)
+                {
+                    Console.Write("\nEnter Password: ");
+                    string enterPW = Console.ReadLine();
+                    if (enterPW == admin.pw)
+                    {
+                        adminMenu(admin.name);
+                    }
+                }
             }
         }
-        static void adminMenu()
+        static void adminMenu(string name)
         {
             bool ExitFlag = false;
             do
@@ -145,7 +170,7 @@ namespace BasicLibrary
             } while (ExitFlag != true);
         }
 
-        static void userMenu()
+        static void userMenu(int id,string name)
         {
             bool ExitFlag = false;
             do
