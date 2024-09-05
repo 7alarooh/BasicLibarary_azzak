@@ -1,5 +1,7 @@
-﻿using System;
+﻿using Microsoft.VisualBasic;
+using System;
 using System.ComponentModel.Design;
+using System.Security.Principal;
 using System.Text;
 using System.Xml.Linq;
 
@@ -116,58 +118,64 @@ namespace BasicLibrary
             }
         }
         static void adminMenu(string name)
-        {
-            bool ExitFlag = false;
-            do
+        {if (name == "registrar")
             {
-                Console.WriteLine("Welcome Admin in Library");
-                Console.WriteLine("\n Enter the No. of operation you need :");
-                Console.WriteLine("\n 1 .Add New Book");
-                Console.WriteLine("\n 2 .Display All Books");
-                Console.WriteLine("\n 3 .Search for Book by Name");
-                Console.WriteLine("\n 4 .Edit a Book");
-                Console.WriteLine("\n 5 .Remove a Book");
-                Console.WriteLine("\n 6 .singout");
-
-                string choice = Console.ReadLine();
-
-                switch (choice)
+                accountsManagement();
+            }
+            else
+            {
+                bool ExitFlag = false;
+                do
                 {
-                    case "1":
-                        AddNewBook();
-                        break;
+                    Console.WriteLine("Welcome Admin in Library");
+                    Console.WriteLine("\n Enter the No. of operation you need :");
+                    Console.WriteLine("\n 1 .Add New Book");
+                    Console.WriteLine("\n 2 .Display All Books");
+                    Console.WriteLine("\n 3 .Search for Book by Name");
+                    Console.WriteLine("\n 4 .Edit a Book");
+                    Console.WriteLine("\n 5 .Remove a Book");
+                    Console.WriteLine("\n 6 .singOut");
 
-                    case "2":
-                        ViewAllBooks();
-                        break;
+                    string choice = Console.ReadLine();
 
-                    case "3":
-                        SearchForBook();
-                        break;
-                    case "4":
-                        editBook();
-                        break;
-                    case "5":
-                        removeBook();
-                        break;
-                    case "6":
-                        SaveBooksToFile();
-                        Console.WriteLine("\npress any key to exit out system");
-                        string outsystem = Console.ReadLine();
-                        ExitFlag = true;
-                        break;
-                    default:
-                        Console.WriteLine("Sorry your choice was wrong !!");
-                        break;
+                    switch (choice)
+                    {
+                        case "1":
+                            AddNewBook();
+                            break;
 
-                }
+                        case "2":
+                            ViewAllBooks();
+                            break;
 
-                Console.WriteLine("press any key to continue");
-                string cont = Console.ReadLine();
+                        case "3":
+                            SearchForBook();
+                            break;
+                        case "4":
+                            editBook();
+                            break;
+                        case "5":
+                            removeBook();
+                            break;
+                        case "6":
+                            SaveBooksToFile();
+                            Console.WriteLine("\npress any key to exit out system");
+                            string outsystem = Console.ReadLine();
+                            ExitFlag = true;
+                            break;
+                        default:
+                            Console.WriteLine("Sorry your choice was wrong !!");
+                            break;
 
-                Console.Clear();
+                    }
 
-            } while (ExitFlag != true);
+                    Console.WriteLine("press any key to continue");
+                    string cont = Console.ReadLine();
+
+                    Console.Clear();
+
+                } while (ExitFlag != true);
+            }
         }
 
         static void userMenu(int id,string name)
@@ -282,8 +290,56 @@ namespace BasicLibrary
             Console.WriteLine($"Book added successfully with ID: {newID} !");
 
         }
+        static void accountsManagement() 
+        {
+            bool ExitFlag = false;
+            do
+            {
+                Console.WriteLine("- Accounts Management -");
+            Console.WriteLine("\n Enter the No. of operation you need :");
+            Console.WriteLine("\n 1 .Add new user");
+            Console.WriteLine("\n 2 .Edit user information");
+            Console.WriteLine("\n 3 .Remove user account");
+            Console.WriteLine("\n 4 .singOut");
 
-        static void ViewAllBooks()
+            string choice = Console.ReadLine();
+
+                switch (choice)
+                {
+                    case "1":
+                        AddNewUser();
+                        break;
+                    case "2":
+                        EditUserInformation();
+                        break;
+                    case "3":
+                        RemoveUserAccount();
+                        break;
+                    case "4":
+                        SaveBooksToFile();
+                        Console.WriteLine("\npress any key to exit out system");
+                        string outsystem = Console.ReadLine();
+                        ExitFlag = true;
+                        break;
+                    default:
+                        Console.WriteLine("Sorry your choice was wrong !!");
+                        break;
+                }
+                Console.WriteLine("press any key to continue");
+                string cont = Console.ReadLine();
+
+                Console.Clear();
+
+            } while (ExitFlag != true);
+        }
+
+            static void AddNewUser() { }
+            
+            static void EditUserInformation() { }
+            
+            static void RemoveUserAccount() { } 
+        
+            static void ViewAllBooks()
         {
             StringBuilder sb = new StringBuilder();
 
@@ -306,7 +362,8 @@ namespace BasicLibrary
             }
         }
 
-        static void SearchForBook()
+        
+            static void SearchForBook()
         {
             ViewAllBooks();
             Console.WriteLine("Enter the book name you want");
@@ -348,7 +405,8 @@ namespace BasicLibrary
             }
         }
 
-        static void editBook() 
+       
+            static void editBook() 
         {
             
             // Check if there are books to edit
@@ -404,7 +462,8 @@ namespace BasicLibrary
             Console.WriteLine("Book details updated successfully.");
 
         }
-        static void removeBook() 
+       
+            static void removeBook() 
         {
             SearchForBook();
             // If a valid book index is found
@@ -428,7 +487,8 @@ namespace BasicLibrary
             
         }
 
-        static void BorrowBook() {
+       
+            static void BorrowBook() {
             try
             {
                 SearchForBook();
