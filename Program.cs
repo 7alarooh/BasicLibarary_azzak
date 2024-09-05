@@ -97,7 +97,7 @@ namespace BasicLibrary
                         SearchForBook();
                         break;
                     case "4":
-                        //editBook();
+                        editBook();
                         break;
                     case "5":
                         //removeBook();
@@ -294,6 +294,61 @@ namespace BasicLibrary
             }
         }
 
+        static void editBook() 
+        {
+            // Check if there are books to edit
+            if (Books.Count == 0)
+            {
+                Console.WriteLine("No books available to edit.");
+                return;
+            }
+            SearchForBook();
+
+            var book=Books[index];
+            
+            Console.WriteLine($"Editing Book: {book.BName} by {book.BAuthor}");
+            Console.WriteLine("Enter new Book Name (or press Enter to skip):");
+            string newName = Console.ReadLine();
+
+            if (!string.IsNullOrWhiteSpace(newName)) //is a better and safer check for ensuring that the input is valid (not null, not empty, and not just whitespace).
+            {
+                book.BName = newName;
+            }
+
+            Console.WriteLine("Enter new Book Author (or press Enter to skip):");
+            string newAuthor = Console.ReadLine();
+            if (!string.IsNullOrWhiteSpace(newAuthor))
+            {
+                book.BAuthor = newAuthor;
+            }
+
+            Console.WriteLine("Enter new Book Quantity (or press Enter to skip):");
+            string quantityInput = Console.ReadLine();
+            if (!string.IsNullOrWhiteSpace(quantityInput))
+            {
+                try
+                {
+                    int newQuantity = int.Parse(quantityInput);
+                    if (newQuantity < 0)
+                    {
+                        Console.WriteLine("Error: Quantity cannot be negative.");
+                        return;
+                    }
+                    book.quantity = newQuantity;
+                    book.originalQuantity = newQuantity;
+                }
+                catch (FormatException)
+                {
+                    Console.WriteLine("Error: Please enter a valid number for the quantity.");
+                    return;
+                }
+            }
+
+            // Update the book in the list
+            Books[index] = book;
+            Console.WriteLine("Book details updated successfully.");
+
+        }
 
         static void BorrowBook() {
             SearchForBook();
