@@ -377,35 +377,43 @@ namespace BasicLibrary
         }
 
         static void BorrowBook() {
-            SearchForBook();
-            if (index != -1)
+            try
             {
-                int quantity = Books[index].quantity;
-                if (quantity > 0)
+                SearchForBook();
+                if (index != -1)
                 {
-                    Console.WriteLine("Do you want to borrow the Book?");
-                    Console.WriteLine("\n press char ' y ' to borrow :");
-                    string selected = Console.ReadLine();
-
-                    if (selected != "y")
+                    int quantity = Books[index].quantity;
+                    if (quantity > 0)
                     {
-                        Console.WriteLine("Sorry! Can not borrow this " + Books[index].BName);
+                        Console.WriteLine("Do you want to borrow the Book?");
+                        Console.WriteLine("\n press char ' y ' to borrow :");
+                        string selected = Console.ReadLine();
+
+                        if (selected != "y")
+                        {
+                            Console.WriteLine("Sorry! Can not borrow this " + Books[index].BName);
+                        }
+
+                        else
+                        {
+                            --quantity;
+                            Books[index] = (Books[index].BName, Books[index].BAuthor, Books[index].ID, Books[index].originalQuantity, quantity);
+
+                            Console.WriteLine("You have borrowed the " + Books[index].BName + "!");
+
+
+                        }
+
+
                     }
 
-                    else
-                    {
-                        --quantity;
-                        Books[index] = (Books[index].BName, Books[index].BAuthor, Books[index].ID, Books[index].originalQuantity, quantity);
-
-                        Console.WriteLine("you are Borrowed this " + Books[index].BName + "  !");
-                        return;
-
-                    }
-
-
+                    else { Console.WriteLine("Sorry! All books are borrowed..."); }
                 }
-
-                else { Console.WriteLine("Sorry! All books are borrowed..."); }
+            }
+            catch (Exception ex)
+            {
+                // Catch any unexpected errors
+                Console.WriteLine("An error occurred while borrowing the book: " + ex.Message);
             }
         }
         static void ReturnBook() {
