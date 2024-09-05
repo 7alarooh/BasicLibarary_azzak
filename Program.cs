@@ -10,7 +10,7 @@ namespace BasicLibrary
 
         static List<(string BName, string BAuthor, int ID,int originalQuantity ,int quantity)> Books = new List<(string BName, string BAuthor, int ID, int originalQuantity, int quantity)>();
         static List<(int id,string email,string pw,string name)> Users =new List<(int id,string email,string pw, string name)>();
-        static List<(int email, int pw, string name)> Admins = new List<(int email, int pw, string name)>();
+        static List<(string email, string pw, string name)> Admins = new List<(string email, string pw, string name)>();
         static List<(int uid, int bid, DateTime date)> Borrowings = new List<(int uid, int bid, DateTime date)>();
         static List<(int uid, int bid, DateTime date)> returnings = new List<(int uid, int bid, DateTime date)>();
         static string filePath = "C:\\Users\\Lenovo\\source\\repos\\azzaGitTest\\lib.txt";
@@ -26,7 +26,7 @@ namespace BasicLibrary
         static void Main(string[] args)
         {
             bool ExitFlag = false;
-            LoadBooksFromFile();
+            LoadAllFiles();
             do
             {
                 Console.WriteLine("------------Welcome to Library------------");
@@ -54,11 +54,15 @@ namespace BasicLibrary
             {
                 case "1":
                     Console.Clear();
+                    string user = "coustomer";
+                    LoginAccess(user);
                     adminMenu();
                     break;
 
                 case "2":
                     Console.Clear();
+                    string user1 = "Admin";
+                    LoginAccess(user1);
                     userMenu();
                     break;
 
@@ -74,6 +78,17 @@ namespace BasicLibrary
                     break;
             }
             
+        }
+        static void LoginAccess(string user)
+        { if (user == "coustomer"){
+           
+            }
+
+            /////
+            if (user == "admin")
+            {
+               
+            }
         }
         static void adminMenu()
         {
@@ -469,7 +484,7 @@ namespace BasicLibrary
                 Console.WriteLine("An error occurred while returning the book: " + ex.Message);
             }
         }
-        static void LoadBooksFromFile()
+        static void LoadAllFiles()
         {
             try
             {
@@ -487,13 +502,62 @@ namespace BasicLibrary
                             }
                         }
                     }
-                    Console.WriteLine("Books loaded from file successfully.");
+                    
                 }
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Error loading from file: {ex.Message}");
             }
+            //-----------
+            try
+            {
+                if (File.Exists(userFilePath))
+                {
+                    using (StreamReader reader = new StreamReader(userFilePath))
+                    {
+                        string line;
+                        while ((line = reader.ReadLine()) != null)
+                        { //int id,string email,string pw,string name
+                            var parts = line.Split('|');
+                            if (parts.Length == 4)
+                            {
+                                Users.Add((int.Parse(parts[0]),parts[1], parts[2], parts[3]));
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error loading from file: {ex.Message}");
+            }
+            //---------------
+            try
+            {
+                if (File.Exists(adminFilePath))
+                {
+                    using (StreamReader reader = new StreamReader(adminFilePath))
+                    {
+                        string line;
+                        while ((line = reader.ReadLine()) != null)
+                        { //string email, string pw, string name
+                            var parts = line.Split('|');
+                            if (parts.Length == 3)
+                            {
+                                Admins.Add((parts[0], parts[1], parts[2]));
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error loading from file: {ex.Message}");
+            }
+
+            Console.WriteLine("all loaded from files successfully...!");
+
         }
 
         static void SaveBooksToFile()
