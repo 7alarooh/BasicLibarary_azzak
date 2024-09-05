@@ -29,11 +29,12 @@ namespace BasicLibrary
             LoadBooksFromFile();
             do
             {
-                Console.WriteLine("Welcome to Library");
-                Console.WriteLine("\n Enter the No of operation you need :");
+                Console.WriteLine("------------Welcome to Library------------");
+                Console.WriteLine("\n----------------Login Page----------------");
+                Console.WriteLine("\n Enter the No what you are :");
                 Console.WriteLine("\n 1 .For Admin");
                 Console.WriteLine("\n 2 .For User");
-                Console.WriteLine("\n 3 .Save and Exit");
+                Console.WriteLine("\n 3 .Exit");
 
                 string choice = Console.ReadLine();
 
@@ -81,7 +82,7 @@ namespace BasicLibrary
                 Console.WriteLine("\n 3 .Search for Book by Name");
                 Console.WriteLine("\n 4 .Edit a Book");
                 Console.WriteLine("\n 5 .Remove a Book");
-                Console.WriteLine("\n 6 .Exit");
+                Console.WriteLine("\n 6 .singout");
 
                 string choice = Console.ReadLine();
 
@@ -105,6 +106,9 @@ namespace BasicLibrary
                         removeBook();
                         break;
                     case "6":
+                        SaveBooksToFile();
+                        Console.WriteLine("\npress any key to exit out system");
+                        string outsystem = Console.ReadLine();
                         ExitFlag = true;
                         break;
                     default:
@@ -131,7 +135,7 @@ namespace BasicLibrary
                 Console.WriteLine("\n 1 .Search For Book");
                 Console.WriteLine("\n 2 .Borrow Book");
                 Console.WriteLine("\n 3 .Return Book");
-                Console.WriteLine("\n 4 .Exit");
+                Console.WriteLine("\n 4 .singout");
 
                 string choice = Console.ReadLine();
 
@@ -150,6 +154,9 @@ namespace BasicLibrary
                         break;
 
                     case "4":
+                        SaveBooksToFile();
+                        Console.WriteLine("\npress any key to exit out system");
+                        string outsystem = Console.ReadLine();
                         ExitFlag = true;
                         break;
 
