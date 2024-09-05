@@ -659,12 +659,12 @@ namespace BasicLibrary
             bool ExitFlag = false;
             do
             {
-                Console.WriteLine("Welcome User in Library");
+                Console.WriteLine($"Welcome {name} in Library");
                 Console.WriteLine("\n Enter the No of operation you need :");
                 Console.WriteLine("\n 1 .Search For Book");
                 Console.WriteLine("\n 2 .Borrow Book");
                 Console.WriteLine("\n 3 .Return Book");
-                Console.WriteLine("\n 4 .singout");
+                Console.WriteLine("\n 4 .singOut");
 
                 string choice = Console.ReadLine();
 
@@ -679,7 +679,7 @@ namespace BasicLibrary
                         break;
 
                     case "3":
-                        ReturnBook();
+                        ReturnBook(id);
                         break;
 
                     case "4":
@@ -743,7 +743,7 @@ namespace BasicLibrary
                 Console.WriteLine("An error occurred while borrowing the book: " + ex.Message);
             }
         }
-        static void ReturnBook() {
+        static void ReturnBook(int userId) {
 
             try
             {
@@ -752,6 +752,15 @@ namespace BasicLibrary
                 {
                     int quantity = Books[index].quantity;
                     int originalQuantity = Books[index].originalQuantity;
+
+                    // Check if the user has borrowed this book
+                    var borrowingRecord = Borrowings.FirstOrDefault(b => b.uid == userId && b.bid == Books[index].ID);
+
+                    if (borrowingRecord == default)
+                    {
+                        Console.WriteLine("Error: You have not borrowed this book.");
+                        return;
+                    }
 
                     Console.WriteLine("Do you want to return the Book?");
                     Console.WriteLine("\n press char ' y ' to borrow :");
@@ -768,6 +777,8 @@ namespace BasicLibrary
                         {
                             ++quantity;
                             Books[index] = (Books[index].BName, Books[index].BAuthor, Books[index].ID, Books[index].originalQuantity, quantity);
+                            returnings.Add((userId, Books[index].ID, DateTime.Now));
+                            Borrowings.Remove(borrowingRecord);
 
                             Console.WriteLine("'" + Books[index].BName + "' Book has been returned successfully!");
                         }
