@@ -18,7 +18,7 @@ namespace BasicLibrary
         static string adminFilePath = "C:\\Users\\Lenovo\\source\\repos\\azzaGitTest\\admin.txt";
         static string borrowingFilePath = "C:\\Users\\Lenovo\\source\\repos\\azzaGitTest\\borrowing.txt";
         static string returningFilePath = "C:\\Users\\Lenovo\\source\\repos\\azzaGitTest\\returning.txt";
-        static int index;
+        static int index=-1;
         //-----------------------------------------------------------------------------//
 
         static void Main(string[] args)
@@ -63,6 +63,10 @@ namespace BasicLibrary
                 Console.Clear();
             } while (ExitFlag != true);
         }
+
+
+
+        //........................Functions...........................................//
         static void adminMenu()
         {
             bool ExitFlag = false;
@@ -253,24 +257,41 @@ namespace BasicLibrary
         {
             Console.WriteLine("Enter the book name you want");
             string name = Console.ReadLine();
-            bool flag = false;
 
-            for (int i = 0; i < Books.Count; i++)
+            // Check if the name is valid
+            if (string.IsNullOrWhiteSpace(name))
             {
-                if (Books[i].BName == name)
-                {
-                    Console.WriteLine("Book Author is : " + Books[i].BAuthor);
-                    flag = true;
-                    index= i;
-                    break;
-
-                }
+                Console.WriteLine("Error: Book name cannot be empty or just spaces.");
+                return;
             }
 
-            if (flag != true)
-            { Console.WriteLine("book not found");
-                index = -1;
+            bool found = false;
+            try
+            {
+                string searchNameLower = name.ToLower();
+                for (int i = 0; i < Books.Count; i++)
+                {
+                    if (Books[i].BName.ToLower() == searchNameLower)
+                    {
+                        Console.WriteLine("Book Author is : " + Books[i].BAuthor);
+                        found = true;
+                        index = i;
+                        break;
+
                     }
+                }
+
+                if (!found)
+                {
+                    Console.WriteLine("book not found");
+                    index = -1;
+                }
+            }
+            catch (Exception ex)
+            {
+                // Catch any unexpected errors
+                Console.WriteLine("An error occurred while searching for the book: " + ex.Message);
+            }
         }
 
 
