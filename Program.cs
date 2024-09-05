@@ -231,7 +231,126 @@ namespace BasicLibrary
             Console.WriteLine("Admin added successfully.");
         }
 
-        static void EditUserInformation() { }
+        static void EditUserInformation()
+        {
+            Console.WriteLine("Enter the type of account to edit (user/admin):");
+            string accountType = Console.ReadLine().ToLower();
+
+            switch (accountType)
+            {
+                case "user":
+                    EditUser();
+                    break;
+                case "admin":
+                    EditAdmin();
+                    break;
+                default:
+                    Console.WriteLine("Error: Invalid account type. Please enter 'user' or 'admin'.");
+                    break;
+            }
+        }
+        static void EditUser()
+        {
+            Console.WriteLine("Enter the User ID of the user you want to edit:");
+            if (!int.TryParse(Console.ReadLine(), out int userId))
+            {
+                Console.WriteLine("Error: Invalid ID format.");
+                return;
+            }
+
+            var user = Users.FirstOrDefault(u => u.id == userId);
+
+            if (user.id == 0)
+            {
+                Console.WriteLine("Error: User not found.");
+                return;
+            }
+
+            Console.WriteLine($"Current details for User ID {userId}:");
+            Console.WriteLine($"Email: {user.email}");
+            Console.WriteLine($"Name: {user.name}");
+
+            Console.WriteLine("Enter new email (leave blank to keep current):");
+            string newEmail = Console.ReadLine();
+            Console.WriteLine("Enter new password (leave blank to keep current):");
+            string newPassword = Console.ReadLine();
+            Console.WriteLine("Enter new name (leave blank to keep current):");
+            string newName = Console.ReadLine();
+
+            // Confirmation
+            Console.WriteLine("Confirm the changes:");
+            Console.WriteLine($"New Email: {(string.IsNullOrWhiteSpace(newEmail) ? user.email : newEmail)}");
+            Console.WriteLine($"New Password: {(string.IsNullOrWhiteSpace(newPassword) ? "Not changed" : newPassword)}");
+            Console.WriteLine($"New Name: {(string.IsNullOrWhiteSpace(newName) ? user.name : newName)}");
+            Console.WriteLine("Are you sure you want to apply these changes? (y/n)");
+            string confirmation = Console.ReadLine();
+
+            if (confirmation.ToLower() == "y")
+            {
+                // Update the user information if confirmed
+                Users = Users.Select(u =>
+                    u.id == userId ?
+                    (u.id,
+                     string.IsNullOrWhiteSpace(newEmail) ? u.email : newEmail,
+                     string.IsNullOrWhiteSpace(newPassword) ? u.pw : newPassword,
+                     string.IsNullOrWhiteSpace(newName) ? u.name : newName)
+                    : u
+                ).ToList();
+
+                Console.WriteLine("User information updated successfully.");
+            }
+            else
+            {
+                Console.WriteLine("User information update canceled.");
+            }
+        }
+        static void EditAdmin()
+        {
+            Console.WriteLine("Enter the email of the admin you want to edit:");
+            string email = Console.ReadLine();
+
+            var admin = Admins.FirstOrDefault(a => a.email.Equals(email, StringComparison.OrdinalIgnoreCase));
+
+            if (admin == default)
+            {
+                Console.WriteLine("Error: Admin not found.");
+                return;
+            }
+
+            Console.WriteLine($"Current details for Admin Email {email}:");
+            Console.WriteLine($"Name: {admin.name}");
+
+            Console.WriteLine("Enter new password (leave blank to keep current):");
+            string newPassword = Console.ReadLine();
+            Console.WriteLine("Enter new name (leave blank to keep current):");
+            string newName = Console.ReadLine();
+
+            // Confirmation
+            Console.WriteLine("Confirm the changes:");
+            Console.WriteLine($"New Password: {(string.IsNullOrWhiteSpace(newPassword) ? "Not changed" : newPassword)}");
+            Console.WriteLine($"New Name: {(string.IsNullOrWhiteSpace(newName) ? admin.name : newName)}");
+            Console.WriteLine("Are you sure you want to apply these changes? (y/n)");
+            string confirmation = Console.ReadLine();
+
+            if (confirmation.ToLower() == "y")
+            {
+                // Update the admin information if confirmed
+                Admins = Admins.Select(a =>
+                    a.email.Equals(email, StringComparison.OrdinalIgnoreCase) ?
+                    (a.email,
+                     string.IsNullOrWhiteSpace(newPassword) ? a.pw : newPassword,
+                     string.IsNullOrWhiteSpace(newName) ? a.name : newName)
+                    : a
+                ).ToList();
+
+                Console.WriteLine("Admin information updated successfully.");
+            }
+            else
+            {
+                Console.WriteLine("Admin information update canceled.");
+            }
+        }
+
         static void RemoveUserAccount() { }
         //........................Admin Functions.....................................//
         static void adminMenu(string name)
