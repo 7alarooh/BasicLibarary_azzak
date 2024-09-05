@@ -351,7 +351,102 @@ namespace BasicLibrary
             }
         }
 
-        static void RemoveUserAccount() { }
+        static void RemoveUserAccount()
+        {
+            Console.WriteLine("Enter the type of account to remove (user/admin):");
+            string accountType = Console.ReadLine().ToLower();
+
+            switch (accountType)
+            {
+                case "user":
+                    RemoveUser();
+                    break;
+                case "admin":
+                    RemoveAdmin();
+                    break;
+                default:
+                    Console.WriteLine("Error: Invalid account type. Please enter 'user' or 'admin'.");
+                    break;
+            }
+        }
+
+        static void RemoveUser()
+        {
+            try
+            {
+                Console.WriteLine("Enter the User ID of the user you want to remove:");
+                if (!int.TryParse(Console.ReadLine(), out int userId))
+                {
+                    Console.WriteLine("Error: Invalid ID format.");
+                    return;
+                }
+
+                var user = Users.FirstOrDefault(u => u.id == userId);
+
+                if (user.id == 0)
+                {
+                    Console.WriteLine("Error: User not found.");
+                    return;
+                }
+
+                Console.WriteLine($"Confirm removal of User ID {userId}:");
+                Console.WriteLine($"Email: {user.email}");
+                Console.WriteLine($"Name: {user.name}");
+                Console.WriteLine("Are you sure you want to remove this user? (y/n)");
+                string confirmation = Console.ReadLine();
+
+                if (confirmation.ToLower() == "y")
+                {
+                    Users = Users.Where(u => u.id != userId).ToList();
+                    Console.WriteLine("User removed successfully.");
+                }
+                else
+                {
+                    Console.WriteLine("User removal canceled.");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("An error occurred while removing the user: " + ex.Message);
+            }
+        }
+
+        static void RemoveAdmin()
+        {
+            try
+            {
+                Console.WriteLine("Enter the email of the admin you want to remove:");
+                string email = Console.ReadLine();
+
+                var admin = Admins.FirstOrDefault(a => a.email.Equals(email, StringComparison.OrdinalIgnoreCase));
+
+                if (admin == default)
+                {
+                    Console.WriteLine("Error: Admin not found.");
+                    return;
+                }
+
+                Console.WriteLine($"Confirm removal of Admin with Email {email}:");
+                Console.WriteLine($"Name: {admin.name}");
+                Console.WriteLine("Are you sure you want to remove this admin? (y/n)");
+                string confirmation = Console.ReadLine();
+
+                if (confirmation.ToLower() == "y")
+                {
+                    Admins = Admins.Where(a => !a.email.Equals(email, StringComparison.OrdinalIgnoreCase)).ToList();
+                    Console.WriteLine("Admin removed successfully.");
+                }
+                else
+                {
+                    Console.WriteLine("Admin removal canceled.");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("An error occurred while removing the admin: " + ex.Message);
+            }
+        }
+
         //........................Admin Functions.....................................//
         static void adminMenu(string name)
         {if (name == "registrar")
