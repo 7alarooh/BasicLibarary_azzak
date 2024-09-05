@@ -32,35 +32,12 @@ namespace BasicLibrary
                 Console.WriteLine("------------Welcome to Library------------");
                 Console.WriteLine("\n----------------Login Page----------------");
                 Console.WriteLine("\n Enter the No what you are :");
-                Console.WriteLine("\n 1 .For Admin");
-                Console.WriteLine("\n 2 .For User");
+                Console.WriteLine("\n 1 . Admin Access");
+                Console.WriteLine("\n 2 . User Access");
                 Console.WriteLine("\n 3 .Exit");
 
                 string choice = Console.ReadLine();
-
-                switch (choice)
-                {
-                    case "1":
-                        Console.Clear();
-                        adminMenu();
-                        break;
-
-                    case "2":
-                        Console.Clear();
-                        userMenu();
-                        break;
-
-                    case "3":
-                        SaveBooksToFile();
-                        Console.WriteLine("\npress any key to exit out system");
-                        string outsystem = Console.ReadLine();
-                        Environment.Exit(0);
-                        break;
-
-                    default:
-                        Console.WriteLine("Sorry your choice was wrong!!");
-                        break;
-                }
+                loginPage(choice);
                 Console.WriteLine("press any key to continue in Home Page");
                 string cont = Console.ReadLine();
                 Console.Clear();
@@ -70,6 +47,34 @@ namespace BasicLibrary
 
 
         //........................Functions...........................................//
+        static void loginPage(string selected) 
+        {
+           
+                switch (selected)
+            {
+                case "1":
+                    Console.Clear();
+                    adminMenu();
+                    break;
+
+                case "2":
+                    Console.Clear();
+                    userMenu();
+                    break;
+
+                case "3":
+                    SaveBooksToFile();
+                    Console.WriteLine("\npress any key to exit out system");
+                    string outsystem = Console.ReadLine();
+                    Environment.Exit(0);
+                    break;
+
+                default:
+                    Console.WriteLine("Sorry your choice was wrong!!");
+                    break;
+            }
+            
+        }
         static void adminMenu()
         {
             bool ExitFlag = false;
