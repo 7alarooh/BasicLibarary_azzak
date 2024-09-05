@@ -396,6 +396,7 @@ namespace BasicLibrary
 
                         else
                         {
+
                             --quantity;
                             Books[index] = (Books[index].BName, Books[index].BAuthor, Books[index].ID, Books[index].originalQuantity, quantity);
 
@@ -417,27 +418,43 @@ namespace BasicLibrary
             }
         }
         static void ReturnBook() {
-            SearchForBook();
-            if (index != -1)
+
+            try
             {
-                int quantity = Books[index].quantity;
-
-                Console.WriteLine("Do you want to return the Book?");
-                Console.WriteLine("\n press char ' y ' to borrow :");
-                string selected = Console.ReadLine();
-
-                if (selected == "y")
+                SearchForBook();
+                if (index != -1)
                 {
-                    ++quantity;
-                    Books[index] = (Books[index].BName, Books[index].BAuthor, Books[index].ID, Books[index].originalQuantity, quantity);
+                    int quantity = Books[index].quantity;
+                    int originalQuantity = Books[index].originalQuantity;
 
-                    Console.WriteLine("'" + Books[index].BName + "' Book has been returned successfully!");
-                    return;
+                    Console.WriteLine("Do you want to return the Book?");
+                    Console.WriteLine("\n press char ' y ' to borrow :");
+                    string selected = Console.ReadLine();
+
+                    if (selected == "y")
+                    {
+                        // Check if the current quantity equals the original quantity
+                        if (quantity >= originalQuantity)
+                        {
+                            Console.WriteLine("Error: Cannot return the book. All copies have already been returned.");
+                        }
+                        else
+                        {
+                            ++quantity;
+                            Books[index] = (Books[index].BName, Books[index].BAuthor, Books[index].ID, Books[index].originalQuantity, quantity);
+
+                            Console.WriteLine("'" + Books[index].BName + "' Book has been returned successfully!");
+                        }
+                    }
+                    else
+                    {
+                        Console.WriteLine("Sorry! Cannot return this " + Books[index].BName);
+                    }
                 }
-
-
-
-                else { Console.WriteLine("Sorry! Can not return this " + Books[index].BName); }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("An error occurred while returning the book: " + ex.Message);
             }
         }
         static void LoadBooksFromFile()
