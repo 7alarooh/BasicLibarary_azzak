@@ -196,7 +196,7 @@ namespace BasicLibrary
                         RemoveUserAccount();
                         break;
                     case "4":
-
+                        saveAllUsers();
                         Console.WriteLine("\npress any key to exit out system");
                         string outsystem = Console.ReadLine();
                         ExitFlag = true;
@@ -937,6 +937,38 @@ namespace BasicLibrary
                     }
                 }
                 Console.WriteLine("Books saved to file successfully.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error saving to file: {ex.Message}");
+            }
+        }
+        static void saveAllUsers()
+        {
+            try
+            {
+                using (StreamWriter writer = new StreamWriter(userFilePath))
+                {
+                    foreach (var user in Users)
+                    {
+                        writer.WriteLine($"{user.id}|{user.email}|{user.pw}|{user.name}");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error saving to file: {ex.Message}");
+            }
+            try
+            {
+                using (StreamWriter writer = new StreamWriter(adminFilePath))
+                {
+                    foreach (var admin in Admins)
+                    {
+                        writer.WriteLine($"{admin.email}|{admin.pw}|{admin.name}");
+                    }
+                }
+                Console.WriteLine("All users data saved to file successfully!!");
             }
             catch (Exception ex)
             {
