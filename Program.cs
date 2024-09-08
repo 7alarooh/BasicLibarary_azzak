@@ -1040,9 +1040,14 @@ namespace BasicLibrary
                         maxBorrowCount = borrowCounts[i];
                     }
                 }
+                string BookName= null;
+                foreach (var book in Books) {
+                    if (book.ID == mostBorrowedBookId)
+                        BookName = book.BName;
+                }
 
                 // Output the ID of the most borrowed book
-                Console.WriteLine($"Most Borrowed Book ID: {mostBorrowedBookId}");
+                Console.WriteLine($"Most Borrowed Book ID: {mostBorrowedBookId} the name book:{BookName}");
 
 
                 // Create lists to track authors and their corresponding borrow counts
@@ -1116,7 +1121,12 @@ namespace BasicLibrary
                 Console.WriteLine("Books borrowed with the most borrowed book:");
                 foreach (var bookId in borrowedWithMostBorrowedBook)
                 {
-                    Console.WriteLine(bookId);
+                    string bookn = null;
+                    foreach (var book in Books) {
+                        if (bookId == book.ID)
+                            bookn=book.BName;
+                                }
+                    Console.WriteLine(bookId+": "+bookn);
                 }
 
             }
