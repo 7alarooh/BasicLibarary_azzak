@@ -276,7 +276,11 @@ namespace BasicLibrary
         {
             Console.WriteLine("Enter Admin Email:");
             string email = Console.ReadLine();
-
+            if (Admins.Any(a => a.email.ToLower() == email.ToLower())) // Case-insensitive check
+            {
+                Console.WriteLine("Error: An admin with this email already exists.");
+                return;
+            }
             Console.WriteLine("Enter Admin Password:");
             string pw = Console.ReadLine();
 
