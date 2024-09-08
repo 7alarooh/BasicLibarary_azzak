@@ -1,5 +1,6 @@
 ﻿using Microsoft.VisualBasic;
 using System;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.Design;
 using System.Security.Principal;
 using System.Text;
@@ -886,7 +887,7 @@ namespace BasicLibrary
 
             try
             {
-                SearchForBook();
+                DisplayYourBookBorrowed(userId);
                 if (index != -1)
                 {
                     int quantity = Books[index].quantity;
@@ -931,6 +932,54 @@ namespace BasicLibrary
             catch (Exception ex)
             {
                 Console.WriteLine("An error occurred while returning the book: " + ex.Message);
+            }
+        }
+        static void DisplayYourBookBorrowed(int userId)
+        {
+            // Check if the user has borrowed any books
+            var userBorrowings = Borrowings.Where(b => b.uid == userId).ToList();
+
+            if (userBorrowings.Count == 0)
+            {
+                Console.WriteLine("You have not borrowed any books.");
+                return;
+            }
+
+            Console.WriteLine("Books you have borrowed:");
+
+            foreach (var borrowing in userBorrowings)
+            {
+                // Find the book details based on the book ID
+                var book = Books.FirstOrDefault(b => b.ID == borrowing.bid);
+
+                if (book != default)
+                {
+                    Console.WriteLine($"- '{book.BName}' by {book.BAuthor} (Borrowed on: {borrowing.date.ToShortDateString()})");
+                }
+            }
+
+            // Allow the user to select a book for return if desired
+            Console.WriteLine("\nEnter the name of the book you want to return or press Enter to skip:");
+            string bookName = Console.ReadLine();
+
+            if (!string.IsNullOrEmpty(bookName))
+            {
+                // Find the book in user's borrowed books
+                var selectedBook = Books.FirstOrDefault(b => b.BName.ToLower() == bookName.ToLower());
+
+                if (selectedBook != default)
+                {
+                    index = Books.IndexOf(selectedBook);
+                }
+                else
+                {
+                    Console.WriteLine("Book not found in your borrowed list.");
+                    index = -1;
+                }
+            }
+            else
+            {
+                index = -1; // No book selected for return
             }
         }
 
