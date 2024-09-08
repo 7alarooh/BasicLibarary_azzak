@@ -254,8 +254,13 @@ namespace BasicLibrary
 
                 Console.WriteLine("Enter User Email:");
                 string email = Console.ReadLine();
+            if (Users.Any(u => u.email.ToLower() == email.ToLower())) // Compare emails case-insensitively
+            {
+                Console.WriteLine("Error: A user with this email already exists.");
+                return;
+            }
 
-                Console.WriteLine("Enter User Password:");
+            Console.WriteLine("Enter User Password:");
                 string password = Console.ReadLine();
 
                 Console.WriteLine("Enter User Name:");
