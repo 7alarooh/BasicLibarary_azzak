@@ -738,6 +738,7 @@ namespace BasicLibrary
 
                     case "4":
                         SaveBooksToFile();
+                        saveAllActions();
                         Console.WriteLine("\npress any key to exit out system");
                         string outsystem = Console.ReadLine();
                         ExitFlag = true;
@@ -936,7 +937,7 @@ namespace BasicLibrary
                         writer.WriteLine($"{book.BName}|{book.BAuthor}|{book.ID}|{book.originalQuantity}|{book.quantity}");
                     }
                 }
-                Console.WriteLine("Books saved to file successfully.");
+                Console.WriteLine("Books updated to file successfully.");
             }
             catch (Exception ex)
             {
@@ -1036,6 +1037,39 @@ namespace BasicLibrary
             {
                 // Catch any unexpected errors
                 Console.WriteLine("An error occurred while searching for the book: " + ex.Message);
+            }
+        }
+
+        static void saveAllActions() 
+        {
+            try
+            {
+                using (StreamWriter writer = new StreamWriter(borrowingFilePath))
+                {
+                    foreach (var b in Borrowings)
+                    {
+                        writer.WriteLine($"{b.uid}|{b.bid}|{b.date}");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error saving to file: {ex.Message}");
+            }
+            try
+            {
+                using (StreamWriter writer = new StreamWriter(returningFilePath))
+                {
+                    foreach (var r in returnings)
+                    {
+                        writer.WriteLine($"{r.uid}|{r.bid}|{r.date}");
+                    }
+                }
+                Console.WriteLine($"all your actions, save in file successfully!!");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error saving to file: {ex.Message}");
             }
         }
 
