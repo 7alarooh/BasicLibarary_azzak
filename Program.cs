@@ -1138,18 +1138,13 @@ namespace BasicLibrary
             StringBuilder sb = new StringBuilder();
 
             int BookNumber = 0;
-
+            sb.Append("\n \t---All Books in Library ---"); 
+            sb.Append("\n \tname\tAuthor\tID\tQuantity");
             for (int i = 0; i < Books.Count; i++)
             {
                 BookNumber = i + 1;
-                sb.Append("Book ").Append(BookNumber).Append(" name : ").Append(Books[i].BName);
+                sb.AppendLine($"\n({BookNumber})\tBook Name:{Books[i].BName}\tAuthor:{Books[i].BAuthor}\tID:{Books[i].BAuthor}\tQuantity:{Books[i].quantity}");
                 sb.AppendLine();
-                sb.Append("Book ").Append(BookNumber).Append(" Author : ").Append(Books[i].BAuthor);
-                sb.AppendLine();
-                sb.Append("Book ").Append(BookNumber).Append(" ID : ").Append(Books[i].ID);
-                sb.AppendLine();
-                sb.Append("Book ").Append(BookNumber).Append(" Quantity : ").Append(Books[i].quantity);
-                sb.AppendLine().AppendLine();
                 Console.WriteLine(sb.ToString());
                 sb.Clear();
 
