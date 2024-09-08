@@ -803,7 +803,8 @@ namespace BasicLibrary
                 Console.WriteLine("\n 1 .Search For Book");
                 Console.WriteLine("\n 2 .Borrow Book");
                 Console.WriteLine("\n 3 .Return Book");
-                Console.WriteLine("\n 4 .singOut");
+                Console.WriteLine("\n 4 .Return Book");
+                Console.WriteLine("\n 5 .singOut");
 
                 string choice = Console.ReadLine();
 
@@ -822,6 +823,11 @@ namespace BasicLibrary
                         break;
 
                     case "4":
+                        suggestionsForUser(id);
+                        break;
+
+
+                    case "5":
                         SaveBooksToFile();
                         saveAllActions();
                         Console.WriteLine("\npress any key to exit out system");
@@ -901,14 +907,14 @@ namespace BasicLibrary
                     int originalQuantity = Books[index].originalQuantity;
 
                     // Check if the user has borrowed this book
-                    var borrowingRecord = Borrowings.FirstOrDefault(b => b.uid == userId && b.bid == Books[index].ID);
+                    var borrowingRecord = Borrowings.FirstOrDefault(b => b.uid == userId && b.bid == Books[index].ID && !b.returnBook);
 
                     if (borrowingRecord == default)
                     {
                         Console.WriteLine("Error: You have not borrowed this book.");
                         return;
                     }
-
+                    
                     Console.WriteLine("Do you want to return the Book?");
                     Console.WriteLine("\n press char ' y ' to borrow :");
                     string selected = Console.ReadLine();
@@ -920,7 +926,7 @@ namespace BasicLibrary
                     }
                     else
                     {// Check if the current quantity equals the original quantity
-                        if (quantity >= originalQuantity)
+                        if (quantity >= originalQuantity )
                         {
                             Console.WriteLine("Error: Cannot return the book. All copies have already been returned.");
                         }
@@ -967,7 +973,7 @@ namespace BasicLibrary
                 // Find the book details based on the book ID
                 var book = Books.FirstOrDefault(b => b.ID == borrowing.bid);
 
-                if (book != default)
+                if (book != default && borrowing.returnBook!=true)
                 {
                     Console.WriteLine($"- '{book.BName}' by {book.BAuthor} (Borrowed on: {borrowing.date.ToShortDateString()})");
                 }
@@ -996,6 +1002,9 @@ namespace BasicLibrary
             {
                 index = -1; // No book selected for return
             }
+        }
+        static void suggestionsForUser(int userID) {
+        
         }
 
         //........................Necessary Functions.....................................//
