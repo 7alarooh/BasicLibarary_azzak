@@ -913,9 +913,13 @@ namespace BasicLibrary
                     Console.WriteLine("\n press char ' y ' to borrow :");
                     string selected = Console.ReadLine();
 
-                    if (selected == "y")
+                    if (selected != "y")
                     {
-                        // Check if the current quantity equals the original quantity
+                        Console.WriteLine("Sorry! Cannot return this " + Books[index].BName);
+
+                    }
+                    else
+                    {// Check if the current quantity equals the original quantity
                         if (quantity >= originalQuantity)
                         {
                             Console.WriteLine("Error: Cannot return the book. All copies have already been returned.");
@@ -924,15 +928,19 @@ namespace BasicLibrary
                         {
                             ++quantity;
                             Books[index] = (Books[index].BName, Books[index].BAuthor, Books[index].ID, Books[index].originalQuantity, quantity);
-                            returnings.Add((userId, Books[index].ID, DateTime.Now));
-                            Borrowings.Remove(borrowingRecord);
 
+                            // Update the Borrowings list 
+                            for (int i = 0; i < Borrowings.Count; i++)
+                            {
+                                if (Borrowings[i].uid == userId && Borrowings[i].bid == Books[index].ID && Borrowings[i].returnBook == false)
+                                {
+                                    Borrowings[i] = (Borrowings[i].uid, Borrowings[i].bid, Borrowings[i].date, true);
+                                }
+                            }
+
+                            returnings.Add((userId, Books[index].ID, DateTime.Now));
                             Console.WriteLine("'" + Books[index].BName + "' Book has been returned successfully!");
                         }
-                    }
-                    else
-                    {
-                        Console.WriteLine("Sorry! Cannot return this " + Books[index].BName);
                     }
                 }
             }
