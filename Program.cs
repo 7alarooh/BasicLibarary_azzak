@@ -72,6 +72,29 @@ namespace BasicLibrary
                         break;
                     case "1":
                         Console.Clear();
+                        // string user2 = "Admin";
+                        // LoginAccess(user2);
+                        Console.Write("Enter Your Email: ");
+                        
+                        string aEmail = Console.ReadLine();
+                      if (aEmail != "registrar"){
+                            var admin = Admins.FirstOrDefault(a => a.email == aEmail);
+                            if (admin != default)
+                            {
+                                Console.Write("\nEnter Password: ");
+                                string enterPW = Console.ReadLine();
+                                if (enterPW == admin.pw)
+                                {
+                                    adminMenu(admin.name);
+                                }
+                            }
+                        else { Console.WriteLine("Sorry! you are not allowed to access here..."); }
+
+                        }
+                        else { Console.WriteLine("Sorry! you are not allowed to access here..."); }
+                        break;
+                    case "2":
+                        Console.Clear();
                         Console.Write("Enter Your Email: ");
 
                         string uEmail = Console.ReadLine();
@@ -83,26 +106,6 @@ namespace BasicLibrary
                             if (enterPW == user.pw)
                             {
                                 userMenu(user.id, user.name);
-                            }
-                        }
-                        else { Console.WriteLine("Sorry! you are not allowed to access here..."); }
-                        break;
-
-                    case "2":
-                        Console.Clear();
-                        // string user2 = "Admin";
-                        // LoginAccess(user2);
-                        Console.Write("Enter Your Email: ");
-
-                        string aEmail = Console.ReadLine();
-                        var admin = Admins.FirstOrDefault(a => a.email == aEmail);
-                        if (admin != default)
-                        {
-                            Console.Write("\nEnter Password: ");
-                            string enterPW = Console.ReadLine();
-                            if (enterPW == admin.pw)
-                            {
-                                adminMenu(admin.name);
                             }
                         }
                         else { Console.WriteLine("Sorry! you are not allowed to access here..."); }
@@ -193,7 +196,7 @@ namespace BasicLibrary
                         RemoveUserAccount();
                         break;
                     case "4":
-                        SaveBooksToFile();
+
                         Console.WriteLine("\npress any key to exit out system");
                         string outsystem = Console.ReadLine();
                         ExitFlag = true;
@@ -503,7 +506,7 @@ namespace BasicLibrary
             //  }
             //  else
             //  {
-            if (name != "registrar") { 
+           // if (name != "registrar") { 
                 bool ExitFlag = false;
             do
             {
@@ -556,7 +559,7 @@ namespace BasicLibrary
 
 
             } while (ExitFlag != true);
-        }
+       // }
           
         }
        
