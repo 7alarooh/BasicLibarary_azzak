@@ -26,56 +26,106 @@ namespace BasicLibrary
 
         static void Main(string[] args)
         {
-            bool ExitFlag = false;
+            
             LoadAllFiles();
-            do
-            {
-                Console.WriteLine("------------Welcome to Library------------");
-                Console.WriteLine("\n----------------Login Page----------------");
-                Console.WriteLine("\n Enter the No what you are :");
-                Console.WriteLine("\n 1 . Admin Access");
-                Console.WriteLine("\n 2 . User Access");
-                Console.WriteLine("\n 3 .Exit");
+            loginPage();
 
-                string choice = Console.ReadLine();
-                loginPage(choice);
-                Console.WriteLine("press any key to continue in Home Page");
-                string cont = Console.ReadLine();
-                Console.Clear();
-            } while (ExitFlag != true);
         }
 
         //........................Functions Part.......................................//
 
         //........................Login Functions.....................................//
-        static void loginPage(string selected) 
+        static void loginPage( ) 
         {
-           
-                switch (selected)
+            bool ExitFlag = false;
+            do
             {
-                case "1":
-                    Console.Clear();
-                    string user = "coustomer";
-                    LoginAccess(user);
-                    break;
+                Console.WriteLine("------------Welcome to Library------------");
+                Console.WriteLine("\n----------------Login Page----------------");
+                Console.WriteLine("\n Enter the No what you are :");
+                Console.WriteLine("\n 0 . Users Register");
+                Console.WriteLine("\n 1 . Admin Access");
+                Console.WriteLine("\n 2 . User Access");
+                Console.WriteLine("\n 3 .Exit");
 
-                case "2":
-                    Console.Clear();
-                    string user1 = "Admin";
-                    LoginAccess(user1);
-                    break;
+                string choice = Console.ReadLine();
+                switch (choice)
+                {
+                    case "0":
+                        Console.Write("Enter Your Email: ");
 
-                case "3":
-                    SaveBooksToFile();
-                    Console.WriteLine("\npress any key to exit out system");
-                    string outsystem = Console.ReadLine();
-                    Environment.Exit(0);
-                    break;
+                        string rEmail = Console.ReadLine();
+                        if (rEmail == "registrar")
+                        {
+                            var registrar = Admins.FirstOrDefault(r => r.email == rEmail);
+                            if (registrar != default)
+                            {
+                                Console.Write("\nEnter Password: ");
+                                string enterPW = Console.ReadLine();
+                                if (enterPW == registrar.pw)
+                                {
+                                    accountsManagement(registrar.name);
+                                }
+                            }
+                        }
+                        else { Console.WriteLine("Sorry! you are not allowed to access here..."); }
+                        break;
+                    case "1":
+                        Console.Clear();
+                        Console.Write("Enter Your Email: ");
 
-                default:
-                    Console.WriteLine("Sorry your choice was wrong!!");
-                    break;
-            }
+                        string uEmail = Console.ReadLine();
+                        var user = Users.FirstOrDefault(u => u.email == uEmail);
+                        if (user != default)
+                        {
+                            Console.Write("\nEnter Password: ");
+                            string enterPW = Console.ReadLine();
+                            if (enterPW == user.pw)
+                            {
+                                userMenu(user.id, user.name);
+                            }
+                        }
+                        else { Console.WriteLine("Sorry! you are not allowed to access here..."); }
+                        break;
+
+                    case "2":
+                        Console.Clear();
+                        // string user2 = "Admin";
+                        // LoginAccess(user2);
+                        Console.Write("Enter Your Email: ");
+
+                        string aEmail = Console.ReadLine();
+                        var admin = Admins.FirstOrDefault(a => a.email == aEmail);
+                        if (admin != default)
+                        {
+                            Console.Write("\nEnter Password: ");
+                            string enterPW = Console.ReadLine();
+                            if (enterPW == admin.pw)
+                            {
+                                adminMenu(admin.name);
+                            }
+                        }
+                        else { Console.WriteLine("Sorry! you are not allowed to access here..."); }
+                        break;
+
+                    case "3":
+                        SaveBooksToFile();
+                        Console.WriteLine("\npress any key to exit out system");
+                        string outsystem = Console.ReadLine();
+                        Environment.Exit(0);
+                        break;
+
+                    default:
+                        Console.WriteLine("Sorry your choice was wrong!!");
+                        break;
+                }
+               
+                Console.WriteLine("press any key to continue in Home Page");
+                string cont = Console.ReadLine();
+                Console.Clear();
+            } while (ExitFlag != true);
+
+           
             
         }
         static void LoginAccess(string userAccess)
@@ -94,12 +144,10 @@ namespace BasicLibrary
                         userMenu(user.id, user.name);
                     }
                 }
-
-
             } 
 
             /////
-            if (userAccess == "admin")
+            else if (userAccess == "admin")
             {
                 Console.Write("Enter Your Email: ");
 
@@ -115,10 +163,11 @@ namespace BasicLibrary
                     }
                 }
             }
+            else { Console.WriteLine("to there any user like that..."); }
         }
         //.........................registrar function.................................//
 
-        static void accountsManagement()
+        static void accountsManagement(string name)
         {
             bool ExitFlag = false;
             do
@@ -184,8 +233,7 @@ namespace BasicLibrary
 
         static void AddUser()
         {
-            static void AddUser()
-            {
+            
                 // Determine the next ID by finding the highest existing ID and incrementing it
                 int nextID = 1; // Start with 1 if there are no books
                 if (Users.Count > 0)
@@ -212,7 +260,7 @@ namespace BasicLibrary
                 // Add new user to the Users list with the auto-generated ID
                 Users.Add((nextID, email, password, name));
                 Console.WriteLine($"New user added successfully with ID: {nextID}");
-            }
+            
         }
 
         static void AddAdmin()
@@ -449,64 +497,67 @@ namespace BasicLibrary
 
         //........................Admin Functions.....................................//
         static void adminMenu(string name)
-        {if (name == "registrar")
-            {
-                accountsManagement();
-            }
-            else
-            {
+        {
+            //{
+            //     accountsManagement();
+            //  }
+            //  else
+            //  {
+            if (name != "registrar") { 
                 bool ExitFlag = false;
-                do
+            do
+            {
+                Console.WriteLine("Welcome Admin in Library");
+                Console.WriteLine("\n Enter the No. of operation you need :");
+                Console.WriteLine("\n 1 .Add New Book");
+                Console.WriteLine("\n 2 .Display All Books");
+                Console.WriteLine("\n 3 .Search for Book by Name");
+                Console.WriteLine("\n 4 .Edit a Book");
+                Console.WriteLine("\n 5 .Remove a Book");
+                Console.WriteLine("\n 6 .singOut");
+
+                string choice = Console.ReadLine();
+
+                switch (choice)
                 {
-                    Console.WriteLine("Welcome Admin in Library");
-                    Console.WriteLine("\n Enter the No. of operation you need :");
-                    Console.WriteLine("\n 1 .Add New Book");
-                    Console.WriteLine("\n 2 .Display All Books");
-                    Console.WriteLine("\n 3 .Search for Book by Name");
-                    Console.WriteLine("\n 4 .Edit a Book");
-                    Console.WriteLine("\n 5 .Remove a Book");
-                    Console.WriteLine("\n 6 .singOut");
+                    case "1":
+                        AddNewBook();
+                        break;
 
-                    string choice = Console.ReadLine();
+                    case "2":
+                        ViewAllBooks();
+                        break;
 
-                    switch (choice)
-                    {
-                        case "1":
-                            AddNewBook();
-                            break;
+                    case "3":
+                        SearchForBook();
+                        break;
+                    case "4":
+                        editBook();
+                        break;
+                    case "5":
+                        removeBook();
+                        break;
+                    case "6":
+                        SaveBooksToFile();
+                        Console.WriteLine("\npress any key to exit out system");
+                        string outsystem = Console.ReadLine();
+                        ExitFlag = true;
+                        break;
+                    default:
+                        Console.WriteLine("Sorry your choice was wrong !!");
+                        break;
 
-                        case "2":
-                            ViewAllBooks();
-                            break;
+                }
 
-                        case "3":
-                            SearchForBook();
-                            break;
-                        case "4":
-                            editBook();
-                            break;
-                        case "5":
-                            removeBook();
-                            break;
-                        case "6":
-                            SaveBooksToFile();
-                            Console.WriteLine("\npress any key to exit out system");
-                            string outsystem = Console.ReadLine();
-                            ExitFlag = true;
-                            break;
-                        default:
-                            Console.WriteLine("Sorry your choice was wrong !!");
-                            break;
+                Console.WriteLine("press any key to continue");
+                string cont = Console.ReadLine();
 
-                    }
+                Console.Clear();
 
-                    Console.WriteLine("press any key to continue");
-                    string cont = Console.ReadLine();
 
-                    Console.Clear();
-
-                } while (ExitFlag != true);
-            }
+            } while (ExitFlag != true);
+        }
+          
         }
        
         static void AddNewBook()
