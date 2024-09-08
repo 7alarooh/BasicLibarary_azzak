@@ -517,7 +517,8 @@ namespace BasicLibrary
                 Console.WriteLine("\n 3 .Search for Book by Name");
                 Console.WriteLine("\n 4 .Edit a Book");
                 Console.WriteLine("\n 5 .Remove a Book");
-                Console.WriteLine("\n 6 .singOut");
+                Console.WriteLine("\n 6 .Report");
+                Console.WriteLine("\n 7 .singOut");
 
                 string choice = Console.ReadLine();
 
@@ -541,11 +542,15 @@ namespace BasicLibrary
                         removeBook();
                         break;
                     case "6":
+                        reporting();
+                        break;
+                    case "7":
                         SaveBooksToFile();
                         Console.WriteLine("\npress any key to exit out system");
                         string outsystem = Console.ReadLine();
                         ExitFlag = true;
                         break;
+                        
                     default:
                         Console.WriteLine("Sorry your choice was wrong !!");
                         break;
@@ -705,6 +710,85 @@ namespace BasicLibrary
                 }
             }
 
+        }
+        static void reporting()
+        {
+            Console.WriteLine("\n------\tToday's Report\t-----");
+            // List of tuples to track how many times each book has been borrowed: (bookId, count)
+            List<(int bookId, int count)> bookBorrowCount = new List<(int bookId, int count)>();
+
+            // List of tuples to track how many times each author has been borrowed: (authorName, count)
+            List<(string authorName, int count)> authorBorrowCount = new List<(string authorName, int count)>();
+            foreach (var borrowing in Borrowings)
+            {
+                int bookId = borrowing.bid;
+
+                // Update book borrow count
+                bool bookFound = false;
+                for (int i = 0; i < bookBorrowCount.Count; i++)
+                {
+                    if (bookBorrowCount[i].bookId == bookId)
+                    {
+                        bookBorrowCount[i] = (bookBorrowCount[i].bookId, bookBorrowCount[i].count + 1);
+                        bookFound = true;
+                        break;
+                    }
+                }
+                if (!bookFound)
+                {
+                    bookBorrowCount.Add((bookId, 1));
+                }
+
+                // Find the book to get the author
+                var book = Books.FirstOrDefault(b => b.ID == bookId);
+                if (book != default)
+                {
+                    string author = book.BAuthor;
+
+                    // Update author borrow count
+                    bool authorFound = false;
+                    for (int i = 0; i < authorBorrowCount.Count; i++)
+                    {
+                        if (authorBorrowCount[i].authorName == author)
+                        {
+                            authorBorrowCount[i] = (authorBorrowCount[i].authorName, authorBorrowCount[i].count + 1);
+                            authorFound = true;
+                            break;
+                        }
+                    }
+                    if (!authorFound)
+                    {
+                        authorBorrowCount.Add((author, 1));
+                    }
+                }
+            }
+
+            // Use Max() function to find the most borrowed book
+            if (bookBorrowCount.Count > 0)
+            {
+                int maxBorrowCount = bookBorrowCount.Max(b => b.count);
+                var mostBorrowedBook = bookBorrowCount.FirstOrDefault(b => b.count == maxBorrowCount);
+
+                var book = Books.FirstOrDefault(b => b.ID == mostBorrowedBook.bookId);
+                Console.WriteLine($"Most Borrowed Book: '{book.BName}' by {book.BAuthor} (Borrowed {maxBorrowCount} times)");
+            }
+            else
+            {
+                Console.WriteLine("No books have been borrowed yet.");
+            }
+
+            // Find the most requested author
+            if (authorBorrowCount.Count > 0)
+            {
+                int maxAuthorBorrowCount = authorBorrowCount.Max(a => a.count);
+                var mostRequestedAuthor = authorBorrowCount.FirstOrDefault(a => a.count == maxAuthorBorrowCount);
+
+                Console.WriteLine($"Most Requested Author: {mostRequestedAuthor.authorName} (Borrowed {maxAuthorBorrowCount} times)");
+            }
+            else
+            {
+                Console.WriteLine("No authors have been borrowed yet.");
+            }
         }
 
         //........................User Functions.....................................//
@@ -1039,7 +1123,6 @@ namespace BasicLibrary
                 Console.WriteLine("An error occurred while searching for the book: " + ex.Message);
             }
         }
-
         static void saveAllActions() 
         {
             try
@@ -1072,6 +1155,7 @@ namespace BasicLibrary
                 Console.WriteLine($"Error saving to file: {ex.Message}");
             }
         }
+        
 
     }
 }
