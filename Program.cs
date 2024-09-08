@@ -15,7 +15,7 @@ namespace BasicLibrary
         static List<(string BName, string BAuthor, int ID,int originalQuantity ,int quantity)> Books = new List<(string BName, string BAuthor, int ID, int originalQuantity, int quantity)>();
         static List<(int id,string email,string pw,string name)> Users =new List<(int id,string email,string pw, string name)>();
         static List<(string email, string pw, string name)> Admins = new List<(string email, string pw, string name)>();
-        static List<(int uid, int bid, DateTime date)> Borrowings = new List<(int uid, int bid, DateTime date)>();
+        static List<(int uid, int bid, DateTime date,bool returnBook)> Borrowings = new List<(int uid, int bid, DateTime date, bool returnBook)>();
         static List<(int uid, int bid, DateTime date)> returnings = new List<(int uid, int bid, DateTime date)>();
         static string filePath = "C:\\Users\\Lenovo\\source\\repos\\azzaGitTest\\lib.txt";
         static string userFilePath = "C:\\Users\\Lenovo\\source\\repos\\azzaGitTest\\user.txt";
@@ -848,6 +848,13 @@ namespace BasicLibrary
                 SearchForBook();
                 if (index != -1)
                 {
+                    var existingBorrowing = Borrowings.FirstOrDefault(b => b.uid == userId && b.bid == Books[index].ID && b.returnBook == false);
+                    if (existingBorrowing != default)
+                    {
+                        Console.WriteLine("Error: You have already borrowed this book and haven't returned it yet.");
+                        return;
+                    }
+
                     int quantity = Books[index].quantity;
                     if (quantity > 0)
                     {
@@ -865,7 +872,7 @@ namespace BasicLibrary
 
                             --quantity;
                             Books[index] = (Books[index].BName, Books[index].BAuthor, Books[index].ID, Books[index].originalQuantity, quantity);
-                            Borrowings.Add((userId, Books[index].ID, DateTime.Now));
+                            Borrowings.Add((userId, Books[index].ID, DateTime.Now,false));
                             Console.WriteLine("You have borrowed the " + Books[index].BName + "!");
 
 
@@ -1180,7 +1187,7 @@ namespace BasicLibrary
                 {
                     foreach (var b in Borrowings)
                     {
-                        writer.WriteLine($"{b.uid}|{b.bid}|{b.date}");
+                        writer.WriteLine($"{b.uid}|{b.bid}|{b.date}|{b.returnBook}");
                     }
                 }
             }
