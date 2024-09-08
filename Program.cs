@@ -803,7 +803,7 @@ namespace BasicLibrary
                 Console.WriteLine("\n 1 .Search For Book");
                 Console.WriteLine("\n 2 .Borrow Book");
                 Console.WriteLine("\n 3 .Return Book");
-                Console.WriteLine("\n 4 .Return Book");
+                Console.WriteLine("\n 4 .Suggestions For you");
                 Console.WriteLine("\n 5 .singOut");
 
                 string choice = Console.ReadLine();
@@ -1176,6 +1176,63 @@ namespace BasicLibrary
             {
                 Console.WriteLine($"Error loading from file: {ex.Message}");
             }
+            //-------------------
+
+            try
+            {
+                if (File.Exists(borrowingFilePath))
+                {
+                    using (StreamReader reader = new StreamReader(borrowingFilePath))
+                    {
+                        string line;
+                        while ((line = reader.ReadLine()) != null)
+                        {
+                            var parts = line.Split('|');
+                            if (parts.Length == 4)
+                            {
+                                int uid = int.Parse(parts[0]);
+                                int bid = int.Parse(parts[1]);
+                                DateTime date = DateTime.Parse(parts[2]); // Parse the date string
+                                bool returnBook = bool.Parse(parts[3]); // Parse the returnBook string
+
+                                Borrowings.Add((uid, bid, date, returnBook));
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error loading from file: {ex.Message}");
+            }
+            //---------------------
+            try
+            {
+                if (File.Exists(returningFilePath))
+                {
+                    using (StreamReader reader = new StreamReader(returningFilePath))
+                    {
+                        string line;
+                        while ((line = reader.ReadLine()) != null)
+                        {
+                            var parts = line.Split('|');
+                            if (parts.Length == 3)
+                            {
+                                int uid = int.Parse(parts[0]);
+                                int bid = int.Parse(parts[1]);
+                                DateTime date = DateTime.Parse(parts[2]); // Parse the date
+
+                                returnings.Add((uid, bid, date));
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error loading from file: {ex.Message}");
+            }
+
             //---------------
             try
             {
