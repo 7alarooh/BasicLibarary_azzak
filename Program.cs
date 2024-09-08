@@ -478,6 +478,12 @@ namespace BasicLibrary
             {
                 Console.WriteLine("Enter the email of the admin you want to remove:");
                 string email = Console.ReadLine();
+                // Prevent the removal of the "registrar" admin
+                if (email.Equals("registrar", StringComparison.OrdinalIgnoreCase))
+                {
+                    Console.WriteLine("Error: The 'registrar' admin cannot be removed.");
+                    return;
+                }
 
                 var admin = Admins.FirstOrDefault(a => a.email.Equals(email, StringComparison.OrdinalIgnoreCase));
 
