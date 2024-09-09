@@ -573,31 +573,50 @@ namespace BasicLibrary
         {
             StringBuilder sb = new StringBuilder();
 
-            int userNumber = 0;
-            sb.Append("\n \t---All Users in Library System---");
-            sb.Append("\n \t---Admins---");
-            sb.Append("\n \tEmail\tPassword\tName");
-            for (int i = 0; i < Admins.Count; i++)
-            {
-                userNumber = i + 1;
-                sb.AppendLine($"\n({userNumber})\t {Admins[i].email}\t{Admins[i].pw}\t{Admins[i].name}");
-                sb.AppendLine();
-                Console.WriteLine(sb.ToString());
-                sb.Clear();
+            // Define column widths
+            int emailWidth = 30;
+            int passwordWidth = 20;
+            int nameWidth = 30;
+            int idWidth = 5;
 
-            }
-            userNumber = 0;
-            sb.Append("\n\n \t---Users---");
-            sb.Append("\n \tEmail\tPassword\tID\tName");
+            // Print Admins
+            sb.AppendLine("\n \t--- All Users in Library System ---");
+            sb.AppendLine("\n \t--- Admins ---");
+            sb.AppendFormat("\t{0,-" + emailWidth + "} {1,-" + passwordWidth + "} {2,-" + nameWidth + "}", "Email", "Password", "Name");
+            sb.AppendLine();
+            sb.AppendLine(new string('-', emailWidth + passwordWidth + nameWidth + 10)); // 10 for padding and " \t"
+
             for (int i = 0; i < Admins.Count; i++)
             {
-                userNumber = i + 1;
-                sb.AppendLine($"\n({userNumber})\t{Users[i].email}\t{Users[i].pw}\t{Users[i].id}\t{Users[i].name}");
+                var admin = Admins[i];
+                sb.AppendFormat("\t{0,-" + emailWidth + "} {1,-" + passwordWidth + "} {2,-" + nameWidth + "}",
+                                admin.email,
+                                admin.pw,
+                                admin.name);
                 sb.AppendLine();
-                Console.WriteLine(sb.ToString());
-                sb.Clear();
             }
+
+            // Print Users
+            sb.AppendLine("\n\n \t--- Users ---");
+            sb.AppendFormat("\t{0,-" + emailWidth + "} {1,-" + passwordWidth + "} {2,-" + idWidth + "} {3,-" + nameWidth + "}",
+                            "Email", "Password", "ID", "Name");
+            sb.AppendLine();
+            sb.AppendLine(new string('-', emailWidth + passwordWidth + idWidth + nameWidth + 12)); // 12 for padding and " \t"
+
+            for (int i = 0; i < Users.Count; i++)
+            {
+                var user = Users[i];
+                sb.AppendFormat("\t{0,-" + emailWidth + "} {1,-" + passwordWidth + "} {2,-" + idWidth + "} {3,-" + nameWidth + "}",
+                                user.email,
+                                user.pw,
+                                user.id,
+                                user.name);
+                sb.AppendLine();
+            }
+
+            Console.WriteLine(sb.ToString());
         }
+
 
         //........................Admin Functions.....................................//
         static void adminMenu(string name)
@@ -1612,6 +1631,7 @@ namespace BasicLibrary
         }
         static void ViewAllBooks()
         {
+            //
             StringBuilder sb = new StringBuilder();
 
             // Define column widths
@@ -1638,7 +1658,6 @@ namespace BasicLibrary
                                 book.quantity);
                 sb.AppendLine();
             }
-
 
             Console.WriteLine(sb.ToString());
         }
