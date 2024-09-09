@@ -4,7 +4,9 @@ using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.Design;
 using System.Security.Principal;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Xml.Linq;
+
 
 namespace BasicLibrary
 {
@@ -133,41 +135,104 @@ namespace BasicLibrary
             
         }
         static void LoginAccess(string userAccess)
-        { if (userAccess == "coustomer")
+        {
+            if (userAccess == "customer")
             {
                 Console.Write("Enter Your Email: ");
-
                 string uEmail = Console.ReadLine();
-                var user = Users.FirstOrDefault(u => u.email == uEmail);
+
+                // Validate email format
+                if (!IsValidEmail(uEmail))
+                {
+                    Console.WriteLine("Error: Invalid email format.");
+                    return;
+                }
+
+                var user = Users.FirstOrDefault(u => u.email.Equals(uEmail, StringComparison.OrdinalIgnoreCase));
                 if (user != default)
                 {
                     Console.Write("\nEnter Password: ");
                     string enterPW = Console.ReadLine();
+
+                    // Validate password format
+                    if (!IsValidPassword(enterPW))
+                    {
+                        Console.WriteLine("Error: Password does not meet the required format.");
+                        return;
+                    }
+
                     if (enterPW == user.pw)
                     {
                         userMenu(user.id, user.name);
                     }
+                    else
+                    {
+                        Console.WriteLine("Error: Incorrect password.");
+                    }
                 }
-            } 
-
-            /////
+                else
+                {
+                    Console.WriteLine("Error: User not found.");
+                }
+            }
             else if (userAccess == "admin")
             {
                 Console.Write("Enter Your Email: ");
-
                 string aEmail = Console.ReadLine();
-                var admin = Admins.FirstOrDefault(a => a.email == aEmail);
+
+                // Validate email format
+                if (!IsValidEmail(aEmail))
+                {
+                    Console.WriteLine("Error: Invalid email format.");
+                    return;
+                }
+
+                var admin = Admins.FirstOrDefault(a => a.email.Equals(aEmail, StringComparison.OrdinalIgnoreCase));
                 if (admin != default)
                 {
                     Console.Write("\nEnter Password: ");
                     string enterPW = Console.ReadLine();
+
+                    // Validate password format
+                    if (!IsValidPassword(enterPW))
+                    {
+                        Console.WriteLine("Error: Password does not meet the required format.");
+                        return;
+                    }
+
                     if (enterPW == admin.pw)
                     {
                         adminMenu(admin.name);
                     }
+                    else
+                    {
+                        Console.WriteLine("Error: Incorrect password.");
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Error: Admin not found.");
                 }
             }
-            else { Console.WriteLine("to there any user like that..."); }
+            else
+            {
+                Console.WriteLine("Error: Invalid user access type.");
+            }
+        }
+
+        // Function to validate email format
+        static bool IsValidEmail(string email)
+        {
+            // Simple email validation regex
+            var emailRegex = new Regex(@"^[^@\s]+@[^@\s]+\.[^@\s]+$", RegexOptions.IgnoreCase);
+            return emailRegex.IsMatch(email);
+        }
+
+        // Function to validate password format
+        static bool IsValidPassword(string password)
+        {
+            // Basic password validation: at least 6 characters
+            return password.Length >= 6;
         }
         //.........................registrar function.................................//
 
