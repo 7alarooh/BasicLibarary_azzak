@@ -114,7 +114,7 @@ namespace BasicLibrary
 
                     case "3":
                         SaveBooksToFile();
-                        Console.WriteLine("\npress any key to exit out system");
+                        Console.WriteLine("\npress Enter key to exit out system");
                         string outsystem = Console.ReadLine();
                         Environment.Exit(0);
                         break;
@@ -198,7 +198,7 @@ namespace BasicLibrary
                         break;
                     case "4":
                         saveAllUsers();
-                        Console.WriteLine("\npress any key to exit out system");
+                        Console.WriteLine("\npress Enter key to exit out system");
                         string outsystem = Console.ReadLine();
                         ExitFlag = true;
                         break;
@@ -594,7 +594,7 @@ namespace BasicLibrary
                         break;
                     case "7":
                         SaveBooksToFile();
-                        Console.WriteLine("\npress any key to exit out system");
+                        Console.WriteLine("\npress Enter key to exit out system");
                         string outsystem = Console.ReadLine();
                         ExitFlag = true;
                         break;
@@ -742,7 +742,7 @@ namespace BasicLibrary
             // If a valid book index is found
             if (index != -1)
             {
-                var activeBorrowing = Borrowings.Any(b => b.bid == Books[index].ID && !b.returnBook);
+                var activeBorrowing = Borrowings.Any(b => b.bid == Books[index].ID && !b.returnBook);//the function checks the Borrowings list to see if any active borrowing exists for the book >> the book is borrowed and the returnBook flag is still false.
 
                 if (activeBorrowing)
                 {
@@ -884,7 +884,7 @@ namespace BasicLibrary
                     case "5":
                         SaveBooksToFile();
                         saveAllActions();
-                        Console.WriteLine("\npress any key to exit out system");
+                        Console.WriteLine("\npress Enter key to exit out system");
                         string outsystem = Console.ReadLine();
                         ExitFlag = true;
                         break;
@@ -1064,6 +1064,7 @@ namespace BasicLibrary
             {
                 try
                 {
+                    Console.Clear();
                     List<int> bookIds = new List<int>();
                     List<int> borrowCounts = new List<int>();
                     // Count the borrowings for each book
@@ -1202,7 +1203,8 @@ namespace BasicLibrary
             }
             else
             {
-                
+                Console.Clear();
+
 
                 // Check if the borrowed book exists
                 var borrowedBook = Books.FirstOrDefault(b => b.ID == BookID);
@@ -1296,7 +1298,7 @@ namespace BasicLibrary
             }
         }
         static void borrowingAfterSuggestions(int userId, List<int> suggestedBookIds)
-        {Console.Clear();
+        {
             try
             {
                 if (suggestedBookIds.Count == 0)
@@ -1614,6 +1616,10 @@ namespace BasicLibrary
             {
                 Console.WriteLine($"Error saving to file: {ex.Message}");
             }
+
+
+
+
             try
             {
                 using (StreamWriter writer = new StreamWriter(returningFilePath))
