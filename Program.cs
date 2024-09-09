@@ -742,6 +742,13 @@ namespace BasicLibrary
             // If a valid book index is found
             if (index != -1)
             {
+                var activeBorrowing = Borrowings.Any(b => b.bid == Books[index].ID && !b.returnBook);
+
+                if (activeBorrowing)
+                {
+                    Console.WriteLine($"Error: The book '{Books[index].BName}' has been borrowed and is not yet returned. It cannot be removed.");
+                    return;
+                }
                 // Ask for confirmation
                 Console.WriteLine($"Are you sure you want to delete the book '{Books[index].BName}' by {Books[index].BAuthor}? (y/n)");
                 string confirmation = Console.ReadLine();
