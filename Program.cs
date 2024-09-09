@@ -692,6 +692,21 @@ namespace BasicLibrary
                 return;
             }
 
+            // Check if a book with the same name already exists
+            var existingBook = Books.FirstOrDefault(b => b.BName.ToLower() == name.ToLower());
+            if (existingBook != default) // If a book with the same name exists
+            {
+                if (existingBook.BAuthor.ToLower() == author.ToLower()) // Check if the author is the same
+                {
+                    Console.WriteLine("Error: A book with the same name and author already exists.");
+                    return;
+                }
+                else
+                {
+                    Console.WriteLine("A book with the same name exists, but by a different author. Proceeding to add the book.");
+                }
+            }
+
             // manually generate the next book ID by checking the IDs in the Books list
             int newID = 1; // Start with 1 if there are no books
             if (Books.Count > 0)
