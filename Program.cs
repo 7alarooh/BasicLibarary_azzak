@@ -237,63 +237,96 @@ namespace BasicLibrary
         }
 
         static void AddUser()
-        {
-            
-                // Determine the next ID by finding the highest existing ID and incrementing it
-                int nextID = 1; // Start with 1 if there are no books
-                if (Users.Count > 0)
+        {// Determine the next ID by finding the highest existing ID and incrementing it
+            int nextID = 1; // Start with 1 if there are no users
+            if (Users.Count > 0)
+            {
+                // Loop through the users to find the highest existing ID
+                foreach (var user in Users)
                 {
-                    // Loop through the books to find the highest existing ID
-                    foreach (var user in Users)
+                    if (user.id >= nextID)
                     {
-                        if (user.id >= nextID)
-                        {
-                            nextID = user.id + 1;
-                        }
+                        nextID = user.id + 1;
                     }
                 }
+            }
 
+            string email;
+            bool emailExists = true;
+
+            // Loop until a unique email is entered
+            do
+            {
                 Console.WriteLine("Enter User Email:");
-                string email = Console.ReadLine();
-            if (Users.Any(u => u.email.ToLower() == email.ToLower())) // Compare emails case-insensitively
-            {
-                Console.WriteLine("Error: A user with this email already exists.");
-                return;
-            }
+                email = Console.ReadLine();
 
-            Console.WriteLine("Enter User Password:");
-                string password = Console.ReadLine();
-            // Confirm password
-            Console.WriteLine("Confirm Password:");
-            string confirmPassword = Console.ReadLine();
+                if (Users.Any(u => u.email.ToLower() == email.ToLower())) // Case-insensitive check
+                {
+                    Console.WriteLine("Error: A user with this email already exists. Please enter a different email.");
+                }
+                else
+                {
+                    emailExists = false; // Email is unique, break the loop
+                }
+            } while (emailExists); // Continue looping until a unique email is provided
 
-            // Check if passwords match
-            if (password != confirmPassword)
+            string password, confirmPassword;
+            bool passwordsMatch = false;
+
+            // Loop until passwords match
+            do
             {
-                Console.WriteLine("Error: Passwords do not match.");
-                return;
-            }
+                Console.WriteLine("Enter User Password:");
+                password = Console.ReadLine();
+
+                Console.WriteLine("Confirm Password:");
+                confirmPassword = Console.ReadLine();
+
+                // Check if passwords match
+                if (password != confirmPassword)
+                {
+                    Console.WriteLine("Error: Passwords do not match. Please try again.");
+                }
+                else
+                {
+                    passwordsMatch = true; // Passwords match, break the loop
+                }
+            } while (!passwordsMatch); // Continue looping until passwords match
 
             Console.WriteLine("Enter User Name:");
-                string name = Console.ReadLine();
+            string name = Console.ReadLine();
 
-                // Add new user to the Users list with the auto-generated ID
-                Users.Add((nextID, email, password, name));
-                Console.WriteLine($"New user added successfully with ID: {nextID}");
-            
+            // Add new user to the Users list with the auto-generated ID
+            Users.Add((nextID, email, password, name));
+            Console.WriteLine($"New user added successfully with ID: {nextID}");
+
         }
 
         static void AddAdmin()
         {
-            Console.WriteLine("Enter Admin Email:");
-            string email = Console.ReadLine();
-            if (Admins.Any(a => a.email.ToLower() == email.ToLower())) // Case-insensitive check
+            string email;
+            bool emailExists = true;
+
+            // Loop until a unique email is entered
+            do
             {
-                Console.WriteLine("Error: An admin with this email already exists.");
-                return;
-            }
+                Console.WriteLine("Enter Admin Email:");
+                email = Console.ReadLine();
+
+                if (Admins.Any(a => a.email.ToLower() == email.ToLower())) // Case-insensitive check
+                {
+                    Console.WriteLine("Error: An admin with this email already exists. Please enter a different email.");
+                }
+                else
+                {
+                    emailExists = false; // Email is unique, break the loop
+                }
+            } while (emailExists); // Continue looping until a unique email is provided
+
+            // Continue with password input
             Console.WriteLine("Enter Admin Password:");
             string pw = Console.ReadLine();
+
             // Confirm password
             Console.WriteLine("Confirm Password:");
             string confirmPassword = Console.ReadLine();
