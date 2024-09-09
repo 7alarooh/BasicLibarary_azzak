@@ -658,7 +658,7 @@ namespace BasicLibrary
 
                 }
 
-                Console.WriteLine("press any key to continue");
+                Console.WriteLine("press Enter key to continue");
                 string cont = Console.ReadLine();
 
                 Console.Clear();
@@ -1614,19 +1614,36 @@ namespace BasicLibrary
         {
             StringBuilder sb = new StringBuilder();
 
-            int BookNumber = 0;
-            sb.Append("\n \t---All Books in Library ---"); 
-            sb.Append("\n \tname\tAuthor\tID\tQuantity");
+            // Define column widths
+            int nameWidth = 30;
+            int authorWidth = 30;
+            int idWidth = 5;
+            int quantityWidth = 8;
+
+            sb.Append("\n \t--- All Books in Library ---");
+            sb.AppendLine();
+
+            // Use interpolation to format headers
+            sb.AppendFormat("\t{0,-" + nameWidth + "} {1,-" + authorWidth + "} {2,-" + idWidth + "} {3,-" + quantityWidth + "}", "Name", "Author", "ID", "Quantity");
+            sb.AppendLine();
+            sb.AppendLine(new string('-', nameWidth + authorWidth + idWidth + quantityWidth + 8)); // 8 for padding
+
             for (int i = 0; i < Books.Count; i++)
             {
-                BookNumber = i + 1;
-                sb.AppendLine($"({BookNumber})\tBook Name:{Books[i].BName}\tAuthor:{Books[i].BAuthor}\tID:{Books[i].BAuthor}\tQuantity:{Books[i].quantity}");
+                var book = Books[i];
+                sb.AppendFormat("\t{0,-" + nameWidth + "} {1,-" + authorWidth + "} {2,-" + idWidth + "} {3,-" + quantityWidth + "}",
+                                book.BName,
+                                book.BAuthor,
+                                book.ID,
+                                book.quantity);
                 sb.AppendLine();
-                Console.WriteLine(sb.ToString());
-                sb.Clear();
-
             }
+
+
+            Console.WriteLine(sb.ToString());
         }
+
+
         static void SearchForBook()
         {
             ViewAllBooks();
