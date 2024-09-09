@@ -1052,6 +1052,7 @@ namespace BasicLibrary
         }
         static void suggestionsForUser(int userID,int BookID=0)
         {
+            List<int> suggestedBookIds = new List<int>();
             if (BookID == 0)
             {
                 try
@@ -1095,7 +1096,7 @@ namespace BasicLibrary
                         if (book.ID == mostBorrowedBookId)
                             BookName = book.BName;
                     }
-
+                    suggestedBookIds.Add(mostBorrowedBookId);
                     // Output the ID of the most borrowed book
                     Console.WriteLine($"Most Borrowed Book ID: {mostBorrowedBookId} the name book:{BookName}");
 
@@ -1143,11 +1144,14 @@ namespace BasicLibrary
 
                     // Output the name of the best author
                     Console.WriteLine($"Best Author: {bestAuthor}");
+                    foreach (var book in Books) 
+                    {if (book.BAuthor == bestAuthor)
+                        { suggestedBookIds.Add(book.ID); }
+                    }
 
 
-
-                    // List to keep track of book IDs borrowed along with the most borrowed book
-                    List<int> borrowedWithMostBorrowedBook = new List<int>();
+                        // List to keep track of book IDs borrowed along with the most borrowed book
+                        List<int> borrowedWithMostBorrowedBook = new List<int>();
 
                     // Find the book IDs borrowed by the same users who borrowed the most borrowed book
                     foreach (var borrowing in Borrowings)
@@ -1175,11 +1179,14 @@ namespace BasicLibrary
                         foreach (var book in Books)
                         {
                             if (bookId == book.ID)
+                            {
                                 bookn = book.BName;
+                                suggestedBookIds.Add(bookId);
+                            }
                         }
                         Console.WriteLine(bookId + ": " + bookn);
                     }
-
+                   borrowingAfterSuggestions(userID, suggestedBookIds);
                 }
                 catch (Exception ex)
                 {
@@ -1187,7 +1194,10 @@ namespace BasicLibrary
                 }
             }
             else
-            {// Check if the borrowed book exists
+            {
+                
+
+                // Check if the borrowed book exists
                 var borrowedBook = Books.FirstOrDefault(b => b.ID == BookID);
                 if (borrowedBook == default)
                 {
@@ -1205,6 +1215,7 @@ namespace BasicLibrary
                     foreach (var book in booksBySameAuthor)
                     {
                         Console.WriteLine($"{book.BName} by {book.BAuthor}");
+                        suggestedBookIds.Add(book.ID);
                     }
                 }
                 else
@@ -1240,6 +1251,7 @@ namespace BasicLibrary
                         if (book != default)
                         {
                             Console.WriteLine($"{book.BName} by {book.BAuthor}");
+                            suggestedBookIds.Add(book.ID);
                         }
                     }
                 }
@@ -1270,11 +1282,73 @@ namespace BasicLibrary
                     if (book != default)
                     {
                         Console.WriteLine($"{book.BName} by {book.BAuthor}");
+                        suggestedBookIds.Add(book.ID );
                     }
                 }
+                borrowingAfterSuggestions(userID,suggestedBookIds);
             }
         }
-        
+        static void borrowingAfterSuggestions(int userId, List<int> suggestedBookIds)
+        {Console.Clear();
+            try
+            {
+                if (suggestedBookIds.Count == 0)
+                {
+                    Console.WriteLine("No books are available to borrow from the suggestions.");
+                    return;
+                }
+
+                // Display suggested books
+                Console.WriteLine("\nWould you like to borrow any of these suggested books?");
+                for (int i = 0; i < suggestedBookIds.Count; i++)
+                {
+                    var book = Books.FirstOrDefault(b => b.ID == suggestedBookIds[i]);
+                    if (book != default)
+                    {
+                        Console.WriteLine($"{i + 1}. {book.BName} by {book.BAuthor} (ID: {book.ID})");
+                    }
+                }
+
+                // Ask the user if they want to borrow a book
+                Console.WriteLine("\nEnter the number of the book you want to borrow, or press 0 to cancel:");
+                if (int.TryParse(Console.ReadLine(), out int choice) && choice > 0 && choice <= suggestedBookIds.Count)
+                {
+                    int bookId = suggestedBookIds[choice - 1];
+                    var bookToBorrow = Books.FirstOrDefault(b => b.ID == bookId);
+
+                    if (bookToBorrow != default)
+                    {
+                        var existingBorrowing = Borrowings.FirstOrDefault(b => b.uid == userId && b.bid == bookToBorrow.ID && !b.returnBook);
+
+                        if (existingBorrowing != default)
+                        {
+                            Console.WriteLine($"Error: You have already borrowed {bookToBorrow.BName} and haven't returned it yet.");
+                            return;
+                        }
+
+                        if (bookToBorrow.quantity > 0)
+                        {
+                            Console.WriteLine($"You have successfully borrowed {bookToBorrow.BName}.");
+                            Books[Books.IndexOf(bookToBorrow)] = (bookToBorrow.BName, bookToBorrow.BAuthor, bookToBorrow.ID, bookToBorrow.originalQuantity, bookToBorrow.quantity - 1);
+                            Borrowings.Add((userId, bookToBorrow.ID, DateTime.Now, false));
+                        }
+                        else
+                        {
+                            Console.WriteLine($"Sorry, {bookToBorrow.BName} is currently not available.");
+                        }
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("No book selected for borrowing.");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("An error occurred while borrowing a suggested book: " + ex.Message);
+            }
+        }
+
 
         //........................helper Functions.....................................//
         static void LoadAllFiles()
