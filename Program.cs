@@ -927,7 +927,7 @@ namespace BasicLibrary
                             Books[index] = (Books[index].BName, Books[index].BAuthor, Books[index].ID, Books[index].originalQuantity, quantity);
                             Borrowings.Add((userId, Books[index].ID, DateTime.Now,false));
                             Console.WriteLine("You have borrowed the " + Books[index].BName + "!");
-
+                            suggestionsForUser(userId, Books[index].ID);
 
                         }
 
@@ -1050,141 +1050,233 @@ namespace BasicLibrary
                 index = -1; // No book selected for return
             }
         }
-        static void suggestionsForUser(int userID)
+        static void suggestionsForUser(int userID,int BookID=0)
         {
-            try
+            if (BookID == 0)
             {
-                List<int> bookIds = new List<int>();
-                List<int> borrowCounts = new List<int>();
-                // Count the borrowings for each book
-                foreach (var borrowing in Borrowings)
+                try
                 {
-                    int bookId = borrowing.bid;
-                    int index = bookIds.IndexOf(bookId);
-
-                    if (index == -1)
+                    List<int> bookIds = new List<int>();
+                    List<int> borrowCounts = new List<int>();
+                    // Count the borrowings for each book
+                    foreach (var borrowing in Borrowings)
                     {
-                        // If the book ID is not in the list, add it with an initial count
-                        bookIds.Add(bookId);
-                        borrowCounts.Add(1);
-                    }
-                    else
-                    {
-                        // If the book ID is already in the list, increment its count
-                        borrowCounts[index]++;
-                    }
-                }
-
-                // Find the book with the highest borrow count
-                int mostBorrowedBookId = -1;
-                int maxBorrowCount = 0;
-
-                for (int i = 0; i < borrowCounts.Count; i++)
-                {
-                    if (borrowCounts[i] > maxBorrowCount)
-                    {
-                        mostBorrowedBookId = bookIds[i];
-                        maxBorrowCount = borrowCounts[i];
-                    }
-                }
-                string BookName= null;
-                foreach (var book in Books) {
-                    if (book.ID == mostBorrowedBookId)
-                        BookName = book.BName;
-                }
-
-                // Output the ID of the most borrowed book
-                Console.WriteLine($"Most Borrowed Book ID: {mostBorrowedBookId} the name book:{BookName}");
-
-
-                // Create lists to track authors and their corresponding borrow counts
-                List<string> authors = new List<string>();
-                List<int> authorCounts = new List<int>();
-
-                // Count the borrowings for each author
-                foreach (var borrowing in Borrowings)
-                {
-                    // Find the book corresponding to the borrowing
-                    var book = Books.FirstOrDefault(b => b.ID == borrowing.bid);
-                    if (book != default)
-                    {
-                        string author = book.BAuthor;
-                        int index = authors.IndexOf(author);
+                        int bookId = borrowing.bid;
+                        int index = bookIds.IndexOf(bookId);
 
                         if (index == -1)
                         {
-                            // If the author is not in the list, add it with an initial count
-                            authors.Add(author);
-                            authorCounts.Add(1);
+                            // If the book ID is not in the list, add it with an initial count
+                            bookIds.Add(bookId);
+                            borrowCounts.Add(1);
                         }
                         else
                         {
-                            // If the author is already in the list, increment their count
-                            authorCounts[index]++;
+                            // If the book ID is already in the list, increment its count
+                            borrowCounts[index]++;
                         }
                     }
+
+                    // Find the book with the highest borrow count
+                    int mostBorrowedBookId = -1;
+                    int maxBorrowCount = 0;
+
+                    for (int i = 0; i < borrowCounts.Count; i++)
+                    {
+                        if (borrowCounts[i] > maxBorrowCount)
+                        {
+                            mostBorrowedBookId = bookIds[i];
+                            maxBorrowCount = borrowCounts[i];
+                        }
+                    }
+                    string BookName = null;
+                    foreach (var book in Books)
+                    {
+                        if (book.ID == mostBorrowedBookId)
+                            BookName = book.BName;
+                    }
+
+                    // Output the ID of the most borrowed book
+                    Console.WriteLine($"Most Borrowed Book ID: {mostBorrowedBookId} the name book:{BookName}");
+
+
+                    // Create lists to track authors and their corresponding borrow counts
+                    List<string> authors = new List<string>();
+                    List<int> authorCounts = new List<int>();
+
+                    // Count the borrowings for each author
+                    foreach (var borrowing in Borrowings)
+                    {
+                        // Find the book corresponding to the borrowing
+                        var book = Books.FirstOrDefault(b => b.ID == borrowing.bid);
+                        if (book != default)
+                        {
+                            string author = book.BAuthor;
+                            int index = authors.IndexOf(author);
+
+                            if (index == -1)
+                            {
+                                // If the author is not in the list, add it with an initial count
+                                authors.Add(author);
+                                authorCounts.Add(1);
+                            }
+                            else
+                            {
+                                // If the author is already in the list, increment their count
+                                authorCounts[index]++;
+                            }
+                        }
+                    }
+
+                    // Find the author with the highest borrow count
+                    string bestAuthor = null;
+                    int maxAuthorCount = 0;
+
+                    for (int i = 0; i < authorCounts.Count; i++)
+                    {
+                        if (authorCounts[i] > maxAuthorCount)
+                        {
+                            bestAuthor = authors[i];
+                            maxAuthorCount = authorCounts[i];
+                        }
+                    }
+
+                    // Output the name of the best author
+                    Console.WriteLine($"Best Author: {bestAuthor}");
+
+
+
+                    // List to keep track of book IDs borrowed along with the most borrowed book
+                    List<int> borrowedWithMostBorrowedBook = new List<int>();
+
+                    // Find the book IDs borrowed by the same users who borrowed the most borrowed book
+                    foreach (var borrowing in Borrowings)
+                    {
+                        if (borrowing.bid == mostBorrowedBookId && !borrowing.returnBook)
+                        {
+                            foreach (var otherBorrowing in Borrowings)
+                            {
+                                if (otherBorrowing.uid == borrowing.uid && otherBorrowing.bid != mostBorrowedBookId && !otherBorrowing.returnBook)
+                                {
+                                    if (!borrowedWithMostBorrowedBook.Contains(otherBorrowing.bid))
+                                    {
+                                        borrowedWithMostBorrowedBook.Add(otherBorrowing.bid);
+                                    }
+                                }
+                            }
+                        }
+                    }
+
+                    // Output the IDs of the books borrowed with the most borrowed book
+                    Console.WriteLine("Books borrowed with the most borrowed book:");
+                    foreach (var bookId in borrowedWithMostBorrowedBook)
+                    {
+                        string bookn = null;
+                        foreach (var book in Books)
+                        {
+                            if (bookId == book.ID)
+                                bookn = book.BName;
+                        }
+                        Console.WriteLine(bookId + ": " + bookn);
+                    }
+
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("An error occurred while suggesting books: " + ex.Message);
+                }
+            }
+            else
+            {// Check if the borrowed book exists
+                var borrowedBook = Books.FirstOrDefault(b => b.ID == BookID);
+                if (borrowedBook == default)
+                {
+                    Console.WriteLine("Book not found for suggestions.");
+                    return;
                 }
 
-                // Find the author with the highest borrow count
-                string bestAuthor = null;
-                int maxAuthorCount = 0;
+                Console.WriteLine("\nBook suggestions for you based on your recent borrowing:");
 
-                for (int i = 0; i < authorCounts.Count; i++)
+                // Suggest books by the same author
+                Console.WriteLine("\nBooks by the same author:");
+                var booksBySameAuthor = Books.Where(b => b.BAuthor == borrowedBook.BAuthor && b.ID != BookID).ToList();
+                if (booksBySameAuthor.Count > 0)
                 {
-                    if (authorCounts[i] > maxAuthorCount)
+                    foreach (var book in booksBySameAuthor)
                     {
-                        bestAuthor = authors[i];
-                        maxAuthorCount = authorCounts[i];
+                        Console.WriteLine($"{book.BName} by {book.BAuthor}");
                     }
                 }
+                else
+                {
+                    Console.WriteLine("No other books by the same author.");
+                }
 
-                // Output the name of the best author
-                Console.WriteLine($"Best Author: {bestAuthor}");
-
-
-
-                // List to keep track of book IDs borrowed along with the most borrowed book
-                List<int> borrowedWithMostBorrowedBook = new List<int>();
-
-                // Find the book IDs borrowed by the same users who borrowed the most borrowed book
+                // Suggest books that were borrowed along with the current book by other users
+                Console.WriteLine("\nBooks commonly borrowed with this book:");
+                List<int> borrowedWithSameBook = new List<int>();
                 foreach (var borrowing in Borrowings)
                 {
-                    if (borrowing.bid == mostBorrowedBookId && !borrowing.returnBook)
+                    if (borrowing.bid == BookID && borrowing.returnBook == false)
                     {
                         foreach (var otherBorrowing in Borrowings)
                         {
-                            if (otherBorrowing.uid == borrowing.uid && otherBorrowing.bid != mostBorrowedBookId && !otherBorrowing.returnBook)
+                            if (otherBorrowing.uid == borrowing.uid && otherBorrowing.bid != BookID && !otherBorrowing.returnBook)
                             {
-                                if (!borrowedWithMostBorrowedBook.Contains(otherBorrowing.bid))
+                                if (!borrowedWithSameBook.Contains(otherBorrowing.bid))
                                 {
-                                    borrowedWithMostBorrowedBook.Add(otherBorrowing.bid);
+                                    borrowedWithSameBook.Add(otherBorrowing.bid);
                                 }
                             }
                         }
                     }
                 }
 
-                // Output the IDs of the books borrowed with the most borrowed book
-                Console.WriteLine("Books borrowed with the most borrowed book:");
-                foreach (var bookId in borrowedWithMostBorrowedBook)
+                if (borrowedWithSameBook.Count > 0)
                 {
-                    string bookn = null;
-                    foreach (var book in Books) {
-                        if (bookId == book.ID)
-                            bookn=book.BName;
-                                }
-                    Console.WriteLine(bookId+": "+bookn);
+                    foreach (var bookId in borrowedWithSameBook)
+                    {
+                        var book = Books.FirstOrDefault(b => b.ID == bookId);
+                        if (book != default)
+                        {
+                            Console.WriteLine($"{book.BName} by {book.BAuthor}");
+                        }
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("No other books borrowed with this one.");
                 }
 
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("An error occurred while suggesting books: " + ex.Message);
+                // Suggest the most borrowed books
+                Console.WriteLine("\nPopular books among other users:");
+                Dictionary<int, int> borrowCount = new Dictionary<int, int>();
+                foreach (var borrowing in Borrowings)
+                {
+                    if (borrowCount.ContainsKey(borrowing.bid))
+                    {
+                        borrowCount[borrowing.bid]++;
+                    }
+                    else
+                    {
+                        borrowCount[borrowing.bid] = 1;
+                    }
+                }
+
+                var popularBooks = borrowCount.OrderByDescending(b => b.Value).Take(3).ToList(); // Suggest top 3 most borrowed books
+                foreach (var bookEntry in popularBooks)
+                {
+                    var book = Books.FirstOrDefault(b => b.ID == bookEntry.Key);
+                    if (book != default)
+                    {
+                        Console.WriteLine($"{book.BName} by {book.BAuthor}");
+                    }
+                }
             }
         }
+        
 
-
-        //........................Necessary Functions.....................................//
+        //........................helper Functions.....................................//
         static void LoadAllFiles()
         {
             try
@@ -1377,7 +1469,7 @@ namespace BasicLibrary
             for (int i = 0; i < Books.Count; i++)
             {
                 BookNumber = i + 1;
-                sb.AppendLine($"\n({BookNumber})\tBook Name:{Books[i].BName}\tAuthor:{Books[i].BAuthor}\tID:{Books[i].BAuthor}\tQuantity:{Books[i].quantity}");
+                sb.AppendLine($"({BookNumber})\tBook Name:{Books[i].BName}\tAuthor:{Books[i].BAuthor}\tID:{Books[i].BAuthor}\tQuantity:{Books[i].quantity}");
                 sb.AppendLine();
                 Console.WriteLine(sb.ToString());
                 sb.Clear();
