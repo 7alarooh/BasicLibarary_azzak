@@ -263,8 +263,18 @@ namespace BasicLibrary
 
             Console.WriteLine("Enter User Password:");
                 string password = Console.ReadLine();
+            // Confirm password
+            Console.WriteLine("Confirm Password:");
+            string confirmPassword = Console.ReadLine();
 
-                Console.WriteLine("Enter User Name:");
+            // Check if passwords match
+            if (password != confirmPassword)
+            {
+                Console.WriteLine("Error: Passwords do not match.");
+                return;
+            }
+
+            Console.WriteLine("Enter User Name:");
                 string name = Console.ReadLine();
 
                 // Add new user to the Users list with the auto-generated ID
@@ -284,6 +294,16 @@ namespace BasicLibrary
             }
             Console.WriteLine("Enter Admin Password:");
             string pw = Console.ReadLine();
+            // Confirm password
+            Console.WriteLine("Confirm Password:");
+            string confirmPassword = Console.ReadLine();
+
+            // Check if passwords match
+            if (pw != confirmPassword)
+            {
+                Console.WriteLine("Error: Passwords do not match.");
+                return;
+            }
 
             Console.WriteLine("Enter Admin Name:");
             string name = Console.ReadLine();
