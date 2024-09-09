@@ -215,6 +215,7 @@ namespace BasicLibrary
         }
         static void AddNewUser()
         {
+            
             Console.WriteLine("Would you like to add a new User or Admin?");
             Console.WriteLine("Enter '1' for User or '2' for Admin:");
             string choice = Console.ReadLine();
@@ -294,6 +295,7 @@ namespace BasicLibrary
 
         static void EditUserInformation()
         {
+            ViewAllUsers();
             Console.WriteLine("Enter the type of account to edit (user/admin):");
             string accountType = Console.ReadLine().ToLower();
 
@@ -414,6 +416,7 @@ namespace BasicLibrary
 
         static void RemoveUserAccount()
         {
+            ViewAllUsers();
             Console.WriteLine("Enter the type of account to remove (user/admin):");
             string accountType = Console.ReadLine().ToLower();
 
@@ -511,6 +514,35 @@ namespace BasicLibrary
             catch (Exception ex)
             {
                 Console.WriteLine("An error occurred while removing the admin: " + ex.Message);
+            }
+        }
+        static void ViewAllUsers()
+        {
+            StringBuilder sb = new StringBuilder();
+
+            int userNumber = 0;
+            sb.Append("\n \t---All Users in Library System---");
+            sb.Append("\n \t---Admins---");
+            sb.Append("\n \tEmail\tPassword\tName");
+            for (int i = 0; i < Admins.Count; i++)
+            {
+                userNumber = i + 1;
+                sb.AppendLine($"\n({userNumber})\t {Admins[i].email}\t{Admins[i].pw}\t{Admins[i].name}");
+                sb.AppendLine();
+                Console.WriteLine(sb.ToString());
+                sb.Clear();
+
+            }
+            userNumber = 0;
+            sb.Append("\n\n \t---Users---");
+            sb.Append("\n \tEmail\tPassword\tID\tName");
+            for (int i = 0; i < Admins.Count; i++)
+            {
+                userNumber = i + 1;
+                sb.AppendLine($"\n({userNumber})\t{Users[i].email}\t{Users[i].pw}\t{Users[i].id}\t{Users[i].name}");
+                sb.AppendLine();
+                Console.WriteLine(sb.ToString());
+                sb.Clear();
             }
         }
 
