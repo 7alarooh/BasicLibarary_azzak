@@ -1942,10 +1942,11 @@ namespace BasicLibrary
                 {
                     foreach (var b in Borrowings)
                     {
-                        writer.WriteLine($"{b.uid}|{b.bid}|{b.date}|{b.ISReturned}");
-
+                        // Save all fields to the file
+                        writer.WriteLine($"{b.uid}|{b.bid}|{b.date}|{b.ReturnDate}|{b.ActualReturnDate}|{b.ISReturned}|{b.Rating}");
                     }
                 }
+                Console.WriteLine("Borrowings saved successfully.");
             }
             catch (Exception ex)
             {
