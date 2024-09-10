@@ -1729,17 +1729,25 @@ namespace BasicLibrary
                         while ((line = reader.ReadLine()) != null)
                         {
                             var parts = line.Split('|');
-                            if (parts.Length == 4)
+                            if (parts.Length == 7) // Ensure that all fields are present
                             {
                                 int uid = int.Parse(parts[0]);
                                 int bid = int.Parse(parts[1]);
-                                DateTime date = DateTime.Parse(parts[2]); // Parse the date string
-                                bool returnBook = bool.Parse(parts[3]); // Parse the returnBook string
+                                DateTime date = DateTime.Parse(parts[2]);
+                                DateTime returnDate = DateTime.Parse(parts[3]);
+                                DateTime actualReturnDate = DateTime.Parse(parts[4]);
+                                bool isReturned = bool.Parse(parts[5]);
+                                int rating = int.Parse(parts[6]);
 
-                                //Borrowings.Add((uid, bid, date, returnBook));
+                                Borrowings.Add((uid, bid, date, returnDate, actualReturnDate, isReturned, rating));
                             }
                         }
                     }
+                    Console.WriteLine("Borrowings loaded successfully from file.");
+                }
+                else
+                {
+                    Console.WriteLine("Borrowing file not found.");
                 }
             }
             catch (Exception ex)
