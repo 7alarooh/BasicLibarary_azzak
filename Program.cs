@@ -292,7 +292,8 @@ namespace BasicLibrary
         }
 
         static void AddUser()
-        {// Determine the next ID by finding the highest existing ID and incrementing it
+        {
+            // Determine the next ID by finding the highest existing ID and incrementing it
             int nextID = 1; // Start with 1 if there are no users
             if (Users.Count > 0)
             {
@@ -309,12 +310,20 @@ namespace BasicLibrary
             string email;
             bool emailExists = true;
 
-            // Loop until a unique email is entered
+            // Loop until a valid and unique email is entered
             do
             {
                 Console.WriteLine("Enter User Email:");
                 email = Console.ReadLine();
-                IsValidEmail(email);
+
+                // Check if email format is valid
+                if (!IsValidEmail(email))
+                {
+                    Console.WriteLine("Error: Invalid email format. Please try again.");
+                    continue; // Go back to the beginning of the loop if email is invalid
+                }
+
+                // Check if email already exists
                 if (Users.Any(u => u.email.ToLower() == email.ToLower())) // Case-insensitive check
                 {
                     Console.WriteLine("Error: A user with this email already exists. Please enter a different email.");
@@ -323,17 +332,23 @@ namespace BasicLibrary
                 {
                     emailExists = false; // Email is unique, break the loop
                 }
-            } while (emailExists); // Continue looping until a unique email is provided
+            } while (emailExists); // Continue looping until a valid and unique email is provided
 
             string password, confirmPassword;
             bool passwordsMatch = false;
 
-            // Loop until passwords match
+            // Loop until passwords match and meet the validation criteria
             do
             {
-                Console.WriteLine("Enter User Password:");
+                Console.WriteLine("Enter User Password (at least 6 characters):");
                 password = Console.ReadLine();
-                IsValidPassword(password);
+
+                // Check if password is valid
+                if (!IsValidPassword(password))
+                {
+                    Console.WriteLine("Error: Password does not meet the required format (at least 6 characters).");
+                    continue; // Go back to the beginning of the loop if password is invalid
+                }
 
                 Console.WriteLine("Confirm Password:");
                 confirmPassword = Console.ReadLine();
@@ -347,7 +362,7 @@ namespace BasicLibrary
                 {
                     passwordsMatch = true; // Passwords match, break the loop
                 }
-            } while (!passwordsMatch); // Continue looping until passwords match
+            } while (!passwordsMatch); // Continue looping until passwords match and are valid
 
             Console.WriteLine("Enter User Name:");
             string name = Console.ReadLine();
@@ -355,7 +370,6 @@ namespace BasicLibrary
             // Add new user to the Users list with the auto-generated ID
             Users.Add((nextID, email, password, name));
             Console.WriteLine($"New user added successfully with ID: {nextID}");
-
         }
 
         static void AddAdmin()
@@ -363,13 +377,20 @@ namespace BasicLibrary
             string email;
             bool emailExists = true;
 
-            // Loop until a unique email is entered
+            // Loop until a valid and unique email is entered
             do
             {
                 Console.WriteLine("Enter Admin Email:");
                 email = Console.ReadLine();
-                IsValidEmail(email);
 
+                // Check if email format is valid
+                if (!IsValidEmail(email))
+                {
+                    Console.WriteLine("Error: Invalid email format. Please try again.");
+                    continue; // Go back to the beginning of the loop if email is invalid
+                }
+
+                // Check if email already exists
                 if (Admins.Any(a => a.email.ToLower() == email.ToLower())) // Case-insensitive check
                 {
                     Console.WriteLine("Error: An admin with this email already exists. Please enter a different email.");
@@ -378,30 +399,46 @@ namespace BasicLibrary
                 {
                     emailExists = false; // Email is unique, break the loop
                 }
-            } while (emailExists); // Continue looping until a unique email is provided
+            } while (emailExists); // Continue looping until a valid and unique email is provided
 
-            // Continue with password input
-            Console.WriteLine("Enter Admin Password:");
-            string pw = Console.ReadLine();
-            IsValidPassword(pw);
-            // Confirm password
-            Console.WriteLine("Confirm Password:");
-            string confirmPassword = Console.ReadLine();
+            string password, confirmPassword;
+            bool passwordsMatch = false;
 
-            // Check if passwords match
-            if (pw != confirmPassword)
+            // Loop until passwords match and meet the validation criteria
+            do
             {
-                Console.WriteLine("Error: Passwords do not match.");
-                return;
-            }
+                Console.WriteLine("Enter Admin Password (at least 6 characters):");
+                password = Console.ReadLine();
+
+                // Check if password is valid
+                if (!IsValidPassword(password))
+                {
+                    Console.WriteLine("Error: Password does not meet the required format (at least 6 characters).");
+                    continue; // Go back to the beginning of the loop if password is invalid
+                }
+
+                Console.WriteLine("Confirm Password:");
+                confirmPassword = Console.ReadLine();
+
+                // Check if passwords match
+                if (password != confirmPassword)
+                {
+                    Console.WriteLine("Error: Passwords do not match. Please try again.");
+                }
+                else
+                {
+                    passwordsMatch = true; // Passwords match, break the loop
+                }
+            } while (!passwordsMatch); // Continue looping until passwords match and are valid
 
             Console.WriteLine("Enter Admin Name:");
             string name = Console.ReadLine();
 
             // Add admin to the list
-            Admins.Add((email, pw, name));
+            Admins.Add((email, password, name));
             Console.WriteLine("Admin added successfully.");
         }
+
 
         static void EditUserInformation()
         {
@@ -1250,7 +1287,7 @@ namespace BasicLibrary
                     }
                     suggestedBookIds.Add(mostBorrowedBookId);
                     // Output the ID of the most borrowed book
-                    Console.WriteLine($"Most Borrowed Book ID: {mostBorrowedBookId} the name book:{BookName}");
+                    Console.WriteLine($"Most Borrowed Book ID: {mostBorrowedBookId} the name book:{BookName}\n");
 
 
                     // Create lists to track authors and their corresponding borrow counts
@@ -1295,7 +1332,7 @@ namespace BasicLibrary
                     }
 
                     // Output the name of the best author
-                    Console.WriteLine($"Best Author: {bestAuthor}");
+                    Console.WriteLine($"Best Author: {bestAuthor}\n");
                     foreach (var book in Books) 
                     {if (book.BAuthor == bestAuthor)
                         { suggestedBookIds.Add(book.ID); }
@@ -1324,7 +1361,7 @@ namespace BasicLibrary
                     }
 
                     // Output the IDs of the books borrowed with the most borrowed book
-                    Console.WriteLine("Books borrowed with the most borrowed book:");
+                    Console.WriteLine("Books borrowed with the most borrowed book:\n");
                     foreach (var bookId in borrowedWithMostBorrowedBook)
                     {
                         string bookn = null;
@@ -1414,7 +1451,7 @@ namespace BasicLibrary
                 }
 
                 // Suggest the most borrowed books
-                Console.WriteLine("\nPopular books among other users:");
+                Console.WriteLine("\nPopular books among other users:/n");
                 Dictionary<int, int> borrowCount = new Dictionary<int, int>();
                 foreach (var borrowing in Borrowings)
                 {
@@ -1443,8 +1480,13 @@ namespace BasicLibrary
         }
         static void borrowingAfterSuggestions(int userId, List<int> suggestedBookIds)
         {
+            Console.Clear();
             try
             {
+                // Remove duplicate book IDs from suggestions
+                suggestedBookIds = suggestedBookIds.Distinct().ToList();
+
+                
                 if (suggestedBookIds.Count == 0)
                 {
                     Console.WriteLine("No books are available to borrow from the suggestions.");
