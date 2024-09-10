@@ -3,6 +3,7 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.Design;
 using System.Diagnostics;
+using System.Security.Cryptography;
 using System.Security.Principal;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -15,16 +16,17 @@ namespace BasicLibrary
     {// TEST 
         //........................Necessary variables and path files.....................................//
 
-        static List<(string BName, string BAuthor, int ID,int copies, int borrowCopies,double price, string catagory,int DaysAllowedForBorrowing)> Books = new List<(string BName, string BAuthor, int ID, int copies, int borrowCopies,double price,string catagory,int DaysAllowedForBorrowing)>();
+        static List<(string BName, string BAuthor, int BID, int copies, int borrowedCopies,double Price, string catagory,int BorrowPeriod)> Books = new List<(string BName, string BAuthor, int BID, int copies, int borrowedCopies, double Price, string catagory,int BorrowPeriod)>();
         static List<(int id,string email,string pw,string name)> Users =new List<(int id,string email,string pw, string name)>();
         static List<(string email, string pw, string name)> Admins = new List<(string email, string pw, string name)>();
-        static List<(int uid, int bid, DateTime date,bool returnBook)> Borrowings = new List<(int uid, int bid, DateTime date, bool returnBook)>();
-        static List<(int uid, int bid, DateTime date)> returnings = new List<(int uid, int bid, DateTime date)>();
+        static List<(int uid, int bid, DateTime date,DateTime ReturnDate, DateTime ActualReturnDate, bool ISReturned, int Rating)> Borrowings = new List<(int uid, int bid, DateTime date, DateTime ReturnDate, DateTime ActualReturnDate, bool ISReturned, int Rating)>();
+        static List<(int CID, string CName, int NOFBooks)> Categories = new List<(int CID, string CName, int NOFBooks)>();
+        
         static string filePath = "C:\\Users\\Lenovo\\source\\repos\\azzaGitTest\\lib.txt";
         static string userFilePath = "C:\\Users\\Lenovo\\source\\repos\\azzaGitTest\\user.txt";
         static string adminFilePath = "C:\\Users\\Lenovo\\source\\repos\\azzaGitTest\\admin.txt";
         static string borrowingFilePath = "C:\\Users\\Lenovo\\source\\repos\\azzaGitTest\\borrowing.txt";
-        static string returningFilePath = "C:\\Users\\Lenovo\\source\\repos\\azzaGitTest\\returning.txt";
+        static string CategoriesFile = "C:\\Users\\Lenovo\\source\\repos\\azzaGitTest\\Categories.txt";
         static int index = -1;
         //-----------------------------------------------------------------------------//
 
@@ -886,9 +888,9 @@ namespace BasicLibrary
                 // Loop through the books to find the highest existing ID
                 foreach (var book in Books)
                 {
-                    if (book.ID >= newID)
+                    if (book.BID >= newID)
                     {
-                        newID = book.ID + 1;
+                        newID = book.BID + 1;
                     }
                 }
             }
@@ -1010,7 +1012,7 @@ namespace BasicLibrary
                         Console.WriteLine("Error: Quantity cannot be negative.");
                         return;
                     }
-                    book.borrowCopies = newQuantity;
+                    book.borrowedCopies = newQuantity;
                     book.copies = newQuantity;
                 }
                 catch (FormatException)
@@ -1031,7 +1033,7 @@ namespace BasicLibrary
             // If a valid book index is found
             if (index != -1)
             {
-                var activeBorrowing = Borrowings.Any(b => b.bid == Books[index].ID && !b.returnBook);//the function checks the Borrowings list to see if any active borrowing exists for the book >> the book is borrowed and the returnBook flag is still false.
+                var activeBorrowing = Borrowings.Any(b => b.bid == Books[index].BID && !b.ISReturned);//the function checks the Borrowings list to see if any active borrowing exists for the book >> the book is borrowed and the returnBook flag is still false.
 
                 if (activeBorrowing)
                 {
@@ -1084,7 +1086,7 @@ namespace BasicLibrary
                 }
 
                 // Find the book to get the author
-                var book = Books.FirstOrDefault(b => b.ID == bookId);
+                var book = Books.FirstOrDefault(b => b.BID == bookId);
                 if (book != default)
                 {
                     string author = book.BAuthor;
@@ -1113,7 +1115,7 @@ namespace BasicLibrary
                 int maxBorrowCount = bookBorrowCount.Max(b => b.count);
                 var mostBorrowedBook = bookBorrowCount.FirstOrDefault(b => b.count == maxBorrowCount);
 
-                var book = Books.FirstOrDefault(b => b.ID == mostBorrowedBook.bookId);
+                var book = Books.FirstOrDefault(b => b.BID == mostBorrowedBook.bookId);
                 Console.WriteLine($"Most Borrowed Book: '{book.BName}' by {book.BAuthor} (Borrowed {maxBorrowCount} times)");
             }
             else
@@ -1197,14 +1199,14 @@ namespace BasicLibrary
                 SearchForBook();
                 if (index != -1)
                 {
-                    var existingBorrowing = Borrowings.FirstOrDefault(b => b.uid == userId && b.bid == Books[index].ID && b.returnBook == false);
+                    var existingBorrowing = Borrowings.FirstOrDefault(b => b.uid == userId && b.bid == Books[index].BID && b.ISReturned == false);
                     if (existingBorrowing != default)
                     {
                         Console.WriteLine("Error: You have already borrowed this book and haven't returned it yet.");
                         return;
                     }
 
-                    int quantity = Books[index].borrowCopies;
+                    int quantity = Books[index].borrowedCopies;
                     if (quantity > 0)
                     {
                         Console.WriteLine("Do you want to borrow the Book?");
@@ -1220,10 +1222,10 @@ namespace BasicLibrary
                         {
 
                             --quantity;
-                            Books[index] = (Books[index].BName, Books[index].BAuthor, Books[index].ID, Books[index].copies, quantity, Books[index].price, Books[index].catagory, Books[index].DaysAllowedForBorrowing);
-                            Borrowings.Add((userId, Books[index].ID, DateTime.Now,false));
+                            Books[index] = (Books[index].BName, Books[index].BAuthor, Books[index].BID, Books[index].copies, quantity, Books[index].Price, Books[index].catagory, Books[index].BorrowPeriod);
+                           // Borrowings.Add((userId, Books[index].BID, DateTime.Now,false));
                             Console.WriteLine("You have borrowed the " + Books[index].BName + "!");
-                            suggestionsForUser(userId, Books[index].ID);
+                            suggestionsForUser(userId, Books[index].BID);
 
                         }
 
@@ -1246,11 +1248,11 @@ namespace BasicLibrary
                 DisplayYourBookBorrowed(userId);
                 if (index != -1)
                 {
-                    int quantity = Books[index].borrowCopies;
+                    int quantity = Books[index].borrowedCopies;
                     int copies = Books[index].copies;
 
                     // Check if the user has borrowed this book
-                    var borrowingRecord = Borrowings.FirstOrDefault(b => b.uid == userId && b.bid == Books[index].ID && !b.returnBook);
+                    var borrowingRecord = Borrowings.FirstOrDefault(b => b.uid == userId && b.bid == Books[index].BID && !b.ISReturned);
 
                     if (borrowingRecord == default)
                     {
@@ -1276,18 +1278,18 @@ namespace BasicLibrary
                         else
                         {
                             ++quantity;
-                            Books[index] = (Books[index].BName, Books[index].BAuthor, Books[index].ID, Books[index].copies, quantity, Books[index].price, Books[index].catagory, Books[index].DaysAllowedForBorrowing);
+                            Books[index] = (Books[index].BName, Books[index].BAuthor, Books[index].BID, Books[index].copies, quantity, Books[index].Price, Books[index].catagory, Books[index].BorrowPeriod);
 
                             // Update the Borrowings list 
                             for (int i = 0; i < Borrowings.Count; i++)
                             {
-                                if (Borrowings[i].uid == userId && Borrowings[i].bid == Books[index].ID && Borrowings[i].returnBook == false)
+                                if (Borrowings[i].uid == userId && Borrowings[i].bid == Books[index].BID && Borrowings[i].ISReturned == false)
                                 {
-                                    Borrowings[i] = (Borrowings[i].uid, Borrowings[i].bid, Borrowings[i].date, true);
+                                   // Borrowings[i] = (Borrowings[i].uid, Borrowings[i].bid, Borrowings[i].date, true);
                                 }
                             }
 
-                            returnings.Add((userId, Books[index].ID, DateTime.Now));
+                           // returnings.Add((userId, Books[index].BID, DateTime.Now));
                             Console.WriteLine("'" + Books[index].BName + "' Book has been returned successfully!");
                         }
                     }
@@ -1298,7 +1300,7 @@ namespace BasicLibrary
                 Console.WriteLine("An error occurred while returning the book: " + ex.Message);
             }
         }
-        static void DisplayYourBookBorrowed(int userId)
+        static void DisplayYourBookBorrowed(int userId)     
         {
             // Check if the user has borrowed any books
             var userBorrowings = Borrowings.Where(b => b.uid == userId).ToList();
@@ -1314,9 +1316,9 @@ namespace BasicLibrary
             foreach (var borrowing in userBorrowings)
             {
                 // Find the book details based on the book ID
-                var book = Books.FirstOrDefault(b => b.ID == borrowing.bid);
+                var book = Books.FirstOrDefault(b => b.BID == borrowing.bid);
 
-                if (book != default && borrowing.returnBook!=true)
+                if (book != default && borrowing.ISReturned !=true)
                 {
                     Console.WriteLine($"- '{book.BName}' by {book.BAuthor} (Borrowed on: {borrowing.date.ToShortDateString()})");
                 }
@@ -1390,7 +1392,7 @@ namespace BasicLibrary
                     string BookName = null;
                     foreach (var book in Books)
                     {
-                        if (book.ID == mostBorrowedBookId)
+                        if (book.BID == mostBorrowedBookId)
                             BookName = book.BName;
                     }
                     suggestedBookIds.Add(mostBorrowedBookId);
@@ -1406,7 +1408,7 @@ namespace BasicLibrary
                     foreach (var borrowing in Borrowings)
                     {
                         // Find the book corresponding to the borrowing
-                        var book = Books.FirstOrDefault(b => b.ID == borrowing.bid);
+                        var book = Books.FirstOrDefault(b => b.BID == borrowing.bid);
                         if (book != default)
                         {
                             string author = book.BAuthor;
@@ -1443,7 +1445,7 @@ namespace BasicLibrary
                     Console.WriteLine($"Best Author: {bestAuthor}\n");
                     foreach (var book in Books) 
                     {if (book.BAuthor == bestAuthor)
-                        { suggestedBookIds.Add(book.ID); }
+                        { suggestedBookIds.Add(book.BID); }
                     }
 
 
@@ -1453,11 +1455,11 @@ namespace BasicLibrary
                     // Find the book IDs borrowed by the same users who borrowed the most borrowed book
                     foreach (var borrowing in Borrowings)
                     {
-                        if (borrowing.bid == mostBorrowedBookId && !borrowing.returnBook)
+                        if (borrowing.bid == mostBorrowedBookId && !borrowing.ISReturned)
                         {
                             foreach (var otherBorrowing in Borrowings)
                             {
-                                if (otherBorrowing.uid == borrowing.uid && otherBorrowing.bid != mostBorrowedBookId && !otherBorrowing.returnBook)
+                                if (otherBorrowing.uid == borrowing.uid && otherBorrowing.bid != mostBorrowedBookId && !otherBorrowing.ISReturned)
                                 {
                                     if (!borrowedWithMostBorrowedBook.Contains(otherBorrowing.bid))
                                     {
@@ -1475,7 +1477,7 @@ namespace BasicLibrary
                         string bookn = null;
                         foreach (var book in Books)
                         {
-                            if (bookId == book.ID)
+                            if (bookId == book.BID)
                             {
                                 bookn = book.BName;
                                 suggestedBookIds.Add(bookId);
@@ -1496,7 +1498,7 @@ namespace BasicLibrary
 
 
                 // Check if the borrowed book exists
-                var borrowedBook = Books.FirstOrDefault(b => b.ID == BookID);
+                var borrowedBook = Books.FirstOrDefault(b => b.BID == BookID);
                 if (borrowedBook == default)
                 {
                     Console.WriteLine("Book not found for suggestions.");
@@ -1507,13 +1509,13 @@ namespace BasicLibrary
 
                 // Suggest books by the same author
                 Console.WriteLine("\nBooks by the same author:");
-                var booksBySameAuthor = Books.Where(b => b.BAuthor == borrowedBook.BAuthor && b.ID != BookID).ToList();
+                var booksBySameAuthor = Books.Where(b => b.BAuthor == borrowedBook.BAuthor && b.BID != BookID).ToList();
                 if (booksBySameAuthor.Count > 0)
                 {
                     foreach (var book in booksBySameAuthor)
                     {
                         Console.WriteLine($"{book.BName} by {book.BAuthor}");
-                        suggestedBookIds.Add(book.ID);
+                        suggestedBookIds.Add(book.BID);
                     }
                 }
                 else
@@ -1526,11 +1528,11 @@ namespace BasicLibrary
                 List<int> borrowedWithSameBook = new List<int>();
                 foreach (var borrowing in Borrowings)
                 {
-                    if (borrowing.bid == BookID && borrowing.returnBook == false)
+                    if (borrowing.bid == BookID && borrowing.ISReturned == false)
                     {
                         foreach (var otherBorrowing in Borrowings)
                         {
-                            if (otherBorrowing.uid == borrowing.uid && otherBorrowing.bid != BookID && !otherBorrowing.returnBook)
+                            if (otherBorrowing.uid == borrowing.uid && otherBorrowing.bid != BookID && !otherBorrowing.ISReturned)
                             {
                                 if (!borrowedWithSameBook.Contains(otherBorrowing.bid))
                                 {
@@ -1545,11 +1547,11 @@ namespace BasicLibrary
                 {
                     foreach (var bookId in borrowedWithSameBook)
                     {
-                        var book = Books.FirstOrDefault(b => b.ID == bookId);
+                        var book = Books.FirstOrDefault(b => b.BID == bookId);
                         if (book != default)
                         {
                             Console.WriteLine($"{book.BName} by {book.BAuthor}");
-                            suggestedBookIds.Add(book.ID);
+                            suggestedBookIds.Add(book.BID);
                         }
                     }
                 }
@@ -1576,11 +1578,11 @@ namespace BasicLibrary
                 var popularBooks = borrowCount.OrderByDescending(b => b.Value).Take(3).ToList(); // Suggest top 3 most borrowed books
                 foreach (var bookEntry in popularBooks)
                 {
-                    var book = Books.FirstOrDefault(b => b.ID == bookEntry.Key);
+                    var book = Books.FirstOrDefault(b => b.BID == bookEntry.Key);
                     if (book != default)
                     {
                         Console.WriteLine($"{book.BName} by {book.BAuthor}");
-                        suggestedBookIds.Add(book.ID );
+                        suggestedBookIds.Add(book.BID );
                     }
                 }
                 borrowingAfterSuggestions(userID,suggestedBookIds);
@@ -1605,10 +1607,10 @@ namespace BasicLibrary
                 Console.WriteLine("\nWould you like to borrow any of these suggested books?");
                 for (int i = 0; i < suggestedBookIds.Count; i++)
                 {
-                    var book = Books.FirstOrDefault(b => b.ID == suggestedBookIds[i]);
+                    var book = Books.FirstOrDefault(b => b.BID == suggestedBookIds[i]);
                     if (book != default)
                     {
-                        Console.WriteLine($"{i + 1}. {book.BName} by {book.BAuthor} (ID: {book.ID})");
+                        Console.WriteLine($"{i + 1}. {book.BName} by {book.BAuthor} (ID: {book.BID})");
                     }
                 }
 
@@ -1617,11 +1619,11 @@ namespace BasicLibrary
                 if (int.TryParse(Console.ReadLine(), out int choice) && choice > 0 && choice <= suggestedBookIds.Count)
                 {
                     int bookId = suggestedBookIds[choice - 1];
-                    var bookToBorrow = Books.FirstOrDefault(b => b.ID == bookId);
+                    var bookToBorrow = Books.FirstOrDefault(b => b.BID == bookId);
 
                     if (bookToBorrow != default)
                     {
-                        var existingBorrowing = Borrowings.FirstOrDefault(b => b.uid == userId && b.bid == bookToBorrow.ID && !b.returnBook);
+                        var existingBorrowing = Borrowings.FirstOrDefault(b => b.uid == userId && b.bid == bookToBorrow.BID && !b.ISReturned);
 
                         if (existingBorrowing != default)
                         {
@@ -1629,11 +1631,11 @@ namespace BasicLibrary
                             return;
                         }
 
-                        if (bookToBorrow.borrowCopies > 0)
+                        if (bookToBorrow.borrowedCopies > 0)
                         {
                             Console.WriteLine($"You have successfully borrowed {bookToBorrow.BName}.");
-                            Books[Books.IndexOf(bookToBorrow)] = (bookToBorrow.BName, bookToBorrow.BAuthor, bookToBorrow.ID, bookToBorrow.copies, bookToBorrow.borrowCopies - 1, bookToBorrow.price, bookToBorrow.catagory, bookToBorrow.DaysAllowedForBorrowing);
-                            Borrowings.Add((userId, bookToBorrow.ID, DateTime.Now, false));
+                            Books[Books.IndexOf(bookToBorrow)] = (bookToBorrow.BName, bookToBorrow.BAuthor, bookToBorrow.BID, bookToBorrow.copies, bookToBorrow.borrowedCopies - 1, bookToBorrow.Price, bookToBorrow.catagory, bookToBorrow.BorrowPeriod);
+                            //Borrowings.Add((userId, bookToBorrow.BID, DateTime.Now, false));
                         }
                         else
                         {
@@ -1721,7 +1723,7 @@ namespace BasicLibrary
                                 DateTime date = DateTime.Parse(parts[2]); // Parse the date string
                                 bool returnBook = bool.Parse(parts[3]); // Parse the returnBook string
 
-                                Borrowings.Add((uid, bid, date, returnBook));
+                                //Borrowings.Add((uid, bid, date, returnBook));
                             }
                         }
                     }
@@ -1734,9 +1736,9 @@ namespace BasicLibrary
             //---------------------
             try
             {
-                if (File.Exists(returningFilePath))
+                if (File.Exists(CategoriesFile))
                 {
-                    using (StreamReader reader = new StreamReader(returningFilePath))
+                    using (StreamReader reader = new StreamReader(CategoriesFile))
                     {
                         string line;
                         while ((line = reader.ReadLine()) != null)
@@ -1748,7 +1750,7 @@ namespace BasicLibrary
                                 int bid = int.Parse(parts[1]);
                                 DateTime date = DateTime.Parse(parts[2]); // Parse the date
 
-                                returnings.Add((uid, bid, date));
+                                //returnings.Add((uid, bid, date));
                             }
                         }
                     }
@@ -1794,7 +1796,7 @@ namespace BasicLibrary
                 {
                     foreach (var book in Books)
                     {
-                        writer.WriteLine($"{book.BName}|{book.BAuthor}|{book.ID}|{book.copies}|{book.borrowCopies}");
+                        writer.WriteLine($"{book.BName}|{book.BAuthor}|{book.BID}|{book.copies}|{book.borrowedCopies}");
                     }
                 }
                 Console.WriteLine("Books updated to file successfully.");
@@ -1836,7 +1838,7 @@ namespace BasicLibrary
                 Console.WriteLine($"Error saving to file: {ex.Message}");
             }
         }
-        static void ViewAllBooks()
+        static void ViewAllBooks()  
         {
             //
             StringBuilder sb = new StringBuilder();
@@ -1861,8 +1863,8 @@ namespace BasicLibrary
                 sb.AppendFormat("\t{0,-" + nameWidth + "} {1,-" + authorWidth + "} {2,-" + idWidth + "} {3,-" + quantityWidth + "}",
                                 book.BName,
                                 book.BAuthor,
-                                book.ID,
-                                book.borrowCopies);
+                                book.BID,
+                                book.borrowedCopies);
                 sb.AppendLine();
             }
 
@@ -1919,7 +1921,8 @@ namespace BasicLibrary
                 {
                     foreach (var b in Borrowings)
                     {
-                        writer.WriteLine($"{b.uid}|{b.bid}|{b.date}|{b.returnBook}");
+                        writer.WriteLine($"{b.uid}|{b.bid}|{b.date}|{b.ISReturned}");
+
                     }
                 }
             }
@@ -1933,11 +1936,11 @@ namespace BasicLibrary
 
             try
             {
-                using (StreamWriter writer = new StreamWriter(returningFilePath))
+                using (StreamWriter writer = new StreamWriter(CategoriesFile))
                 {
-                    foreach (var r in returnings)
+                    foreach (var c in Categories)
                     {
-                        writer.WriteLine($"{r.uid}|{r.bid}|{r.date}");
+                        writer.WriteLine($"{c.CID}|{c.CName}|{c.NOFBooks}");
                     }
                 }
                 Console.WriteLine($"all your actions, save in file successfully!!");
