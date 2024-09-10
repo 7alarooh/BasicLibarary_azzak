@@ -38,7 +38,7 @@ namespace BasicLibrary
         //........................Functions Part.......................................//
 
         //........................Login Functions.....................................//
-        static void loginPage( ) 
+        static void loginPage()
         {
             bool ExitFlag = false;
             do
@@ -58,12 +58,15 @@ namespace BasicLibrary
                         Console.Clear();
                         Console.Write("Enter Your Email: ");
                         string rEmail = Console.ReadLine();
+
+                        // Validate email format
                         if (!IsValidEmail(rEmail))
                         {
                             Console.WriteLine("Error: Invalid email format.");
-                            return;
+                            break;  // This will return to the menu instead of exiting the method.
                         }
-                        if (rEmail == "registrar")
+
+                        if (rEmail == "registrar@gmail.com")
                         {
                             var admin = Admins.FirstOrDefault(a => a.email.Equals(rEmail, StringComparison.OrdinalIgnoreCase));
                             if (admin != default)
@@ -75,12 +78,12 @@ namespace BasicLibrary
                                 if (!IsValidPassword(enterPW))
                                 {
                                     Console.WriteLine("Error: Password does not meet the required format.");
-                                    return;
+                                    break;  // Return to the menu instead of exiting.
                                 }
 
                                 if (enterPW == admin.pw)
                                 {
-                                    adminMenu(admin.name);
+                                    accountsManagement(admin.name);
                                 }
                                 else
                                 {
@@ -92,20 +95,24 @@ namespace BasicLibrary
                                 Console.WriteLine("Error: Admin not found.");
                             }
                         }
-                        else { Console.WriteLine("Sorry! you are not allowed to access here..."); }
+                        else
+                        {
+                            Console.WriteLine("Sorry! you are not allowed to access here...");
+                        }
                         break;
 
                     case "1":
                         Console.Clear();
                         Console.Write("Enter Your Email: ");
-
                         string aEmail = Console.ReadLine();
+
                         // Validate email format
                         if (!IsValidEmail(aEmail))
                         {
                             Console.WriteLine("Error: Invalid email format.");
-                            return;
+                            break;  // Return to the menu instead of exiting.
                         }
+
                         if (aEmail != "registrar")
                         {
                             var admin = Admins.FirstOrDefault(a => a.email.Equals(aEmail, StringComparison.OrdinalIgnoreCase));
@@ -118,7 +125,7 @@ namespace BasicLibrary
                                 if (!IsValidPassword(enterPW))
                                 {
                                     Console.WriteLine("Error: Password does not meet the required format.");
-                                    return;
+                                    break;  // Return to the menu instead of exiting.
                                 }
 
                                 if (enterPW == admin.pw)
@@ -135,9 +142,12 @@ namespace BasicLibrary
                                 Console.WriteLine("Error: Admin not found.");
                             }
                         }
-                        else { Console.WriteLine("Sorry! you are not allowed to access here..."); }
-           
+                        else
+                        {
+                            Console.WriteLine("Sorry! you are not allowed to access here...");
+                        }
                         break;
+
                     case "2":
                         Console.Clear();
                         Console.Write("Enter Your Email: ");
@@ -147,7 +157,7 @@ namespace BasicLibrary
                         if (!IsValidEmail(uEmail))
                         {
                             Console.WriteLine("Error: Invalid email format.");
-                            return;
+                            break;  // Return to the menu instead of exiting.
                         }
 
                         var user = Users.FirstOrDefault(u => u.email.Equals(uEmail, StringComparison.OrdinalIgnoreCase));
@@ -160,7 +170,7 @@ namespace BasicLibrary
                             if (!IsValidPassword(enterPW))
                             {
                                 Console.WriteLine("Error: Password does not meet the required format.");
-                                return;
+                                break;  // Return to the menu instead of exiting.
                             }
 
                             if (enterPW == user.pw)
@@ -177,28 +187,32 @@ namespace BasicLibrary
                             Console.WriteLine("Error: User not found.");
                         }
                         break;
+
                     case "3":
                         SaveBooksToFile();
                         Console.WriteLine("\npress Enter key to exit out system");
                         string outsystem = Console.ReadLine();
-                        Environment.Exit(0);
+                        ExitFlag = true;  // Set the exit flag to true to exit the loop.
                         break;
+
                     default:
-                        Console.WriteLine("Sorry your choice was wrong!!");
+                        Console.WriteLine("Sorry, your choice was wrong!!");
                         break;
                 }
-               
-                Console.WriteLine("press any key to continue in Home Page");
-                string cont = Console.ReadLine();
-                Console.Clear();
-            } while (ExitFlag != true);
-   
+
+                if (!ExitFlag)
+                {
+                    Console.WriteLine("Press any key to continue to the Home Page");
+                    Console.ReadLine();  // Wait for user input before clearing.
+                    Console.Clear();
+                }
+
+            } while (!ExitFlag);  // Continue looping until the exit flag is true.
         }
 
         // Function to validate email format
         static bool IsValidEmail(string email)
         {
-            // Simple email validation regex
             var emailRegex = new Regex(@"^[^@\s]+@[^@\s]+\.[^@\s]+$", RegexOptions.IgnoreCase);
             return emailRegex.IsMatch(email);
         }
@@ -209,6 +223,7 @@ namespace BasicLibrary
             // Basic password validation: at least 6 characters
             return password.Length >= 6;
         }
+
         //.........................registrar function.................................//
 
         static void accountsManagement(string name)
@@ -299,7 +314,7 @@ namespace BasicLibrary
             {
                 Console.WriteLine("Enter User Email:");
                 email = Console.ReadLine();
-
+                IsValidEmail(email);
                 if (Users.Any(u => u.email.ToLower() == email.ToLower())) // Case-insensitive check
                 {
                     Console.WriteLine("Error: A user with this email already exists. Please enter a different email.");
@@ -318,6 +333,7 @@ namespace BasicLibrary
             {
                 Console.WriteLine("Enter User Password:");
                 password = Console.ReadLine();
+                IsValidPassword(password);
 
                 Console.WriteLine("Confirm Password:");
                 confirmPassword = Console.ReadLine();
@@ -352,6 +368,7 @@ namespace BasicLibrary
             {
                 Console.WriteLine("Enter Admin Email:");
                 email = Console.ReadLine();
+                IsValidEmail(email);
 
                 if (Admins.Any(a => a.email.ToLower() == email.ToLower())) // Case-insensitive check
                 {
@@ -366,7 +383,7 @@ namespace BasicLibrary
             // Continue with password input
             Console.WriteLine("Enter Admin Password:");
             string pw = Console.ReadLine();
-
+            IsValidPassword(pw);
             // Confirm password
             Console.WriteLine("Confirm Password:");
             string confirmPassword = Console.ReadLine();
