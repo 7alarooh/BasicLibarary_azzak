@@ -55,72 +55,134 @@ namespace BasicLibrary
                 switch (choice)
                 {
                     case "0":
+                        Console.Clear();
                         Console.Write("Enter Your Email: ");
-
                         string rEmail = Console.ReadLine();
+                        if (!IsValidEmail(rEmail))
+                        {
+                            Console.WriteLine("Error: Invalid email format.");
+                            return;
+                        }
                         if (rEmail == "registrar")
                         {
-                            var registrar = Admins.FirstOrDefault(r => r.email == rEmail);
-                            if (registrar != default)
-                            {
-                                Console.Write("\nEnter Password: ");
-                                string enterPW = Console.ReadLine();
-                                if (enterPW == registrar.pw)
-                                {
-                                    accountsManagement(registrar.name);
-                                }
-                            }
-                        }
-                        else { Console.WriteLine("Sorry! you are not allowed to access here..."); }
-                        break;
-                    case "1":
-                        Console.Clear();
-                        // string user2 = "Admin";
-                        // LoginAccess(user2);
-                        Console.Write("Enter Your Email: ");
-                        
-                        string aEmail = Console.ReadLine();
-                      if (aEmail != "registrar"){
-                            var admin = Admins.FirstOrDefault(a => a.email == aEmail);
+                            var admin = Admins.FirstOrDefault(a => a.email.Equals(rEmail, StringComparison.OrdinalIgnoreCase));
                             if (admin != default)
                             {
                                 Console.Write("\nEnter Password: ");
                                 string enterPW = Console.ReadLine();
+
+                                // Validate password format
+                                if (!IsValidPassword(enterPW))
+                                {
+                                    Console.WriteLine("Error: Password does not meet the required format.");
+                                    return;
+                                }
+
                                 if (enterPW == admin.pw)
                                 {
                                     adminMenu(admin.name);
                                 }
+                                else
+                                {
+                                    Console.WriteLine("Error: Incorrect password.");
+                                }
                             }
-                        else { Console.WriteLine("Sorry! you are not allowed to access here..."); }
-
+                            else
+                            {
+                                Console.WriteLine("Error: Admin not found.");
+                            }
                         }
                         else { Console.WriteLine("Sorry! you are not allowed to access here..."); }
+                        break;
+
+                    case "1":
+                        Console.Clear();
+                        Console.Write("Enter Your Email: ");
+
+                        string aEmail = Console.ReadLine();
+                        // Validate email format
+                        if (!IsValidEmail(aEmail))
+                        {
+                            Console.WriteLine("Error: Invalid email format.");
+                            return;
+                        }
+                        if (aEmail != "registrar")
+                        {
+                            var admin = Admins.FirstOrDefault(a => a.email.Equals(aEmail, StringComparison.OrdinalIgnoreCase));
+                            if (admin != default)
+                            {
+                                Console.Write("\nEnter Password: ");
+                                string enterPW = Console.ReadLine();
+
+                                // Validate password format
+                                if (!IsValidPassword(enterPW))
+                                {
+                                    Console.WriteLine("Error: Password does not meet the required format.");
+                                    return;
+                                }
+
+                                if (enterPW == admin.pw)
+                                {
+                                    adminMenu(admin.name);
+                                }
+                                else
+                                {
+                                    Console.WriteLine("Error: Incorrect password.");
+                                }
+                            }
+                            else
+                            {
+                                Console.WriteLine("Error: Admin not found.");
+                            }
+                        }
+                        else { Console.WriteLine("Sorry! you are not allowed to access here..."); }
+           
                         break;
                     case "2":
                         Console.Clear();
                         Console.Write("Enter Your Email: ");
-
                         string uEmail = Console.ReadLine();
-                        var user = Users.FirstOrDefault(u => u.email == uEmail);
+
+                        // Validate email format
+                        if (!IsValidEmail(uEmail))
+                        {
+                            Console.WriteLine("Error: Invalid email format.");
+                            return;
+                        }
+
+                        var user = Users.FirstOrDefault(u => u.email.Equals(uEmail, StringComparison.OrdinalIgnoreCase));
                         if (user != default)
                         {
                             Console.Write("\nEnter Password: ");
                             string enterPW = Console.ReadLine();
+
+                            // Validate password format
+                            if (!IsValidPassword(enterPW))
+                            {
+                                Console.WriteLine("Error: Password does not meet the required format.");
+                                return;
+                            }
+
                             if (enterPW == user.pw)
                             {
                                 userMenu(user.id, user.name);
                             }
+                            else
+                            {
+                                Console.WriteLine("Error: Incorrect password.");
+                            }
                         }
-                        else { Console.WriteLine("Sorry! you are not allowed to access here..."); }
+                        else
+                        {
+                            Console.WriteLine("Error: User not found.");
+                        }
                         break;
-
                     case "3":
                         SaveBooksToFile();
                         Console.WriteLine("\npress Enter key to exit out system");
                         string outsystem = Console.ReadLine();
                         Environment.Exit(0);
                         break;
-
                     default:
                         Console.WriteLine("Sorry your choice was wrong!!");
                         break;
@@ -130,94 +192,7 @@ namespace BasicLibrary
                 string cont = Console.ReadLine();
                 Console.Clear();
             } while (ExitFlag != true);
-
-           
-            
-        }
-        static void LoginAccess(string userAccess)
-        {
-            if (userAccess == "customer")
-            {
-                Console.Write("Enter Your Email: ");
-                string uEmail = Console.ReadLine();
-
-                // Validate email format
-                if (!IsValidEmail(uEmail))
-                {
-                    Console.WriteLine("Error: Invalid email format.");
-                    return;
-                }
-
-                var user = Users.FirstOrDefault(u => u.email.Equals(uEmail, StringComparison.OrdinalIgnoreCase));
-                if (user != default)
-                {
-                    Console.Write("\nEnter Password: ");
-                    string enterPW = Console.ReadLine();
-
-                    // Validate password format
-                    if (!IsValidPassword(enterPW))
-                    {
-                        Console.WriteLine("Error: Password does not meet the required format.");
-                        return;
-                    }
-
-                    if (enterPW == user.pw)
-                    {
-                        userMenu(user.id, user.name);
-                    }
-                    else
-                    {
-                        Console.WriteLine("Error: Incorrect password.");
-                    }
-                }
-                else
-                {
-                    Console.WriteLine("Error: User not found.");
-                }
-            }
-            else if (userAccess == "admin")
-            {
-                Console.Write("Enter Your Email: ");
-                string aEmail = Console.ReadLine();
-
-                // Validate email format
-                if (!IsValidEmail(aEmail))
-                {
-                    Console.WriteLine("Error: Invalid email format.");
-                    return;
-                }
-
-                var admin = Admins.FirstOrDefault(a => a.email.Equals(aEmail, StringComparison.OrdinalIgnoreCase));
-                if (admin != default)
-                {
-                    Console.Write("\nEnter Password: ");
-                    string enterPW = Console.ReadLine();
-
-                    // Validate password format
-                    if (!IsValidPassword(enterPW))
-                    {
-                        Console.WriteLine("Error: Password does not meet the required format.");
-                        return;
-                    }
-
-                    if (enterPW == admin.pw)
-                    {
-                        adminMenu(admin.name);
-                    }
-                    else
-                    {
-                        Console.WriteLine("Error: Incorrect password.");
-                    }
-                }
-                else
-                {
-                    Console.WriteLine("Error: Admin not found.");
-                }
-            }
-            else
-            {
-                Console.WriteLine("Error: Invalid user access type.");
-            }
+   
         }
 
         // Function to validate email format
