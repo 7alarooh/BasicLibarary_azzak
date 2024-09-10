@@ -17,8 +17,9 @@ namespace BasicLibrary
         //........................Necessary variables and path files.....................................//
 
         static List<(string BName, string BAuthor, int BID, int copies, int borrowedCopies,double Price, string catagory,int BorrowPeriod)> Books = new List<(string BName, string BAuthor, int BID, int copies, int borrowedCopies, double Price, string catagory,int BorrowPeriod)>();
-        static List<(int id,string email,string pw,string name)> Users =new List<(int id,string email,string pw, string name)>();
-        static List<(string email, string pw, string name)> Admins = new List<(string email, string pw, string name)>();
+        static List<(int UID, string Uname, string Email, string Password)> Users =new List<(int UID, string Uname, string Email, string Password)>();
+       
+        static List<(int AID, string AName, string Email, string Password)> Admins = new List<(int AID, string AName, string Email, string Password)>();
         static List<(int uid, int bid, DateTime date,DateTime ReturnDate, DateTime ActualReturnDate, bool ISReturned, int Rating)> Borrowings = new List<(int uid, int bid, DateTime date, DateTime ReturnDate, DateTime ActualReturnDate, bool ISReturned, int Rating)>();
         static List<(int CID, string CName, int NOFBooks)> Categories = new List<(int CID, string CName, int NOFBooks)>();
         
@@ -71,7 +72,7 @@ namespace BasicLibrary
 
                         if (rEmail == "registrar@gmail.com")
                         {
-                            var admin = Admins.FirstOrDefault(a => a.email.Equals(rEmail, StringComparison.OrdinalIgnoreCase));
+                            var admin = Admins.FirstOrDefault(a => a.Email.Equals(rEmail, StringComparison.OrdinalIgnoreCase));
                             if (admin != default)
                             {
                                 Console.Write("\nEnter Password: ");
@@ -89,9 +90,9 @@ namespace BasicLibrary
                                 else
                                 {
 
-                                    if (enterPW == admin.pw)
+                                    if (enterPW == admin.Password)
                                     {
-                                        accountsManagement(admin.name);
+                                        accountsManagement(admin.AName);
                                     }
                                     else
                                     {
@@ -124,7 +125,7 @@ namespace BasicLibrary
 
                         if (aEmail != "registrar")
                         {
-                            var admin = Admins.FirstOrDefault(a => a.email.Equals(aEmail, StringComparison.OrdinalIgnoreCase));
+                            var admin = Admins.FirstOrDefault(a => a.Email.Equals(aEmail, StringComparison.OrdinalIgnoreCase));
                             if (admin != default)
                             {
                                 Console.Write("\nEnter Password: ");
@@ -139,9 +140,9 @@ namespace BasicLibrary
                                     break; // Return to the menu instead of exiting.
                                 }
                                 {
-                                    if (enterPW == admin.pw)
+                                    if (enterPW == admin.Password)
                                     {
-                                        adminMenu(admin.name);
+                                        adminMenu(admin.AName);
                                     }
                                     else
                                     {
@@ -172,7 +173,7 @@ namespace BasicLibrary
                             break;  // Return to the menu instead of exiting.
                         }
 
-                        var user = Users.FirstOrDefault(u => u.email.Equals(uEmail, StringComparison.OrdinalIgnoreCase));
+                        var user = Users.FirstOrDefault(u => u.Email.Equals(uEmail, StringComparison.OrdinalIgnoreCase));
                         if (user != default)
                         {
                             Console.Write("\nEnter Password: ");
@@ -189,9 +190,9 @@ namespace BasicLibrary
                             else
                             {
 
-                                if (enterPW == user.pw)
+                                if (enterPW == user.Password)
                                 {
-                                    userMenu(user.id, user.name);
+                                    userMenu(user.UID, user.Uname);
                                 }
                                 else
                                 {
@@ -348,9 +349,9 @@ namespace BasicLibrary
                 // Loop through the users to find the highest existing ID
                 foreach (var user in Users)
                 {
-                    if (user.id >= nextID)
+                    if (user.UID >= nextID)
                     {
-                        nextID = user.id + 1;
+                        nextID = user.UID + 1;
                     }
                 }
             }
@@ -372,7 +373,7 @@ namespace BasicLibrary
                 }
 
                 // Check if email already exists
-                if (Users.Any(u => u.email == email)) // Case-insensitive check
+                if (Users.Any(u => u.Email == email)) // Case-insensitive check
                 {
                     Console.WriteLine("Error: A user with this email already exists. Please enter a different email.");
                 }
@@ -426,7 +427,13 @@ namespace BasicLibrary
         }
 
         static void AddAdmin()
-        {
+        {// Auto-generate unique admin ID
+            int nextID = 1; // Default ID is 1 if no admins exist
+            if (Admins.Count > 0)
+            {
+                nextID = Admins.Max(a => a.AID) + 1; // Find the highest ID and increment it
+            }
+
             string email;
             bool emailExists = true;
 
@@ -444,7 +451,7 @@ namespace BasicLibrary
                 }
 
                 // Check if email already exists
-                if (Admins.Any(a => a.email.ToLower() == email.ToLower())) // Case-insensitive check
+                if (Admins.Any(a => a.Email.ToLower() == email.ToLower())) // Case-insensitive check
                 {
                     Console.WriteLine("Error: An admin with this email already exists. Please enter a different email.");
                 }
@@ -492,9 +499,9 @@ namespace BasicLibrary
             Console.WriteLine("Enter Admin Name:");
             string name = Console.ReadLine();
 
-            // Add admin to the list
-            Admins.Add((email, password, name));
-            Console.WriteLine("Admin added successfully.");
+            // Add admin to the list with the auto-generated unique ID
+            Admins.Add((nextID, name, email, password));
+            Console.WriteLine($"Admin added successfully with ID: {nextID}");
         }
 
 
@@ -526,17 +533,17 @@ namespace BasicLibrary
                 return;
             }
 
-            var user = Users.FirstOrDefault(u => u.id == userId);
+            var user = Users.FirstOrDefault(u => u.UID == userId);
 
-            if (user.id == 0)
+            if (user.UID == 0)
             {
                 Console.WriteLine("Error: User not found.");
                 return;
             }
 
             Console.WriteLine($"Current details for User ID {userId}:");
-            Console.WriteLine($"Email: {user.email}");
-            Console.WriteLine($"Name: {user.name}");
+            Console.WriteLine($"Email: {user.Email}");
+            Console.WriteLine($"Name: {user.Uname}");
 
             Console.WriteLine("Enter new email (leave blank to keep current):");
             string newEmail = Console.ReadLine();
@@ -547,9 +554,9 @@ namespace BasicLibrary
 
             // Confirmation
             Console.WriteLine("Confirm the changes:");
-            Console.WriteLine($"New Email: {(string.IsNullOrWhiteSpace(newEmail) ? user.email : newEmail)}");
+            Console.WriteLine($"New Email: {(string.IsNullOrWhiteSpace(newEmail) ? user.Email : newEmail)}");
             Console.WriteLine($"New Password: {(string.IsNullOrWhiteSpace(newPassword) ? "Not changed" : newPassword)}");
-            Console.WriteLine($"New Name: {(string.IsNullOrWhiteSpace(newName) ? user.name : newName)}");
+            Console.WriteLine($"New Name: {(string.IsNullOrWhiteSpace(newName) ? user.Uname : newName)}");
             Console.WriteLine("Are you sure you want to apply these changes? (y/n)");
             string confirmation = Console.ReadLine();
 
@@ -557,11 +564,11 @@ namespace BasicLibrary
             {
                 // Update the user information if confirmed
                 Users = Users.Select(u =>
-                    u.id == userId ?
-                    (u.id,
-                     string.IsNullOrWhiteSpace(newEmail) ? u.email : newEmail,
-                     string.IsNullOrWhiteSpace(newPassword) ? u.pw : newPassword,
-                     string.IsNullOrWhiteSpace(newName) ? u.name : newName)
+                    u.UID == userId ?
+                    (u.UID,
+                     string.IsNullOrWhiteSpace(newEmail) ? u.Email : newEmail,
+                     string.IsNullOrWhiteSpace(newPassword) ? u.Password : newPassword,
+                     string.IsNullOrWhiteSpace(newName) ? u.Uname : newName)
                     : u
                 ).ToList();
 
@@ -577,7 +584,7 @@ namespace BasicLibrary
             Console.WriteLine("Enter the email of the admin you want to edit:");
             string email = Console.ReadLine();
 
-            var admin = Admins.FirstOrDefault(a => a.email.Equals(email, StringComparison.OrdinalIgnoreCase));
+            var admin = Admins.FirstOrDefault(a => a.Email.Equals(email, StringComparison.OrdinalIgnoreCase));
 
             if (admin == default)
             {
@@ -586,7 +593,7 @@ namespace BasicLibrary
             }
 
             Console.WriteLine($"Current details for Admin Email {email}:");
-            Console.WriteLine($"Name: {admin.name}");
+            Console.WriteLine($"Name: {admin.AName}");
 
             Console.WriteLine("Enter new password (leave blank to keep current):");
             string newPassword = Console.ReadLine();
@@ -596,20 +603,20 @@ namespace BasicLibrary
             // Confirmation
             Console.WriteLine("Confirm the changes:");
             Console.WriteLine($"New Password: {(string.IsNullOrWhiteSpace(newPassword) ? "Not changed" : newPassword)}");
-            Console.WriteLine($"New Name: {(string.IsNullOrWhiteSpace(newName) ? admin.name : newName)}");
+            Console.WriteLine($"New Name: {(string.IsNullOrWhiteSpace(newName) ? admin.AName : newName)}");
             Console.WriteLine("Are you sure you want to apply these changes? (y/n)");
             string confirmation = Console.ReadLine();
 
             if (confirmation.ToLower() == "y")
             {
                 // Update the admin information if confirmed
-                Admins = Admins.Select(a =>
-                    a.email.Equals(email, StringComparison.OrdinalIgnoreCase) ?
-                    (a.email,
-                     string.IsNullOrWhiteSpace(newPassword) ? a.pw : newPassword,
-                     string.IsNullOrWhiteSpace(newName) ? a.name : newName)
-                    : a
-                ).ToList();
+                //Admins = Admins.Select(a =>
+                //    a.Email.Equals(email, StringComparison.OrdinalIgnoreCase) ?
+                //    (a.Email,
+                //     string.IsNullOrWhiteSpace(newPassword) ? a.Password : newPassword,
+                //     string.IsNullOrWhiteSpace(newName) ? a.AName : newName)
+                //    : a
+                //).ToList();
 
                 Console.WriteLine("Admin information updated successfully.");
             }
@@ -650,23 +657,23 @@ namespace BasicLibrary
                     return;
                 }
 
-                var user = Users.FirstOrDefault(u => u.id == userId);
+                var user = Users.FirstOrDefault(u => u.UID == userId);
 
-                if (user.id == 0)
+                if (user.UID == 0)
                 {
                     Console.WriteLine("Error: User not found.");
                     return;
                 }
 
                 Console.WriteLine($"Confirm removal of User ID {userId}:");
-                Console.WriteLine($"Email: {user.email}");
-                Console.WriteLine($"Name: {user.name}");
+                Console.WriteLine($"Email: {user.Email}");
+                Console.WriteLine($"Name: {user.Uname}");
                 Console.WriteLine("Are you sure you want to remove this user? (y/n)");
                 string confirmation = Console.ReadLine();
 
                 if (confirmation.ToLower() == "y")
                 {
-                    Users = Users.Where(u => u.id != userId).ToList();
+                    Users = Users.Where(u => u.UID != userId).ToList();
                     Console.WriteLine("User removed successfully.");
                 }
                 else
@@ -693,7 +700,7 @@ namespace BasicLibrary
                     return;
                 }
 
-                var admin = Admins.FirstOrDefault(a => a.email.Equals(email, StringComparison.OrdinalIgnoreCase));
+                var admin = Admins.FirstOrDefault(a => a.Email.Equals(email, StringComparison.OrdinalIgnoreCase));
 
                 if (admin == default)
                 {
@@ -702,13 +709,13 @@ namespace BasicLibrary
                 }
 
                 Console.WriteLine($"Confirm removal of Admin with Email {email}:");
-                Console.WriteLine($"Name: {admin.name}");
+                Console.WriteLine($"Name: {admin.AName}");
                 Console.WriteLine("Are you sure you want to remove this admin? (y/n)");
                 string confirmation = Console.ReadLine();
 
                 if (confirmation.ToLower() == "y")
                 {
-                    Admins = Admins.Where(a => !a.email.Equals(email, StringComparison.OrdinalIgnoreCase)).ToList();
+                    Admins = Admins.Where(a => !a.Email.Equals(email, StringComparison.OrdinalIgnoreCase)).ToList();
                     Console.WriteLine("Admin removed successfully.");
                 }
                 else
@@ -742,9 +749,9 @@ namespace BasicLibrary
             {
                 var admin = Admins[i];
                 sb.AppendFormat("\t{0,-" + emailWidth + "} {1,-" + passwordWidth + "} {2,-" + nameWidth + "}",
-                                admin.email,
-                                admin.pw,
-                                admin.name);
+                                admin.Email,
+                                admin.Password,
+                                admin.AName);
                 sb.AppendLine();
             }
 
@@ -759,10 +766,10 @@ namespace BasicLibrary
             {
                 var user = Users[i];
                 sb.AppendFormat("\t{0,-" + emailWidth + "} {1,-" + passwordWidth + "} {2,-" + idWidth + "} {3,-" + nameWidth + "}",
-                                user.email,
-                                user.pw,
-                                user.id,
-                                user.name);
+                                user.Email,
+                                user.Password,
+                                user.UID,
+                                user.Uname);
                 sb.AppendLine();
             }
 
@@ -1774,7 +1781,7 @@ namespace BasicLibrary
                             var parts = line.Split('|');
                             if (parts.Length == 3)
                             {
-                                Admins.Add((parts[0], parts[1], parts[2]));
+                                //Admins.Add((parts[0], parts[1], parts[2]));
                             }
                         }
                     }
@@ -1814,7 +1821,7 @@ namespace BasicLibrary
                 {
                     foreach (var user in Users)
                     {
-                        writer.WriteLine($"{user.id}|{user.email}|{user.pw}|{user.name}");
+                        writer.WriteLine($"{user.UID}|{user.Email}|{user.Password}|{user.Uname}");
                     }
                 }
             }
@@ -1828,7 +1835,7 @@ namespace BasicLibrary
                 {
                     foreach (var admin in Admins)
                     {
-                        writer.WriteLine($"{admin.email}|{admin.pw}|{admin.name}");
+                      //  writer.WriteLine($"{admin.email}|{admin.pw}|{admin.name}");
                     }
                 }
                 Console.WriteLine("All users data saved to file successfully!!");
