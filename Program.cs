@@ -1777,11 +1777,11 @@ namespace BasicLibrary
                     {
                         string line;
                         while ((line = reader.ReadLine()) != null)
-                        { //string email, string pw, string name
+                        { 
                             var parts = line.Split('|');
-                            if (parts.Length == 3)
+                            if (parts.Length == 4)
                             {
-                                //Admins.Add((parts[0], parts[1], parts[2]));
+                                Admins.Add((int.Parse(parts[0]), parts[1], parts[2], parts[3]));
                             }
                         }
                     }
@@ -1835,7 +1835,7 @@ namespace BasicLibrary
                 {
                     foreach (var admin in Admins)
                     {
-                      //  writer.WriteLine($"{admin.email}|{admin.pw}|{admin.name}");
+                       writer.WriteLine($"{admin.AID}{admin.Email}|{admin.Password}|{admin.AName}");
                     }
                 }
                 Console.WriteLine("All users data saved to file successfully!!");
