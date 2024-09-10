@@ -2,6 +2,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.Design;
+using System.Diagnostics;
 using System.Security.Principal;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -14,7 +15,7 @@ namespace BasicLibrary
     {// TEST 
         //........................Necessary variables and path files.....................................//
 
-        static List<(string BName, string BAuthor, int ID,int originalQuantity ,int quantity)> Books = new List<(string BName, string BAuthor, int ID, int originalQuantity, int quantity)>();
+        static List<(string BName, string BAuthor, int ID,int copies, int borrowCopies,double price, string catagory,int DaysAllowedForBorrowing)> Books = new List<(string BName, string BAuthor, int ID, int copies, int borrowCopies,double price,string catagory,int DaysAllowedForBorrowing)>();
         static List<(int id,string email,string pw,string name)> Users =new List<(int id,string email,string pw, string name)>();
         static List<(string email, string pw, string name)> Admins = new List<(string email, string pw, string name)>();
         static List<(int uid, int bid, DateTime date,bool returnBook)> Borrowings = new List<(int uid, int bid, DateTime date, bool returnBook)>();
@@ -395,6 +396,7 @@ namespace BasicLibrary
                 if (passwordValidationResult.StartsWith("Error"))
                 {
                     Console.WriteLine(passwordValidationResult); // Show error message for invalid password
+
                     continue; // Return to the menu instead of exiting.
                 }
                 Console.WriteLine("This Password is " + IsValidPassword(password));
@@ -841,6 +843,9 @@ namespace BasicLibrary
             string name;
             string author;
             int quantity = 0;
+            double price = 0;
+            string catagory;
+            int DaysAllowedForBorrowing = 0;
 
 
             Console.WriteLine("Enter Book Name");
@@ -888,7 +893,7 @@ namespace BasicLibrary
                 }
             }
 
-            // to handle the book quantity
+            // to handle the book price
             Console.WriteLine("Enter the Book Quantity");
             try
             {
@@ -909,9 +914,58 @@ namespace BasicLibrary
                 Console.WriteLine("Error: The number for the Book Quantity is too large.");
                 return;
             }
+            Console.WriteLine("Enter the Book Quantity");
 
+            try
+            {
+                price = int.Parse(Console.ReadLine());
+                if (price < 0)
+                {
+                    Console.WriteLine("Error: price cannot be negative.");
+                    return;
+                }
+            }
+            catch (FormatException)
+            {
+                Console.WriteLine("Error: Please enter a valid number for price.");
+                return;
+            }
+            catch (OverflowException)
+            {
+                Console.WriteLine("Error: The number for the Book Price is too large.");
+                return;
+            }
+
+            Console.WriteLine("Enter Book Name");
+            catagory = Console.ReadLine();
+            if (string.IsNullOrWhiteSpace(catagory))// to handle the book name
+            {
+                Console.WriteLine("Error: Book name cannot be empty.");
+                return;
+            }
+
+            Console.WriteLine("Enter the Book Quantity");
+            try
+            {
+                DaysAllowedForBorrowing = int.Parse(Console.ReadLine());
+                if (DaysAllowedForBorrowing < 0)
+                {
+                    Console.WriteLine("Error: Quantity cannot be negative.");
+                    return;
+                }
+            }
+            catch (FormatException)
+            {
+                Console.WriteLine("Error: Please enter a valid number for the Book Quantity.");
+                return;
+            }
+            catch (OverflowException)
+            {
+                Console.WriteLine("Error: The number for the Book Quantity is too large.");
+                return;
+            }
             // Add the book if everything is valid
-            Books.Add((name, author, newID, quantity, quantity));
+            Books.Add((name, author, newID, quantity, quantity, price, catagory, DaysAllowedForBorrowing));
             Console.WriteLine($"Book added successfully with ID: {newID} !");
 
         }
@@ -956,8 +1010,8 @@ namespace BasicLibrary
                         Console.WriteLine("Error: Quantity cannot be negative.");
                         return;
                     }
-                    book.quantity = newQuantity;
-                    book.originalQuantity = newQuantity;
+                    book.borrowCopies = newQuantity;
+                    book.copies = newQuantity;
                 }
                 catch (FormatException)
                 {
@@ -1150,7 +1204,7 @@ namespace BasicLibrary
                         return;
                     }
 
-                    int quantity = Books[index].quantity;
+                    int quantity = Books[index].borrowCopies;
                     if (quantity > 0)
                     {
                         Console.WriteLine("Do you want to borrow the Book?");
@@ -1166,7 +1220,7 @@ namespace BasicLibrary
                         {
 
                             --quantity;
-                            Books[index] = (Books[index].BName, Books[index].BAuthor, Books[index].ID, Books[index].originalQuantity, quantity);
+                            Books[index] = (Books[index].BName, Books[index].BAuthor, Books[index].ID, Books[index].copies, quantity, Books[index].price, Books[index].catagory, Books[index].DaysAllowedForBorrowing);
                             Borrowings.Add((userId, Books[index].ID, DateTime.Now,false));
                             Console.WriteLine("You have borrowed the " + Books[index].BName + "!");
                             suggestionsForUser(userId, Books[index].ID);
@@ -1192,8 +1246,8 @@ namespace BasicLibrary
                 DisplayYourBookBorrowed(userId);
                 if (index != -1)
                 {
-                    int quantity = Books[index].quantity;
-                    int originalQuantity = Books[index].originalQuantity;
+                    int quantity = Books[index].borrowCopies;
+                    int copies = Books[index].copies;
 
                     // Check if the user has borrowed this book
                     var borrowingRecord = Borrowings.FirstOrDefault(b => b.uid == userId && b.bid == Books[index].ID && !b.returnBook);
@@ -1215,14 +1269,14 @@ namespace BasicLibrary
                     }
                     else
                     {// Check if the current quantity equals the original quantity
-                        if (quantity >= originalQuantity )
+                        if (quantity >= copies )
                         {
                             Console.WriteLine("Error: Cannot return the book. All copies have already been returned.");
                         }
                         else
                         {
                             ++quantity;
-                            Books[index] = (Books[index].BName, Books[index].BAuthor, Books[index].ID, Books[index].originalQuantity, quantity);
+                            Books[index] = (Books[index].BName, Books[index].BAuthor, Books[index].ID, Books[index].copies, quantity, Books[index].price, Books[index].catagory, Books[index].DaysAllowedForBorrowing);
 
                             // Update the Borrowings list 
                             for (int i = 0; i < Borrowings.Count; i++)
@@ -1575,10 +1629,10 @@ namespace BasicLibrary
                             return;
                         }
 
-                        if (bookToBorrow.quantity > 0)
+                        if (bookToBorrow.borrowCopies > 0)
                         {
                             Console.WriteLine($"You have successfully borrowed {bookToBorrow.BName}.");
-                            Books[Books.IndexOf(bookToBorrow)] = (bookToBorrow.BName, bookToBorrow.BAuthor, bookToBorrow.ID, bookToBorrow.originalQuantity, bookToBorrow.quantity - 1);
+                            Books[Books.IndexOf(bookToBorrow)] = (bookToBorrow.BName, bookToBorrow.BAuthor, bookToBorrow.ID, bookToBorrow.copies, bookToBorrow.borrowCopies - 1, bookToBorrow.price, bookToBorrow.catagory, bookToBorrow.DaysAllowedForBorrowing);
                             Borrowings.Add((userId, bookToBorrow.ID, DateTime.Now, false));
                         }
                         else
@@ -1612,9 +1666,9 @@ namespace BasicLibrary
                         while ((line = reader.ReadLine()) != null)
                         {
                             var parts = line.Split('|');
-                            if (parts.Length == 5)
+                            if (parts.Length == 8)
                             {
-                                Books.Add((parts[0], parts[1], int.Parse(parts[2]), int.Parse(parts[3]), int.Parse(parts[4])));
+                                Books.Add((parts[0], parts[1], int.Parse(parts[2]), int.Parse(parts[3]), int.Parse(parts[4]), double.Parse(parts[5]), parts[6], int.Parse(parts[7])));
                             }
                         }
                     }
@@ -1740,7 +1794,7 @@ namespace BasicLibrary
                 {
                     foreach (var book in Books)
                     {
-                        writer.WriteLine($"{book.BName}|{book.BAuthor}|{book.ID}|{book.originalQuantity}|{book.quantity}");
+                        writer.WriteLine($"{book.BName}|{book.BAuthor}|{book.ID}|{book.copies}|{book.borrowCopies}");
                     }
                 }
                 Console.WriteLine("Books updated to file successfully.");
@@ -1808,7 +1862,7 @@ namespace BasicLibrary
                                 book.BName,
                                 book.BAuthor,
                                 book.ID,
-                                book.quantity);
+                                book.borrowCopies);
                 sb.AppendLine();
             }
 
