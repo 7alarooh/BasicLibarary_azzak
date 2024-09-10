@@ -14,12 +14,12 @@ namespace BasicLibrary
 {
     internal class Program
     {// TEST 
-        //........................Necessary variables and path files.....................................//
-
-        static List<(string BName, string BAuthor, int BID, int copies, int borrowedCopies,double Price, string catagory,int BorrowPeriod)> Books = new List<(string BName, string BAuthor, int BID, int copies, int borrowedCopies, double Price, string catagory,int BorrowPeriod)>();
+     //........................Necessary variables and path files.....................................//
+        static List<(int AID, string AName, string Email, string Password)> Admins = new List<(int AID, string AName, string Email, string Password)>();
         static List<(int UID, string Uname, string Email, string Password)> Users =new List<(int UID, string Uname, string Email, string Password)>();
        
-        static List<(int AID, string AName, string Email, string Password)> Admins = new List<(int AID, string AName, string Email, string Password)>();
+        static List<(string BName, string BAuthor, int BID, int copies, int borrowedCopies, double Price, string catagory, int BorrowPeriod)> Books = new List<(string BName, string BAuthor, int BID, int copies, int borrowedCopies, double Price, string catagory, int BorrowPeriod)>();
+
         static List<(int uid, int bid, DateTime date,DateTime ReturnDate, DateTime ActualReturnDate, bool ISReturned, int Rating)> Borrowings = new List<(int uid, int bid, DateTime date, DateTime ReturnDate, DateTime ActualReturnDate, bool ISReturned, int Rating)>();
         static List<(int CID, string CName, int NOFBooks)> Categories = new List<(int CID, string CName, int NOFBooks)>();
         
@@ -1207,8 +1207,9 @@ namespace BasicLibrary
                         return;
                     }
 
-                    int quantity = Books[index].borrowedCopies;
-                    if (quantity > 0)
+                    // Check if there are available copies to borrow
+                    int availableCopies = Books[index].copies - Books[index].borrowedCopies;
+                    if (availableCopies > 0)
                     {
                         Console.WriteLine("Do you want to borrow the Book?");
                         Console.WriteLine("\n press char ' y ' to borrow :");
@@ -1216,18 +1217,29 @@ namespace BasicLibrary
 
                         if (selected != "y")
                         {
-                            Console.WriteLine("Sorry! Can not borrow this " + Books[index].BName);
+                            Console.WriteLine("Borrowing canceled !!");
                         }
 
                         else
                         {
 
-                            --quantity;
-                            Books[index] = (Books[index].BName, Books[index].BAuthor, Books[index].BID, Books[index].copies, quantity, Books[index].Price, Books[index].catagory, Books[index].BorrowPeriod);
-                           // Borrowings.Add((userId, Books[index].BID, DateTime.Now,false));
-                            Console.WriteLine("You have borrowed the " + Books[index].BName + "!");
-                            suggestionsForUser(userId, Books[index].BID);
+                            // Increase borrowedCopies by 1
+                            int updatedBorrowedCopies = Books[index].borrowedCopies + 1;
+                            Books[index] = (Books[index].BName, Books[index].BAuthor, Books[index].BID, Books[index].copies, updatedBorrowedCopies, Books[index].Price, Books[index].catagory, Books[index].BorrowPeriod);
 
+                            // Set return date and default ActualReturnDate and Rating
+                            DateTime borrowDate = DateTime.Now;
+                            DateTime returnDate = borrowDate.AddDays(Books[index].BorrowPeriod);
+                            DateTime actualReturnDate = returnDate; // Default to ReturnDate until actual return happens
+                            int rating = 0; // Default rating
+
+                            // Add the borrowing entry
+                            Borrowings.Add((userId, Books[index].BID, borrowDate, returnDate, actualReturnDate, false, rating));
+
+                            Console.WriteLine($"You have successfully borrowed \"{Books[index].BName}\"!");
+
+                            // Suggest further books to the user
+                            suggestionsForUser(userId, Books[index].BID);
                         }
 
 
