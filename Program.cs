@@ -1286,14 +1286,30 @@ namespace BasicLibrary
                             // Increment the number of borrowedCopies (return one book)
                             borrowedCopies--;
                             Books[index] = (Books[index].BName, Books[index].BAuthor, Books[index].BID, Books[index].copies, borrowedCopies, Books[index].Price, Books[index].catagory, Books[index].BorrowPeriod);
+                            // Ask the user to rate the book before finalizing the return
+                            int rating = 0;
+                            bool validRating = false;
+                            while (!validRating)
+                            {
+                                Console.WriteLine("Please provide a rating for the book (1-5): ");
+                                string ratingInput = Console.ReadLine();
 
-                            // Update the borrowing record to reflect the return
-                            for (int i = 0; i < Borrowings.Count; i++)
+                                if (int.TryParse(ratingInput, out rating) && rating >= 1 && rating <= 5)
+                                {
+                                    validRating = true;
+                                }
+                                else
+                                {
+                                    Console.WriteLine("Invalid rating. Please enter a number between 1 and 5.");
+                                }
+                            }
+                                // Update the borrowing record to reflect the return
+                                for (int i = 0; i < Borrowings.Count; i++)
                             {
                                 if (Borrowings[i].uid == userId && Borrowings[i].bid == Books[index].BID && !Borrowings[i].ISReturned)
                                 {
                                     // Set ISReturned to true and update the ActualReturnDate
-                                    Borrowings[i] = (Borrowings[i].uid, Borrowings[i].bid, Borrowings[i].date, Borrowings[i].ReturnDate, DateTime.Now, true, Borrowings[i].Rating);
+                                    Borrowings[i] = (Borrowings[i].uid, Borrowings[i].bid, Borrowings[i].date, Borrowings[i].ReturnDate, DateTime.Now, true, rating);
                                 }
                             }
 
