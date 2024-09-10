@@ -75,19 +75,25 @@ namespace BasicLibrary
                                 string enterPW = Console.ReadLine();
 
                                 // Validate password format
-                                if (!IsValidPassword(enterPW))
-                                {
-                                    Console.WriteLine("Error: Password does not meet the required format.");
-                                    break;  // Return to the menu instead of exiting.
-                                }
+                                // Validate password format
+                                string passwordValidationResult = IsValidPassword(enterPW);
 
-                                if (enterPW == admin.pw)
+                                if (passwordValidationResult.StartsWith("Error"))
                                 {
-                                    accountsManagement(admin.name);
+                                    Console.WriteLine(passwordValidationResult); // Show error message for invalid password
+                                    break; // Return to the menu instead of exiting.
                                 }
                                 else
                                 {
-                                    Console.WriteLine("Error: Incorrect password.");
+
+                                    if (enterPW == admin.pw)
+                                    {
+                                        accountsManagement(admin.name);
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine("Error: Incorrect password.");
+                                    }
                                 }
                             }
                             else
@@ -122,19 +128,22 @@ namespace BasicLibrary
                                 string enterPW = Console.ReadLine();
 
                                 // Validate password format
-                                if (!IsValidPassword(enterPW))
-                                {
-                                    Console.WriteLine("Error: Password does not meet the required format.");
-                                    break;  // Return to the menu instead of exiting.
-                                }
+                                string passwordValidationResult = IsValidPassword(enterPW);
 
-                                if (enterPW == admin.pw)
+                                if (passwordValidationResult.StartsWith("Error"))
                                 {
-                                    adminMenu(admin.name);
+                                    Console.WriteLine(passwordValidationResult); // Show error message for invalid password
+                                    break; // Return to the menu instead of exiting.
                                 }
-                                else
                                 {
-                                    Console.WriteLine("Error: Incorrect password.");
+                                    if (enterPW == admin.pw)
+                                    {
+                                        adminMenu(admin.name);
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine("Error: Incorrect password.");
+                                    }
                                 }
                             }
                             else
@@ -167,19 +176,24 @@ namespace BasicLibrary
                             string enterPW = Console.ReadLine();
 
                             // Validate password format
-                            if (!IsValidPassword(enterPW))
-                            {
-                                Console.WriteLine("Error: Password does not meet the required format.");
-                                break;  // Return to the menu instead of exiting.
-                            }
+                            string passwordValidationResult = IsValidPassword(enterPW);
 
-                            if (enterPW == user.pw)
+                            if (passwordValidationResult.StartsWith("Error"))
                             {
-                                userMenu(user.id, user.name);
+                                Console.WriteLine(passwordValidationResult); // Show error message for invalid password
+                                break; // Return to the menu instead of exiting.
                             }
                             else
                             {
-                                Console.WriteLine("Error: Incorrect password.");
+
+                                if (enterPW == user.pw)
+                                {
+                                    userMenu(user.id, user.name);
+                                }
+                                else
+                                {
+                                    Console.WriteLine("Error: Incorrect password.");
+                                }
                             }
                         }
                         else
@@ -220,10 +234,39 @@ namespace BasicLibrary
         }
 
         // Function to validate password format
-        static bool IsValidPassword(string password)
+        static string IsValidPassword(string password)
         {
-            // Basic password validation: at least 6 characters
-            return password.Length >= 6;
+            if (password.Length < 6)
+            {
+                return "Error: Password must be at least 6 characters long.";
+            }
+
+            // Regex patterns to check for uppercase, lowercase, numbers, and special characters
+            bool hasUpperCase = password.Any(char.IsUpper);
+            bool hasLowerCase = password.Any(char.IsLower);
+            bool hasDigit = password.Any(char.IsDigit);
+            bool hasSpecialChar = password.Any(ch => !char.IsLetterOrDigit(ch));
+
+            // Check password strength
+            int strengthScore = 0;
+            if (hasUpperCase) strengthScore++;
+            if (hasLowerCase) strengthScore++;
+            if (hasDigit) strengthScore++;
+            if (hasSpecialChar) strengthScore++;
+
+            // Determine password strength
+            if (strengthScore == 4)
+            {
+                return "Strong password.";
+            }
+            else if (strengthScore == 3)
+            {
+                return "Medium password.";
+            }
+            else
+            {
+                return "Weak password.";
+            }
         }
 
         //.........................registrar function.................................//
@@ -326,7 +369,7 @@ namespace BasicLibrary
                 }
 
                 // Check if email already exists
-                if (Users.Any(u => u.email.ToLower() == email.ToLower())) // Case-insensitive check
+                if (Users.Any(u => u.email == email)) // Case-insensitive check
                 {
                     Console.WriteLine("Error: A user with this email already exists. Please enter a different email.");
                 }
@@ -346,11 +389,15 @@ namespace BasicLibrary
                 password = Console.ReadLine();
 
                 // Check if password is valid
-                if (!IsValidPassword(password))
+                // Validate password format
+                string passwordValidationResult = IsValidPassword(password);
+
+                if (passwordValidationResult.StartsWith("Error"))
                 {
-                    Console.WriteLine("Error: Password does not meet the required format (at least 6 characters).");
-                    continue; // Go back to the beginning of the loop if password is invalid
+                    Console.WriteLine(passwordValidationResult); // Show error message for invalid password
+                    continue; // Return to the menu instead of exiting.
                 }
+                Console.WriteLine("This Password is " + IsValidPassword(password));
 
                 Console.WriteLine("Confirm Password:");
                 confirmPassword = Console.ReadLine();
@@ -413,11 +460,16 @@ namespace BasicLibrary
                 password = Console.ReadLine();
 
                 // Check if password is valid
-                if (!IsValidPassword(password))
+                // Validate password format
+                string passwordValidationResult = IsValidPassword(password);
+
+                if (passwordValidationResult.StartsWith("Error"))
                 {
-                    Console.WriteLine("Error: Password does not meet the required format (at least 6 characters).");
-                    continue; // Go back to the beginning of the loop if password is invalid
+                    Console.WriteLine(passwordValidationResult); // Show error message for invalid password
+                    continue; // Return to the menu instead of exiting.
                 }
+                Console.WriteLine("This Password is " + IsValidPassword(password));
+
 
                 Console.WriteLine("Confirm Password:");
                 confirmPassword = Console.ReadLine();
