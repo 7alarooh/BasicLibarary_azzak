@@ -1134,6 +1134,7 @@ namespace BasicLibrary
         //........................User Functions.....................................//
         static void userMenu(int id,string name)
         {
+            CheckOverdueBooks(id); // Check for overdue books before showing the men
             bool ExitFlag = false;
             do
             {
@@ -1187,6 +1188,44 @@ namespace BasicLibrary
 
             } while (ExitFlag != true);
         }
+        static void CheckOverdueBooks(int userId)
+        {
+            var overdueBooks = Borrowings.Where(b => b.uid == userId && !b.ISReturned && b.ReturnDate < DateTime.Now).ToList();
+
+            if (overdueBooks.Count > 0)
+            {
+                Console.Clear();
+                Console.WriteLine("You have overdue books that need to be returned before you can proceed with other operations.");
+
+                foreach (var overdue in overdueBooks)
+                {
+                    var book = Books.FirstOrDefault(b => b.BID == overdue.bid);
+                    if (book != default)
+                    {
+                        Console.WriteLine($"Overdue Book: {book.BName} (Return Date: {overdue.ReturnDate.ToShortDateString()})");
+                    }
+                }
+
+                Console.WriteLine("Do you want to return these books now? (y/n)");
+                string response = Console.ReadLine();
+
+                if (response.ToLower() == "y")
+                {
+                    foreach (var overdue in overdueBooks)
+                    {
+                        ReturnBook(userId);
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("You must return the overdue books to proceed.");
+
+                    // note: check and test  if i want to exit or return 
+                    return;
+                }
+            }
+        }
+
         static void BorrowBook(int userId) {
             try
             {
