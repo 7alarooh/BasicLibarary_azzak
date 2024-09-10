@@ -213,7 +213,9 @@ namespace BasicLibrary
         // Function to validate email format
         static bool IsValidEmail(string email)
         {
-            var emailRegex = new Regex(@"^[^@\s]+@[^@\s]+\.[^@\s]+$", RegexOptions.IgnoreCase);
+            // TLDs updated email style with case sensitivity and emphasis 
+            var emailRegex = new Regex(@"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$");
+
             return emailRegex.IsMatch(email);
         }
 
