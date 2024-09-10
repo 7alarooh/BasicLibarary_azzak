@@ -339,7 +339,6 @@ namespace BasicLibrary
                     break;
             }
         }
-
         static void AddUser()
         {
             // Determine the next ID by finding the highest existing ID and incrementing it
@@ -425,7 +424,6 @@ namespace BasicLibrary
             Users.Add((nextID, email, password, name));
             Console.WriteLine($"New user added successfully with ID: {nextID}");
         }
-
         static void AddAdmin()
         {// Auto-generate unique admin ID
             int nextID = 1; // Default ID is 1 if no admins exist
@@ -625,7 +623,6 @@ namespace BasicLibrary
                 Console.WriteLine("Admin information update canceled.");
             }
         }
-
         static void RemoveUserAccount()
         {
             ViewAllUsers();
@@ -645,7 +642,6 @@ namespace BasicLibrary
                     break;
             }
         }
-
         static void RemoveUser()
         {
             try
@@ -686,7 +682,6 @@ namespace BasicLibrary
                 Console.WriteLine("An error occurred while removing the user: " + ex.Message);
             }
         }
-
         static void RemoveAdmin()
         {
             try
@@ -848,7 +843,6 @@ namespace BasicLibrary
        // }
           
         }
-
         static void AddNewBook()
         {
             string name;
@@ -971,7 +965,6 @@ namespace BasicLibrary
             Books.Add((name, author, newID, quantity, quantity, price, category, DaysAllowedForBorrowing));
             Console.WriteLine($"Book added successfully with ID: {newID} !");
         }
-
         static void editBook()
         {
 
@@ -1261,7 +1254,7 @@ namespace BasicLibrary
                 DisplayYourBookBorrowed(userId);
                 if (index != -1)
                 {
-                    int quantity = Books[index].borrowedCopies;
+                    int borrowedCopies = Books[index].borrowedCopies;
                     int copies = Books[index].copies;
 
                     // Check if the user has borrowed this book
@@ -1283,27 +1276,29 @@ namespace BasicLibrary
 
                     }
                     else
-                    {// Check if the current quantity equals the original quantity
-                        if (quantity >= copies )
+                    { // Check if all copies have already been returned
+                        if (borrowedCopies <= 0)
                         {
-                            Console.WriteLine("Error: Cannot return the book. All copies have already been returned.");
+                            Console.WriteLine("Error: No borrowed copies to return.");
                         }
                         else
                         {
-                            ++quantity;
-                            Books[index] = (Books[index].BName, Books[index].BAuthor, Books[index].BID, Books[index].copies, quantity, Books[index].Price, Books[index].catagory, Books[index].BorrowPeriod);
+                            // Increment the number of borrowedCopies (return one book)
+                            borrowedCopies--;
+                            Books[index] = (Books[index].BName, Books[index].BAuthor, Books[index].BID, Books[index].copies, borrowedCopies, Books[index].Price, Books[index].catagory, Books[index].BorrowPeriod);
 
-                            // Update the Borrowings list 
+                            // Update the borrowing record to reflect the return
                             for (int i = 0; i < Borrowings.Count; i++)
                             {
-                                if (Borrowings[i].uid == userId && Borrowings[i].bid == Books[index].BID && Borrowings[i].ISReturned == false)
+                                if (Borrowings[i].uid == userId && Borrowings[i].bid == Books[index].BID && !Borrowings[i].ISReturned)
                                 {
-                                   // Borrowings[i] = (Borrowings[i].uid, Borrowings[i].bid, Borrowings[i].date, true);
+                                    // Set ISReturned to true and update the ActualReturnDate
+                                    Borrowings[i] = (Borrowings[i].uid, Borrowings[i].bid, Borrowings[i].date, Borrowings[i].ReturnDate, DateTime.Now, true, Borrowings[i].Rating);
                                 }
                             }
 
-                           // returnings.Add((userId, Books[index].BID, DateTime.Now));
-                            Console.WriteLine("'" + Books[index].BName + "' Book has been returned successfully!");
+                            // returnings.Add((userId, Books[index].BID, DateTime.Now));
+                            Console.WriteLine($"'{Books[index].BName}' has been returned successfully!");
                         }
                     }
                 }
@@ -1826,7 +1821,23 @@ namespace BasicLibrary
             {
                 Console.WriteLine($"Error saving to file: {ex.Message}");
             }
-        }
+            try
+            {
+                using (StreamWriter writer = new StreamWriter(CategoriesFile))
+                {
+                    foreach (var c in Categories)
+                    {
+                        writer.WriteLine($"{c.CID}|{c.CName}|{c.NOFBooks}");
+                    }
+                }
+                Console.WriteLine($"all your actions, save in file successfully!!");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error saving to file: {ex.Message}");
+            }
+        
+    }
         static void saveAllUsers()
         {
             try
@@ -1891,8 +1902,6 @@ namespace BasicLibrary
 
             Console.WriteLine(sb.ToString());
         }
-
-
         static void SearchForBook()
         {
             ViewAllBooks();
@@ -1934,7 +1943,7 @@ namespace BasicLibrary
                 Console.WriteLine("An error occurred while searching for the book: " + ex.Message);
             }
         }
-        static void saveAllActions() 
+        static void saveAllActions()
         {
             try
             {
@@ -1954,25 +1963,7 @@ namespace BasicLibrary
             }
 
 
-
-
-            try
-            {
-                using (StreamWriter writer = new StreamWriter(CategoriesFile))
-                {
-                    foreach (var c in Categories)
-                    {
-                        writer.WriteLine($"{c.CID}|{c.CName}|{c.NOFBooks}");
-                    }
-                }
-                Console.WriteLine($"all your actions, save in file successfully!!");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error saving to file: {ex.Message}");
-            }
         }
-        
 
     }
 }
