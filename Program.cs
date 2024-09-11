@@ -1897,15 +1897,16 @@ namespace BasicLibrary
                 {
                     foreach (var book in Books)
                     {
-                        writer.WriteLine($"{book.BName}|{book.BAuthor}|{book.BID}|{book.copies}|{book.borrowedCopies}");
+                        writer.WriteLine($"{book.BID}|{book.BName}|{book.BAuthor}|{book.copies}|{book.borrowedCopies}|{book.Price}|{book.catagory}|{book.BorrowPeriod}");
                     }
                 }
                 Console.WriteLine("Books updated to file successfully.");
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error saving to file: {ex.Message}");
+                Console.WriteLine($"Error saving books to file: {ex.Message}");
             }
+
             try
             {
                 using (StreamWriter writer = new StreamWriter(CategoriesFile))
@@ -1915,14 +1916,14 @@ namespace BasicLibrary
                         writer.WriteLine($"{c.CID}|{c.CName}|{c.NOFBooks}");
                     }
                 }
-                Console.WriteLine($"all your actions, save in file successfully!!");
+                Console.WriteLine("Categories updated to file successfully.");
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error saving to file: {ex.Message}");
+                Console.WriteLine($"Error saving categories to file: {ex.Message}");
             }
-        
-    }
+        }
+
         static void saveAllUsers()
         {
             try
@@ -1955,38 +1956,46 @@ namespace BasicLibrary
                 Console.WriteLine($"Error saving to file: {ex.Message}");
             }
         }
-        static void ViewAllBooks()  
+        static void ViewAllBooks()
         {
-            //
             StringBuilder sb = new StringBuilder();
 
             // Define column widths
             int nameWidth = 30;
             int authorWidth = 30;
             int idWidth = 5;
-            int quantityWidth = 8;
+            int copiesWidth = 8;
+            int borrowedWidth = 10;
+            int priceWidth = 10;
+            int categoryWidth = 15;
+            int periodWidth = 10;
 
-            sb.Append("\n \t--- All Books in Library ---");
-            sb.AppendLine();
+            sb.AppendLine("\n \t--- All Books in Library ---");
 
             // Use interpolation to format headers
-            sb.AppendFormat("\t{0,-" + nameWidth + "} {1,-" + authorWidth + "} {2,-" + idWidth + "} {3,-" + quantityWidth + "}", "Name", "Author", "ID", "Quantity");
+            sb.AppendFormat("\t{0,-" + nameWidth + "} {1,-" + authorWidth + "} {2,-" + idWidth + "} {3,-" + copiesWidth + "} {4,-" + borrowedWidth + "} {5,-" + priceWidth + "} {6,-" + categoryWidth + "} {7,-" + periodWidth + "}",
+                            "Name", "Author", "ID", "Copies", "Borrowed", "Price", "Category", "Borrow Period");
             sb.AppendLine();
-            sb.AppendLine(new string('-', nameWidth + authorWidth + idWidth + quantityWidth + 8)); // 8 for padding
+            sb.AppendLine(new string('-', nameWidth + authorWidth + idWidth + copiesWidth + borrowedWidth + priceWidth + categoryWidth + periodWidth + 24)); // 24 for padding
 
             for (int i = 0; i < Books.Count; i++)
             {
                 var book = Books[i];
-                sb.AppendFormat("\t{0,-" + nameWidth + "} {1,-" + authorWidth + "} {2,-" + idWidth + "} {3,-" + quantityWidth + "}",
+                sb.AppendFormat("\t{0,-" + nameWidth + "} {1,-" + authorWidth + "} {2,-" + idWidth + "} {3,-" + copiesWidth + "} {4,-" + borrowedWidth + "} {5,-" + priceWidth + "} {6,-" + categoryWidth + "} {7,-" + periodWidth + "}",
                                 book.BName,
                                 book.BAuthor,
                                 book.BID,
-                                book.copies-book.borrowedCopies);
+                                book.copies,
+                                book.borrowedCopies,
+                                book.Price.ToString("0.00") + " OMR", // Format as OMR currency
+                                book.catagory,
+                                book.BorrowPeriod);
                 sb.AppendLine();
             }
 
             Console.WriteLine(sb.ToString());
         }
+
         static void SearchForBook()
         {
             ViewAllBooks();
