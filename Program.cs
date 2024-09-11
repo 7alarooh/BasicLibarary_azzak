@@ -1243,7 +1243,7 @@ namespace BasicLibrary
                     // Process each overdue book
                     foreach (var overdue in overdueBooks)
                     {
-                        ReturnBook(userId, overdue.bid);
+                        HandleOverdueBooks(userId);
                     }
                 }
                 else
@@ -1254,6 +1254,55 @@ namespace BasicLibrary
             }
         }
 
+        static void HandleOverdueBooks(int userId)
+        {
+            // Find all overdue books for the user
+            var overdueBooks = Borrowings.Where(b => b.uid == userId && !b.ISReturned && b.ReturnDate < DateTime.Now).ToList();
+
+            if (overdueBooks.Count > 0)
+            {
+                Console.Clear();
+                Console.WriteLine("You have overdue books that need to be returned before you can proceed with other operations.");
+
+                // Display each overdue book
+                foreach (var overdue in overdueBooks)
+                {
+                    var book = Books.FirstOrDefault(b => b.BID == overdue.bid);
+                    if (book != default)
+                    {
+                        Console.WriteLine($"Overdue Book: {book.BName} (Return Date: {overdue.ReturnDate.ToShortDateString()})");
+                    }
+                }
+
+                // Ask if the user wants to return the books
+                Console.WriteLine("Do you want to return these books now? (y/n)");
+                string response = Console.ReadLine();
+
+                if (response.ToLower() == "y")
+                {
+                    // Process each overdue book for return
+                    foreach (var overdue in overdueBooks)
+                    {
+                        var bookIndex = Books.FindIndex(b => b.BID == overdue.bid);
+                        if (bookIndex != -1)
+                        {
+                            ReturnBook(userId, bookIndex);  // Return the book by passing the userId and the book index
+                        }
+                    }
+
+                    Console.WriteLine("All overdue books have been returned.");
+                }
+                else
+                {
+                    Console.WriteLine("You must return the overdue books to proceed.");
+                    loginPage();  // Redirect to the login page if they refuse to return
+                }
+            }
+            else
+            {
+                Console.WriteLine("No overdue books found. You can proceed.");
+            }
+        }
 
         static void BorrowBook(int userId) {
             try
@@ -1313,83 +1362,87 @@ namespace BasicLibrary
                 Console.WriteLine("An error occurred while borrowing the book: " + ex.Message);
             }
         }
-        static void ReturnBook(int userId, int index=-1) {
-
+        static void ReturnBook(int userId, int index = -1)
+        {
             try
             {
                 DisplayYourBookBorrowed(userId);
-                if (index != -1)
+
+                if (index == -1 || index >= Books.Count)
                 {
-                    int borrowedCopies = Books[index].borrowedCopies;
-                    int copies = Books[index].copies;
+                    Console.WriteLine("Error: Invalid book index.");
+                    return;
+                }
 
-                    // Check if the user has borrowed this book
-                    var borrowingRecord = Borrowings.FirstOrDefault(b => b.uid == userId && b.bid == Books[index].BID && !b.ISReturned);
+                var book = Books[index];
+                int borrowedCopies = book.borrowedCopies;
+                int copies = book.copies;
 
-                    if (borrowingRecord == default)
+                // Check if the user has borrowed this book
+                var borrowingRecord = Borrowings.FirstOrDefault(b => b.uid == userId && b.bid == book.BID && !b.ISReturned);
+
+                if (borrowingRecord == default)
+                {
+                    Console.WriteLine("Error: You have not borrowed this book.");
+                    return;
+                }
+
+                Console.WriteLine("Do you want to return the Book? Press 'y' to confirm:");
+                string selected = Console.ReadLine();
+
+                if (selected != "y")
+                {
+                    Console.WriteLine("Sorry! Cannot return this " + book.BName);
+                    return;
+                }
+
+                // Check if the book has already been returned
+                if (borrowedCopies <= 0)
+                {
+                    Console.WriteLine("Error: No borrowed copies to return.");
+                    return;
+                }
+
+                // Increment the number of copies available (return one book)
+                borrowedCopies++;
+                Books[index] = (book.BID, book.BName, book.BAuthor, book.copies, borrowedCopies, book.Price, book.catagory, book.BorrowPeriod);
+
+                // Ask the user to rate the book before finalizing the return
+                int rating = 0;
+                bool validRating = false;
+                while (!validRating)
+                {
+                    Console.WriteLine("Please provide a rating for the book (1-5): ");
+                    string ratingInput = Console.ReadLine();
+
+                    if (int.TryParse(ratingInput, out rating) && rating >= 1 && rating <= 5)
                     {
-                        Console.WriteLine("Error: You have not borrowed this book.");
-                        return;
-                    }
-                    
-                    Console.WriteLine("Do you want to return the Book?");
-                    Console.WriteLine("\n press char ' y ' to borrow :");
-                    string selected = Console.ReadLine();
-
-                    if (selected != "y")
-                    {
-                        Console.WriteLine("Sorry! Cannot return this " + Books[index].BName);
-
+                        validRating = true;
                     }
                     else
-                    { // Check if all copies have already been returned
-                        if (borrowedCopies <= 0)
-                        {
-                            Console.WriteLine("Error: No borrowed copies to return.");
-                        }
-                        else
-                        {
-                            // Increment the number of borrowedCopies (return one book)
-                            borrowedCopies--;
-                            Books[index] = (Books[index].BID,Books[index].BName, Books[index].BAuthor, Books[index].copies, borrowedCopies, Books[index].Price, Books[index].catagory, Books[index].BorrowPeriod);
-                            // Ask the user to rate the book before finalizing the return
-                            int rating = 0;
-                            bool validRating = false;
-                            while (!validRating)
-                            {
-                                Console.WriteLine("Please provide a rating for the book (1-5): ");
-                                string ratingInput = Console.ReadLine();
-
-                                if (int.TryParse(ratingInput, out rating) && rating >= 1 && rating <= 5)
-                                {
-                                    validRating = true;
-                                }
-                                else
-                                {
-                                    Console.WriteLine("Invalid rating. Please enter a number between 1 and 5.");
-                                }
-                            }
-                                // Update the borrowing record to reflect the return
-                                for (int i = 0; i < Borrowings.Count; i++)
-                            {
-                                if (Borrowings[i].uid == userId && Borrowings[i].bid == Books[index].BID && !Borrowings[i].ISReturned)
-                                {
-                                    // Set ISReturned to true and update the ActualReturnDate
-                                    Borrowings[i] = (Borrowings[i].uid, Borrowings[i].bid, Borrowings[i].date, Borrowings[i].ReturnDate, DateTime.Now, rating, true);
-                                }
-                            }
-
-                            // returnings.Add((userId, Books[index].BID, DateTime.Now));
-                            Console.WriteLine($"'{Books[index].BName}' has been returned successfully!");
-                        }
+                    {
+                        Console.WriteLine("Invalid rating. Please enter a number between 1 and 5.");
                     }
                 }
+
+                // Update the borrowing record to reflect the return
+                for (int i = 0; i < Borrowings.Count; i++)
+                {
+                    if (Borrowings[i].uid == userId && Borrowings[i].bid == book.BID && !Borrowings[i].ISReturned)
+                    {
+                        Borrowings[i] = (Borrowings[i].uid, Borrowings[i].bid, Borrowings[i].date, Borrowings[i].ReturnDate, DateTime.Now, rating, true);
+                        break; // Exit the loop once the record is updated
+                    }
+                }
+
+                Console.WriteLine($"'{book.BName}' has been returned successfully!");
             }
             catch (Exception ex)
             {
                 Console.WriteLine("An error occurred while returning the book: " + ex.Message);
             }
         }
+
         static void DisplayYourBookBorrowed(int userId)     
         {
             // Check if the user has borrowed any books
@@ -1960,7 +2013,7 @@ namespace BasicLibrary
                 {
                     foreach (var user in Users)
                     {
-                        writer.WriteLine($"{user.UID}|{user.Email}|{user.Password}|{user.Uname}");
+                        writer.WriteLine($"{user.UID}|{user.Uname}|{user.Email}|{user.Password}");
                     }
                 }
             }
@@ -1992,8 +2045,7 @@ namespace BasicLibrary
             int nameWidth = 30;
             int authorWidth = 30;
             int idWidth = 5;
-            int copiesWidth = 8;
-            int borrowedWidth = 10;
+            int copiesWidth = 16;
             int priceWidth = 10;
             int categoryWidth = 15;
             int periodWidth = 10;
@@ -2001,20 +2053,19 @@ namespace BasicLibrary
             sb.AppendLine("\n \t--- All Books in Library ---");
 
             // Use interpolation to format headers
-            sb.AppendFormat("\t{0,-" + nameWidth + "} {1,-" + authorWidth + "} {2,-" + idWidth + "} {3,-" + copiesWidth + "} {4,-" + borrowedWidth + "} {5,-" + priceWidth + "} {6,-" + categoryWidth + "} {7,-" + periodWidth + "}",
-                            "Name", "Author", "ID", "Copies", "Borrowed", "Price", "Category", "Borrow Period");
+            sb.AppendFormat("\t{0,-" + nameWidth + "} {1,-" + authorWidth + "} {2,-" + idWidth + "} {3,-" + copiesWidth + "}  {4,-" + priceWidth + "} {5,-" + categoryWidth + "} {6,-" + periodWidth + "}",
+                            "Name", "Author", "ID", "Available Copies", "Price", "Category", "Borrow Period");
             sb.AppendLine();
-            sb.AppendLine(new string('-', nameWidth + authorWidth + idWidth + copiesWidth + borrowedWidth + priceWidth + categoryWidth + periodWidth + 24)); // 24 for padding
+            sb.AppendLine(new string('-', nameWidth + authorWidth + idWidth + copiesWidth  + priceWidth + categoryWidth + periodWidth + 24)); // 24 for padding
 
             for (int i = 0; i < Books.Count; i++)
             {
                 var book = Books[i];
-                sb.AppendFormat("\t{0,-" + nameWidth + "} {1,-" + authorWidth + "} {2,-" + idWidth + "} {3,-" + copiesWidth + "} {4,-" + borrowedWidth + "} {5,-" + priceWidth + "} {6,-" + categoryWidth + "} {7,-" + periodWidth + "}",
+                sb.AppendFormat("\t{0,-" + nameWidth + "} {1,-" + authorWidth + "} {2,-" + idWidth + "} {3,-" + copiesWidth + "}  {4,-" + priceWidth + "} {5,-" + categoryWidth + "} {6,-" + periodWidth + "}",
                                 book.BName,
                                 book.BAuthor,
                                 book.BID,
-                                book.copies,
-                                book.borrowedCopies,
+                                book.copies-book.borrowedCopies,
                                 book.Price.ToString("0.00") + " OMR", // Format as OMR currency
                                 book.catagory,
                                 book.BorrowPeriod);
