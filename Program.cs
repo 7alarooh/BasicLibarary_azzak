@@ -730,22 +730,22 @@ namespace BasicLibrary
             StringBuilder sb = new StringBuilder();
 
             // Define column widths
+            int idWidth = 10;
+            int nameWidth = 25;
             int emailWidth = 30;
             int passwordWidth = 20;
-            int nameWidth = 25;
-            int idWidth = 10;
 
             // Print Admins
             sb.AppendLine("\n \t--- All Users in Library System ---");
             sb.AppendLine("\n \t--- Admins ---");
-            sb.AppendFormat("\t{0,-" + idWidth + "} {1,-" + emailWidth + "} {2,-" + passwordWidth + "} {3,-" + nameWidth + "}", "ID", "Email", "Password", "Name");
+            sb.AppendFormat("\t{0,-" + idWidth + "} {1,-" + nameWidth + "} {2,-" + emailWidth + "} {3,-" + passwordWidth + "}",
+                            "ID", "Name", "Email", "Password");
             sb.AppendLine();
-            sb.AppendLine(new string('-', idWidth + emailWidth + passwordWidth + nameWidth + 12)); // 12 for padding and " \t"
+            sb.AppendLine(new string('-', idWidth + nameWidth + emailWidth + passwordWidth + 12)); // 12 for padding and " \t"
 
-            for (int i = 0; i < Admins.Count; i++)
+            foreach (var admin in Admins)
             {
-                var admin = Admins[i];
-                sb.AppendFormat("\t{0,-" + idWidth + "} {1,-" + emailWidth + "} {2,-" + passwordWidth + "} {3,-" + nameWidth + "}",
+                sb.AppendFormat("\t{0,-" + idWidth + "} {1,-" + nameWidth + "} {2,-" + emailWidth + "} {3,-" + passwordWidth + "}",
                                 admin.AID,
                                 admin.AName,
                                 admin.Email,
@@ -755,24 +755,24 @@ namespace BasicLibrary
 
             // Print Users
             sb.AppendLine("\n\n \t--- Users ---");
-            sb.AppendFormat("\t{0,-" + idWidth + "} {1,-" + emailWidth + "} {2,-" + passwordWidth + "} {3,-" + nameWidth + "}",
-                            "ID", "Email", "Password", "Name");
+            sb.AppendFormat("\t{0,-" + idWidth + "} {1,-" + nameWidth + "} {2,-" + emailWidth + "} {3,-" + passwordWidth + "}",
+                            "ID", "Name", "Email", "Password");
             sb.AppendLine();
-            sb.AppendLine(new string('-', idWidth + emailWidth + passwordWidth + nameWidth + 12)); // 12 for padding and " \t"
+            sb.AppendLine(new string('-', idWidth + nameWidth + emailWidth + passwordWidth + 12)); // 12 for padding and " \t"
 
-            for (int i = 0; i < Users.Count; i++)
+            foreach (var user in Users)
             {
-                var user = Users[i];
-                sb.AppendFormat("\t{0,-" + idWidth + "} {1,-" + emailWidth + "} {2,-" + passwordWidth + "} {3,-" + nameWidth + "}",
+                sb.AppendFormat("\t{0,-" + idWidth + "} {1,-" + nameWidth + "} {2,-" + emailWidth + "} {3,-" + passwordWidth + "}",
                                 user.UID,
+                                user.Uname,
                                 user.Email,
-                                user.Password,
-                                user.Uname);
+                                user.Password);
                 sb.AppendLine();
             }
 
             Console.WriteLine(sb.ToString());
         }
+
 
 
 
