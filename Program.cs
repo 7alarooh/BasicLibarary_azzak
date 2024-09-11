@@ -1179,12 +1179,39 @@ namespace BasicLibrary
         }
         static void reporting()
         {
+            Console.Clear();
             Console.WriteLine("\n------\tToday's Report\t-----");
+
+            // Total number of books in the library
+            int totalBooksInLibrary = Books.Count;
+            Console.WriteLine($"Total Number of Books in the Library: {totalBooksInLibrary}");
+
+            // Total number of categories and book count per category
+            Console.WriteLine($"\nTotal Number of Categories: {Categories.Count}");
+            Console.WriteLine("Categories:");
+            foreach (var category in Categories)
+            {
+                Console.WriteLine($"- {category.CName}: {category.NOFBooks} books");
+            }
+
+            // Total number of copies of all books
+            int totalBookCopies = Books.Sum(b => b.copies);
+            Console.WriteLine($"\nTotal Number of Book Copies (All Books Combined): {totalBookCopies}");
+
+            // Total number of borrowed books (sum of all borrowed copies)
+            int totalBorrowedBooks = Books.Sum(b => b.borrowedCopies);
+            Console.WriteLine($"Total Number of Borrowed Books: {totalBorrowedBooks}");
+
+            // Total number of returned books (count of Borrowings where ISReturned is true)
+            int totalReturnedBooks = Borrowings.Count(b => b.ISReturned);
+            Console.WriteLine($"Total Number of Returned Books: {totalReturnedBooks}");
+
             // List of tuples to track how many times each book has been borrowed: (bookId, count)
             List<(int bookId, int count)> bookBorrowCount = new List<(int bookId, int count)>();
 
             // List of tuples to track how many times each author has been borrowed: (authorName, count)
             List<(string authorName, int count)> authorBorrowCount = new List<(string authorName, int count)>();
+
             foreach (var borrowing in Borrowings)
             {
                 int bookId = borrowing.bid;
@@ -1236,7 +1263,7 @@ namespace BasicLibrary
                 var mostBorrowedBook = bookBorrowCount.FirstOrDefault(b => b.count == maxBorrowCount);
 
                 var book = Books.FirstOrDefault(b => b.BID == mostBorrowedBook.bookId);
-                Console.WriteLine($"Most Borrowed Book: '{book.BName}' by {book.BAuthor} (Borrowed {maxBorrowCount} times)");
+                Console.WriteLine($"\nMost Borrowed Book: '{book.BName}' by {book.BAuthor} (Borrowed {maxBorrowCount} times)");
             }
             else
             {
@@ -1255,7 +1282,10 @@ namespace BasicLibrary
             {
                 Console.WriteLine("No authors have been borrowed yet.");
             }
+
+            Console.WriteLine("\n------\tEnd of Report\t-----");
         }
+
 
         //........................User Functions.....................................//
         static void userMenu(int id,string name)
