@@ -2045,8 +2045,12 @@ namespace BasicLibrary
                 {
                     foreach (var b in Borrowings)
                     {
+                        // Format dates and handle null values
+                        string actualReturnDate = b.ActualReturnDate.HasValue ? b.ActualReturnDate.Value.ToString("yyyy-MM-dd") : "N/A";
+                        string rating = b.Rating.HasValue ? b.Rating.Value.ToString() : "N/A";
+
                         // Save all fields to the file
-                        writer.WriteLine($"{b.uid}|{b.bid}|{b.date}|{b.ReturnDate}|{b.ActualReturnDate}|{b.ISReturned}|{b.Rating}");
+                        writer.WriteLine($"{b.uid}|{b.bid}|{b.date.ToString("yyyy-MM-dd")}|{b.ReturnDate.ToString("yyyy-MM-dd")}|{actualReturnDate}|{rating}|{b.ISReturned}");
                     }
                 }
                 Console.WriteLine("Borrowings saved successfully.");
@@ -2055,9 +2059,8 @@ namespace BasicLibrary
             {
                 Console.WriteLine($"Error saving to file: {ex.Message}");
             }
-
-
         }
+
 
     }
 }
