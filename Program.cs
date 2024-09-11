@@ -988,28 +988,82 @@ namespace BasicLibrary
             Books.Add((newID, name, author, copies, 0, price, category, DaysAllowedForBorrowing));
             Console.WriteLine($"Book added successfully with ID: {newID} !");
         }
+        static void ViewAllBooks()
+        {
+            StringBuilder sb = new StringBuilder();
+
+            // Define column widths
+            int nameWidth = 30;
+            int authorWidth = 30;
+            int idWidth = 5;
+            int copiesWidth = 16;
+            int priceWidth = 10;
+            int categoryWidth = 15;
+            int periodWidth = 10;
+
+            sb.AppendLine("\n \t--- All Books in Library ---");
+
+            // Use interpolation to format headers
+            sb.AppendFormat("\t{0,-" + nameWidth + "} {1,-" + authorWidth + "} {2,-" + idWidth + "} {3,-" + copiesWidth + "}  {4,-" + priceWidth + "} {5,-" + categoryWidth + "} {6,-" + periodWidth + "}",
+                            "Name", "Author", "ID", "Available Copies", "Price", "Category", "Borrow Period");
+            sb.AppendLine();
+            sb.AppendLine(new string('-', nameWidth + authorWidth + idWidth + copiesWidth + priceWidth + categoryWidth + periodWidth + 24)); // 24 for padding
+
+            for (int i = 0; i < Books.Count; i++)
+            {
+                var book = Books[i];
+                sb.AppendFormat("\t{0,-" + nameWidth + "} {1,-" + authorWidth + "} {2,-" + idWidth + "} {3,-" + copiesWidth + "}  {4,-" + priceWidth + "} {5,-" + categoryWidth + "} {6,-" + periodWidth + "}",
+                                book.BName,
+                                book.BAuthor,
+                                book.BID,
+                                book.copies - book.borrowedCopies,
+                                book.Price.ToString("0.00") + " OMR", // Format as OMR currency
+                                book.catagory,
+                                book.BorrowPeriod);
+                sb.AppendLine();
+            }
+
+            Console.WriteLine(sb.ToString());
+        }
         static void editBook()
         {
-
             // Check if there are books to edit
             if (Books.Count == 0)
             {
                 Console.WriteLine("No books available to edit.");
                 return;
             }
+
             SearchForBook();
+
+            // Assuming `index` is set from the search function
+            if (index == -1)
+            {
+                Console.WriteLine("Error: Book not found.");
+                return;
+            }
 
             var book = Books[index];
 
             Console.WriteLine($"Editing Book: {book.BName} by {book.BAuthor}");
+
+            // Edit Book Name
             Console.WriteLine("Enter new Book Name (or press Enter to skip):");
             string newName = Console.ReadLine();
 
-            if (!string.IsNullOrWhiteSpace(newName)) //is a better and safer check for ensuring that the input is valid (not null, not empty, and not just whitespace).
+            if (!string.IsNullOrWhiteSpace(newName))
             {
+                // Check for duplicate book name
+                var duplicateBook = Books.FirstOrDefault(b => b.BName.ToLower() == newName.ToLower() && b.BID != book.BID);
+                if (duplicateBook != default)
+                {
+                    Console.WriteLine("Error: A book with the same name already exists.");
+                    return;
+                }
                 book.BName = newName;
             }
 
+            // Edit Book Author
             Console.WriteLine("Enter new Book Author (or press Enter to skip):");
             string newAuthor = Console.ReadLine();
             if (!string.IsNullOrWhiteSpace(newAuthor))
@@ -1017,6 +1071,7 @@ namespace BasicLibrary
                 book.BAuthor = newAuthor;
             }
 
+            // Edit Book Copies
             Console.WriteLine("Enter new Book Quantity (or press Enter to skip):");
             string quantityInput = Console.ReadLine();
             if (!string.IsNullOrWhiteSpace(quantityInput))
@@ -1024,12 +1079,11 @@ namespace BasicLibrary
                 try
                 {
                     int newQuantity = int.Parse(quantityInput);
-                    if (newQuantity < 0)
+                    if (newQuantity < book.borrowedCopies)  // Ensure the new quantity is not less than borrowed copies
                     {
-                        Console.WriteLine("Error: Quantity cannot be negative.");
+                        Console.WriteLine($"Error: Cannot decrease the total copies below the number of currently borrowed copies ({book.borrowedCopies}).");
                         return;
                     }
-                    book.borrowedCopies = newQuantity;
                     book.copies = newQuantity;
                 }
                 catch (FormatException)
@@ -1042,7 +1096,6 @@ namespace BasicLibrary
             // Update the book in the list
             Books[index] = book;
             Console.WriteLine("Book details updated successfully.");
-
         }
         static void removeBook()
         {
@@ -1250,7 +1303,6 @@ namespace BasicLibrary
                 }
             }
         }
-
         static void HandleOverdueBooks(int userId)
         {
             // Find all overdue books for the user
@@ -1302,7 +1354,6 @@ namespace BasicLibrary
                 Console.WriteLine("No overdue books found. You can proceed.");
             }
         }
-
         static void BorrowBook(int userId) {
             try
             {
@@ -1441,7 +1492,6 @@ namespace BasicLibrary
                 Console.WriteLine("An error occurred while returning the book: " + ex.Message);
             }
         }
-
         static void DisplayYourBookBorrowed(int userId)     
         {
             // Check if the user has borrowed any books
@@ -2002,7 +2052,6 @@ namespace BasicLibrary
                 Console.WriteLine($"Error saving categories to file: {ex.Message}");
             }
         }
-
         static void saveAllUsers()
         {
             try
@@ -2035,44 +2084,6 @@ namespace BasicLibrary
                 Console.WriteLine($"Error saving to file: {ex.Message}");
             }
         }
-        static void ViewAllBooks()
-        {
-            StringBuilder sb = new StringBuilder();
-
-            // Define column widths
-            int nameWidth = 30;
-            int authorWidth = 30;
-            int idWidth = 5;
-            int copiesWidth = 16;
-            int priceWidth = 10;
-            int categoryWidth = 15;
-            int periodWidth = 10;
-
-            sb.AppendLine("\n \t--- All Books in Library ---");
-
-            // Use interpolation to format headers
-            sb.AppendFormat("\t{0,-" + nameWidth + "} {1,-" + authorWidth + "} {2,-" + idWidth + "} {3,-" + copiesWidth + "}  {4,-" + priceWidth + "} {5,-" + categoryWidth + "} {6,-" + periodWidth + "}",
-                            "Name", "Author", "ID", "Available Copies", "Price", "Category", "Borrow Period");
-            sb.AppendLine();
-            sb.AppendLine(new string('-', nameWidth + authorWidth + idWidth + copiesWidth  + priceWidth + categoryWidth + periodWidth + 24)); // 24 for padding
-
-            for (int i = 0; i < Books.Count; i++)
-            {
-                var book = Books[i];
-                sb.AppendFormat("\t{0,-" + nameWidth + "} {1,-" + authorWidth + "} {2,-" + idWidth + "} {3,-" + copiesWidth + "}  {4,-" + priceWidth + "} {5,-" + categoryWidth + "} {6,-" + periodWidth + "}",
-                                book.BName,
-                                book.BAuthor,
-                                book.BID,
-                                book.copies-book.borrowedCopies,
-                                book.Price.ToString("0.00") + " OMR", // Format as OMR currency
-                                book.catagory,
-                                book.BorrowPeriod);
-                sb.AppendLine();
-            }
-
-            Console.WriteLine(sb.ToString());
-        }
-
         static void SearchForBook()
         {
             ViewAllBooks();
