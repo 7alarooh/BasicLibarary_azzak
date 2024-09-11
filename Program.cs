@@ -19,7 +19,7 @@ namespace BasicLibrary
         
         static List<(int UID, string Uname, string Email, string Password)> Users =new List<(int UID, string Uname, string Email, string Password)>();
        
-        static List<(string BName, string BAuthor, int BID, int copies, int borrowedCopies, double Price, string catagory, int BorrowPeriod)> Books = new List<(string BName, string BAuthor, int BID, int copies, int borrowedCopies, double Price, string catagory, int BorrowPeriod)>();
+        static List<(int BID,string BName, string BAuthor, int copies, int borrowedCopies, double Price, string catagory, int BorrowPeriod)> Books = new List<(int BID,string BName, string BAuthor, int copies, int borrowedCopies, double Price, string catagory, int BorrowPeriod)>();
 
         static List<(int uid, int bid, DateTime date,DateTime ReturnDate, DateTime ActualReturnDate, bool ISReturned, int Rating)> Borrowings = new List<(int uid, int bid, DateTime date, DateTime ReturnDate, DateTime ActualReturnDate, bool ISReturned, int Rating)>();
         static List<(int CID, string CName, int NOFBooks)> Categories = new List<(int CID, string CName, int NOFBooks)>();
@@ -960,7 +960,7 @@ namespace BasicLibrary
             }
 
             // Add the book if everything is valid
-            Books.Add((name, author, newID, quantity, quantity, price, category, DaysAllowedForBorrowing));
+            Books.Add((newID, name, author,  quantity, quantity, price, category, DaysAllowedForBorrowing));
             Console.WriteLine($"Book added successfully with ID: {newID} !");
         }
         static void editBook()
@@ -1255,7 +1255,7 @@ namespace BasicLibrary
 
                             // Increase borrowedCopies by 1
                             int updatedBorrowedCopies = Books[index].borrowedCopies + 1;
-                            Books[index] = (Books[index].BName, Books[index].BAuthor, Books[index].BID, Books[index].copies, updatedBorrowedCopies, Books[index].Price, Books[index].catagory, Books[index].BorrowPeriod);
+                            Books[index] = (Books[index].BID, Books[index].BName, Books[index].BAuthor, Books[index].copies, updatedBorrowedCopies, Books[index].Price, Books[index].catagory, Books[index].BorrowPeriod);
 
                             // Set return date and default ActualReturnDate and Rating
                             DateTime borrowDate = DateTime.Now;
@@ -1322,7 +1322,7 @@ namespace BasicLibrary
                         {
                             // Increment the number of borrowedCopies (return one book)
                             borrowedCopies--;
-                            Books[index] = (Books[index].BName, Books[index].BAuthor, Books[index].BID, Books[index].copies, borrowedCopies, Books[index].Price, Books[index].catagory, Books[index].BorrowPeriod);
+                            Books[index] = (Books[index].BID,Books[index].BName, Books[index].BAuthor, Books[index].copies, borrowedCopies, Books[index].Price, Books[index].catagory, Books[index].BorrowPeriod);
                             // Ask the user to rate the book before finalizing the return
                             int rating = 0;
                             bool validRating = false;
@@ -1695,7 +1695,7 @@ namespace BasicLibrary
                         if (bookToBorrow.borrowedCopies > 0)
                         {
                             Console.WriteLine($"You have successfully borrowed {bookToBorrow.BName}.");
-                            Books[Books.IndexOf(bookToBorrow)] = (bookToBorrow.BName, bookToBorrow.BAuthor, bookToBorrow.BID, bookToBorrow.copies, bookToBorrow.borrowedCopies - 1, bookToBorrow.Price, bookToBorrow.catagory, bookToBorrow.BorrowPeriod);
+                            Books[Books.IndexOf(bookToBorrow)] = (bookToBorrow.BID, bookToBorrow.BName, bookToBorrow.BAuthor,  bookToBorrow.copies, bookToBorrow.borrowedCopies - 1, bookToBorrow.Price, bookToBorrow.catagory, bookToBorrow.BorrowPeriod);
                             //Borrowings.Add((userId, bookToBorrow.BID, DateTime.Now, false));
                         }
                         else
@@ -1730,7 +1730,18 @@ namespace BasicLibrary
                             var parts = line.Split('|');
                             if (parts.Length == 8)
                             {
-                                Books.Add((parts[0], parts[1], int.Parse(parts[2]), int.Parse(parts[3]), int.Parse(parts[4]), double.Parse(parts[5]), parts[6], int.Parse(parts[7])));
+                                // Parse each part into the appropriate data type
+                                int bid = int.Parse(parts[0]);
+                                string bookName = parts[1];
+                                string author = parts[2];
+                                int copies = int.Parse(parts[3]);
+                                int borrowedCopies = int.Parse(parts[4]);
+                                double price = double.Parse(parts[5]);
+                                string category = parts[6];
+                                int borrowPeriod = int.Parse(parts[7]);
+
+                                // Add to the Books list
+                                Books.Add((bid, bookName, author, copies, borrowedCopies, price, category, borrowPeriod));
                             }
                         }
                     }
