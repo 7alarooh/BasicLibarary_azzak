@@ -241,7 +241,7 @@ namespace BasicLibrary
         // Function to validate password format
         static string IsValidPassword(string password)
         {
-            if (password.Length < 6)
+            if (password.Length < 8)
             {
                 return "Error: Password must be at least 6 characters long.";
             }
@@ -502,8 +502,6 @@ namespace BasicLibrary
             Admins.Add((nextID, name, email, password));
             Console.WriteLine($"Admin added successfully with ID: {nextID}");
         }
-
-
         static void EditUserInformation()
         {
             ViewAllUsers();
@@ -845,7 +843,7 @@ namespace BasicLibrary
         {
             string name;
             string author;
-            int quantity = 0;
+            int copies = 0;
             double price = 0;
             string category;
             int DaysAllowedForBorrowing = 0;
@@ -888,8 +886,8 @@ namespace BasicLibrary
             Console.WriteLine("Enter the Book Quantity:");
             try
             {
-                quantity = int.Parse(Console.ReadLine());
-                if (quantity < 0)
+                   copies = int.Parse(Console.ReadLine());
+                if (copies < 0)
                 {
                     Console.WriteLine("Error: Quantity cannot be negative.");
                     return;
@@ -940,7 +938,7 @@ namespace BasicLibrary
             {
                 Console.WriteLine($"{i + 1}. {Categories[i].CName}");
             }
-
+            Console.WriteLine($"Enter No. Categories:");
             int categoryIndex = 0;
             try
             {
@@ -987,10 +985,9 @@ namespace BasicLibrary
             }
 
             // Add the book if everything is valid
-            Books.Add((newID, name, author, quantity, quantity, price, category, DaysAllowedForBorrowing));
+            Books.Add((newID, name, author, copies, 0, price, category, DaysAllowedForBorrowing));
             Console.WriteLine($"Book added successfully with ID: {newID} !");
         }
-
         static void editBook()
         {
 
@@ -1291,6 +1288,8 @@ namespace BasicLibrary
                     }
 
                     Console.WriteLine("All overdue books have been returned.");
+                    string press= Console.ReadLine();
+                    Console.Clear();
                 }
                 else
                 {
@@ -1997,7 +1996,6 @@ namespace BasicLibrary
                         writer.WriteLine($"{c.CID}|{c.CName}|{c.NOFBooks}");
                     }
                 }
-                Console.WriteLine("Categories updated to file successfully.");
             }
             catch (Exception ex)
             {
@@ -2132,7 +2130,7 @@ namespace BasicLibrary
                         writer.WriteLine($"{b.uid}|{b.bid}|{b.date.ToString("yyyy-MM-dd")}|{b.ReturnDate.ToString("yyyy-MM-dd")}|{actualReturnDate}|{rating}|{b.ISReturned}");
                     }
                 }
-                Console.WriteLine("Borrowings saved successfully.");
+                Console.WriteLine("saved successfully...!");
             }
             catch (Exception ex)
             {
