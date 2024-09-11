@@ -928,14 +928,41 @@ namespace BasicLibrary
                 return;
             }
 
-            // Handle the book category
-            Console.WriteLine("Enter Book Category:");
-            category = Console.ReadLine();
-            if (string.IsNullOrWhiteSpace(category)) // to handle the book category
+            // Show all categories and let the user select one
+            if (Categories.Count == 0)
             {
-                Console.WriteLine("Error: Book category cannot be empty.");
+                Console.WriteLine("Error: No categories available. Please add categories before adding a book.");
                 return;
             }
+
+            Console.WriteLine("Select Book Category:");
+            for (int i = 0; i < Categories.Count; i++)
+            {
+                Console.WriteLine($"{i + 1}. {Categories[i].CName}");
+            }
+
+            int categoryIndex = 0;
+            try
+            {
+                categoryIndex = int.Parse(Console.ReadLine()) - 1;
+                if (categoryIndex < 0 || categoryIndex >= Categories.Count)
+                {
+                    Console.WriteLine("Error: Invalid category selection.");
+                    return;
+                }
+            }
+            catch (FormatException)
+            {
+                Console.WriteLine("Error: Please enter a valid number for the category selection.");
+                return;
+            }
+            catch (OverflowException)
+            {
+                Console.WriteLine("Error: The number for the category selection is too large.");
+                return;
+            }
+
+            category = Categories[categoryIndex].CName;
 
             // Handle the borrowing period
             Console.WriteLine("Enter the Number of Days Allowed for Borrowing:");
@@ -960,9 +987,10 @@ namespace BasicLibrary
             }
 
             // Add the book if everything is valid
-            Books.Add((newID, name, author,  quantity, quantity, price, category, DaysAllowedForBorrowing));
+            Books.Add((newID, name, author, quantity, quantity, price, category, DaysAllowedForBorrowing));
             Console.WriteLine($"Book added successfully with ID: {newID} !");
         }
+
         static void editBook()
         {
 
