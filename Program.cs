@@ -21,14 +21,14 @@ namespace BasicLibrary
        
         static List<(int BID,string BName, string BAuthor, int copies, int borrowedCopies, double Price, string catagory, int BorrowPeriod)> Books = new List<(int BID,string BName, string BAuthor, int copies, int borrowedCopies, double Price, string catagory, int BorrowPeriod)>();
 
-        static List<(int uid, int bid, DateTime date,DateTime ReturnDate, DateTime ActualReturnDate, int Rating, bool ISReturned)> Borrowings = new List<(int uid, int bid, DateTime date, DateTime ReturnDate, DateTime ActualReturnDate,int Rating ,bool ISReturned)>();
+        static List<(int uid, int bid, DateTime date,DateTime ReturnDate, DateTime? ActualReturnDate, int? Rating, bool ISReturned)> Borrowings = new List<(int uid, int bid, DateTime date, DateTime ReturnDate, DateTime? ActualReturnDate, int? Rating ,bool ISReturned)>();
         static List<(int CID, string CName, int NOFBooks)> Categories = new List<(int CID, string CName, int NOFBooks)>();
         
-        static string filePath = "C:\\Users\\Lenovo\\source\\repos\\azzaGitTest\\lib.txt";
-        static string userFilePath = "C:\\Users\\Lenovo\\source\\repos\\azzaGitTest\\user.txt";
-        static string adminFilePath = "C:\\Users\\Lenovo\\source\\repos\\azzaGitTest\\admin.txt";
-        static string borrowingFilePath = "C:\\Users\\Lenovo\\source\\repos\\azzaGitTest\\borrowing.txt";
-        static string CategoriesFile = "C:\\Users\\Lenovo\\source\\repos\\azzaGitTest\\Categories.txt";
+        static string filePath = "C:\\Users\\Lenovo\\source\\repos\\azzaGitTest\\BooksFile.txt";
+        static string userFilePath = "C:\\Users\\Lenovo\\source\\repos\\azzaGitTest\\UsersFile.txt";
+        static string adminFilePath = "C:\\Users\\Lenovo\\source\\repos\\azzaGitTest\\AdminsFile.txt";
+        static string borrowingFilePath = "C:\\Users\\Lenovo\\source\\repos\\azzaGitTest\\BorrowingFile.txt";
+        static string CategoriesFile = "C:\\Users\\Lenovo\\source\\repos\\azzaGitTest\\CategoriesFile.txt";
         static int index = -1;
         //-----------------------------------------------------------------------------//
 
@@ -71,7 +71,7 @@ namespace BasicLibrary
                             break;  // This will return to the menu instead of exiting the method.
                         }
 
-                        if (rEmail == "registrar@gmail.com")
+                        if (rEmail == "eve.davis@example.com")
                         {
                             var admin = Admins.FirstOrDefault(a => a.Email.Equals(rEmail, StringComparison.OrdinalIgnoreCase));
                             if (admin != default)
@@ -1188,6 +1188,7 @@ namespace BasicLibrary
         }
         static void CheckOverdueBooks(int userId)
         {
+            // Find all overdue books for the user
             var overdueBooks = Borrowings.Where(b => b.uid == userId && !b.ISReturned && b.ReturnDate < DateTime.Now).ToList();
 
             if (overdueBooks.Count > 0)
@@ -1195,6 +1196,7 @@ namespace BasicLibrary
                 Console.Clear();
                 Console.WriteLine("You have overdue books that need to be returned before you can proceed with other operations.");
 
+                // Display each overdue book
                 foreach (var overdue in overdueBooks)
                 {
                     var book = Books.FirstOrDefault(b => b.BID == overdue.bid);
@@ -1204,25 +1206,26 @@ namespace BasicLibrary
                     }
                 }
 
+                // Ask if the user wants to return the books
                 Console.WriteLine("Do you want to return these books now? (y/n)");
                 string response = Console.ReadLine();
 
                 if (response.ToLower() == "y")
                 {
+                    // Process each overdue book
                     foreach (var overdue in overdueBooks)
                     {
-                        ReturnBook(userId);
+                        ReturnBook(userId, overdue.bid);
                     }
                 }
                 else
                 {
                     Console.WriteLine("You must return the overdue books to proceed.");
-
-                    // note: check and test  if i want to exit or return 
-                    return;
+                    loginPage();
                 }
             }
         }
+
 
         static void BorrowBook(int userId) {
             try
@@ -1260,11 +1263,9 @@ namespace BasicLibrary
                             // Set return date and default ActualReturnDate and Rating
                             DateTime borrowDate = DateTime.Now;
                             DateTime returnDate = borrowDate.AddDays(Books[index].BorrowPeriod);
-                            DateTime actualReturnDate = returnDate; // Default to ReturnDate until actual return happens
-                            int rating = 0; // Default rating
-
+      
                             // Add the borrowing entry
-                            Borrowings.Add((userId, Books[index].BID, borrowDate, returnDate, actualReturnDate, rating, false));
+                            Borrowings.Add((userId, Books[index].BID, borrowDate, returnDate, null, null, false));
 
                             Console.WriteLine($"You have successfully borrowed \"{Books[index].BName}\"!");
 
@@ -1284,7 +1285,7 @@ namespace BasicLibrary
                 Console.WriteLine("An error occurred while borrowing the book: " + ex.Message);
             }
         }
-        static void ReturnBook(int userId) {
+        static void ReturnBook(int userId, int index=-1) {
 
             try
             {
@@ -1745,7 +1746,6 @@ namespace BasicLibrary
                             }
                         }
                     }
-                    Console.WriteLine("Books loaded successfully from file.");
                 }
                 else
                 {
@@ -1774,7 +1774,7 @@ namespace BasicLibrary
                             }
                         }
                     }
-                    Console.WriteLine("Users loaded successfully from file.");
+                    
                 }
                 else
                 {
@@ -1803,15 +1803,19 @@ namespace BasicLibrary
                                 int bid = int.Parse(parts[1]);
                                 DateTime date = DateTime.Parse(parts[2]);
                                 DateTime returnDate = DateTime.Parse(parts[3]);
-                                DateTime actualReturnDate = DateTime.Parse(parts[4]);
-                                bool isReturned = bool.Parse(parts[5]);
-                                int rating = int.Parse(parts[6]);
 
-                                Borrowings.Add((uid, bid, date, returnDate, actualReturnDate, rating, isReturned ));
+                                // Handle ActualReturnDate
+                                DateTime? actualReturnDate = parts[4].Equals("N/A", StringComparison.OrdinalIgnoreCase) ? (DateTime?)null : DateTime.Parse(parts[4]);
+
+                                // Handle Rating
+                                int? rating = parts[5].Equals("N/A", StringComparison.OrdinalIgnoreCase) ? (int?)null : int.Parse(parts[5]);
+
+                                bool isReturned = bool.Parse(parts[6]);
+
+                                Borrowings.Add((uid, bid, date, returnDate, actualReturnDate, rating, isReturned));
                             }
                         }
                     }
-                    Console.WriteLine("Borrowings loaded successfully from file.");
                 }
                 else
                 {
@@ -1844,7 +1848,6 @@ namespace BasicLibrary
                             }
                         }
                     }
-                    Console.WriteLine("Categories loaded successfully from file.");
                 }
                 else
                 {
@@ -1873,7 +1876,6 @@ namespace BasicLibrary
                             }
                         }
                     }
-                    Console.WriteLine("Admins loaded successfully from file.");
                 }
                 else
                 {
@@ -1979,7 +1981,7 @@ namespace BasicLibrary
                                 book.BName,
                                 book.BAuthor,
                                 book.BID,
-                                book.borrowedCopies);
+                                book.copies-book.borrowedCopies);
                 sb.AppendLine();
             }
 
