@@ -21,7 +21,7 @@ namespace BasicLibrary
        
         static List<(int BID,string BName, string BAuthor, int copies, int borrowedCopies, double Price, string catagory, int BorrowPeriod)> Books = new List<(int BID,string BName, string BAuthor, int copies, int borrowedCopies, double Price, string catagory, int BorrowPeriod)>();
 
-        static List<(int uid, int bid, DateTime date,DateTime ReturnDate, DateTime ActualReturnDate, bool ISReturned, int Rating)> Borrowings = new List<(int uid, int bid, DateTime date, DateTime ReturnDate, DateTime ActualReturnDate, bool ISReturned, int Rating)>();
+        static List<(int uid, int bid, DateTime date,DateTime ReturnDate, DateTime ActualReturnDate, int Rating, bool ISReturned)> Borrowings = new List<(int uid, int bid, DateTime date, DateTime ReturnDate, DateTime ActualReturnDate,int Rating ,bool ISReturned)>();
         static List<(int CID, string CName, int NOFBooks)> Categories = new List<(int CID, string CName, int NOFBooks)>();
         
         static string filePath = "C:\\Users\\Lenovo\\source\\repos\\azzaGitTest\\lib.txt";
@@ -1264,7 +1264,7 @@ namespace BasicLibrary
                             int rating = 0; // Default rating
 
                             // Add the borrowing entry
-                            Borrowings.Add((userId, Books[index].BID, borrowDate, returnDate, actualReturnDate, false, rating));
+                            Borrowings.Add((userId, Books[index].BID, borrowDate, returnDate, actualReturnDate, rating, false));
 
                             Console.WriteLine($"You have successfully borrowed \"{Books[index].BName}\"!");
 
@@ -1346,7 +1346,7 @@ namespace BasicLibrary
                                 if (Borrowings[i].uid == userId && Borrowings[i].bid == Books[index].BID && !Borrowings[i].ISReturned)
                                 {
                                     // Set ISReturned to true and update the ActualReturnDate
-                                    Borrowings[i] = (Borrowings[i].uid, Borrowings[i].bid, Borrowings[i].date, Borrowings[i].ReturnDate, DateTime.Now, true, rating);
+                                    Borrowings[i] = (Borrowings[i].uid, Borrowings[i].bid, Borrowings[i].date, Borrowings[i].ReturnDate, DateTime.Now, rating, true);
                                 }
                             }
 
@@ -1807,7 +1807,7 @@ namespace BasicLibrary
                                 bool isReturned = bool.Parse(parts[5]);
                                 int rating = int.Parse(parts[6]);
 
-                                Borrowings.Add((uid, bid, date, returnDate, actualReturnDate, isReturned, rating));
+                                Borrowings.Add((uid, bid, date, returnDate, actualReturnDate, rating, isReturned ));
                             }
                         }
                     }
