@@ -886,7 +886,7 @@ namespace BasicLibrary
             Console.WriteLine("Enter the Book Quantity:");
             try
             {
-                   copies = int.Parse(Console.ReadLine());
+                copies = int.Parse(Console.ReadLine());
                 if (copies < 0)
                 {
                     Console.WriteLine("Error: Quantity cannot be negative.");
@@ -938,7 +938,7 @@ namespace BasicLibrary
             {
                 Console.WriteLine($"{i + 1}. {Categories[i].CName}");
             }
-            Console.WriteLine($"Enter No. Categories:");
+            Console.WriteLine("Enter No. Categories:");
             int categoryIndex = 0;
             try
             {
@@ -986,8 +986,13 @@ namespace BasicLibrary
 
             // Add the book if everything is valid
             Books.Add((newID, name, author, copies, 0, price, category, DaysAllowedForBorrowing));
-            Console.WriteLine($"Book added successfully with ID: {newID} !");
+            Console.WriteLine($"Book added successfully with ID: {newID}!");
+
+            // Update the category's book count
+            Categories[categoryIndex] = (Categories[categoryIndex].CID, Categories[categoryIndex].CName, Categories[categoryIndex].NOFBooks + 1);
+            Console.WriteLine($"Category '{category}' now has {Categories[categoryIndex].NOFBooks} books.");
         }
+
         static void ViewAllBooks()
         {
             StringBuilder sb = new StringBuilder();
