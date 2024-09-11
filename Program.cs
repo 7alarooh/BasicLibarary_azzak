@@ -1127,6 +1127,56 @@ namespace BasicLibrary
             }
 
         }
+        static void SearchForBook()
+        {
+            ViewAllBooks(); // Display all books before search
+
+            Console.WriteLine("\n Enter the book name or part of the book name you want to search for:");
+            string searchName = Console.ReadLine();
+
+            // Check if the name is valid
+            if (string.IsNullOrWhiteSpace(searchName))
+            {
+                Console.WriteLine("Error: Book name cannot be empty or just spaces.");
+                return;
+            }
+
+            bool found = false; // Track whether any books were found
+            try
+            {
+                string searchNameLower = searchName.ToLower();
+
+                // Iterate through the list of books and find those that contain the search word
+                for (int i = 0; i < Books.Count; i++)
+                {
+                    if (Books[i].BName.ToLower().Contains(searchNameLower))
+                    {
+                        // Display full details of the matching book
+                        Console.WriteLine($"\nBook ID: {Books[i].BID}");
+                        Console.WriteLine($"Book Name: {Books[i].BName}");
+                        Console.WriteLine($"Book Author: {Books[i].BAuthor}");
+                        Console.WriteLine($"Available Copies: {Books[i].copies- Books[i].borrowedCopies}");
+                        Console.WriteLine($"Book Price: {Books[i].Price} OMR");
+                        Console.WriteLine($"Book Category: {Books[i].catagory}");
+                        Console.WriteLine($"Borrow Period (days): {Books[i].BorrowPeriod}");
+
+                        found = true;
+                        index = i; // Update index with the latest match
+                    }
+                }
+
+                if (!found)
+                {
+                    Console.WriteLine("No books found with the given name or keyword.");
+                    index = -1; // Reset index if no books are found
+                }
+            }
+            catch (Exception ex)
+            {
+                // Catch any unexpected errors
+                Console.WriteLine("An error occurred while searching for the book: " + ex.Message);
+            }
+        }
         static void reporting()
         {
             Console.WriteLine("\n------\tToday's Report\t-----");
@@ -2082,47 +2132,6 @@ namespace BasicLibrary
             catch (Exception ex)
             {
                 Console.WriteLine($"Error saving to file: {ex.Message}");
-            }
-        }
-        static void SearchForBook()
-        {
-            ViewAllBooks();
-            Console.WriteLine("Enter the book name you want");
-            string name = Console.ReadLine();
-
-            // Check if the name is valid
-            if (string.IsNullOrWhiteSpace(name))
-            {
-                Console.WriteLine("Error: Book name cannot be empty or just spaces.");
-                return;
-            }
-
-            bool found = false;
-            try
-            {
-                string searchNameLower = name.ToLower();
-                for (int i = 0; i < Books.Count; i++)
-                {
-                    if (Books[i].BName.ToLower() == searchNameLower)
-                    {
-                        Console.WriteLine("Book Author is : " + Books[i].BAuthor);
-                        found = true;
-                        index = i;
-                        break;
-
-                    }
-                }
-
-                if (!found)
-                {
-                    Console.WriteLine("book not found !");
-                    index = -1;
-                }
-            }
-            catch (Exception ex)
-            {
-                // Catch any unexpected errors
-                Console.WriteLine("An error occurred while searching for the book: " + ex.Message);
             }
         }
         static void saveAllActions()
