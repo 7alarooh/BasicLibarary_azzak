@@ -16,6 +16,7 @@ namespace BasicLibrary
     {// TEST 
      //........................Necessary variables and path files.....................................//
         static List<(int AID, string AName, string Email, string Password)> Admins = new List<(int AID, string AName, string Email, string Password)>();
+        
         static List<(int UID, string Uname, string Email, string Password)> Users =new List<(int UID, string Uname, string Email, string Password)>();
        
         static List<(string BName, string BAuthor, int BID, int copies, int borrowedCopies, double Price, string catagory, int BorrowPeriod)> Books = new List<(string BName, string BAuthor, int BID, int copies, int borrowedCopies, double Price, string catagory, int BorrowPeriod)>();
@@ -421,7 +422,7 @@ namespace BasicLibrary
             string name = Console.ReadLine();
 
             // Add new user to the Users list with the auto-generated ID
-            Users.Add((nextID, email, password, name));
+            Users.Add((nextID, name ,email, password));
             Console.WriteLine($"New user added successfully with ID: {nextID}");
         }
         static void AddAdmin()
@@ -564,9 +565,10 @@ namespace BasicLibrary
                 Users = Users.Select(u =>
                     u.UID == userId ?
                     (u.UID,
+                    string.IsNullOrWhiteSpace(newName) ? u.Uname : newName,
                      string.IsNullOrWhiteSpace(newEmail) ? u.Email : newEmail,
-                     string.IsNullOrWhiteSpace(newPassword) ? u.Password : newPassword,
-                     string.IsNullOrWhiteSpace(newName) ? u.Uname : newName)
+                     string.IsNullOrWhiteSpace(newPassword) ? u.Password : newPassword
+                     )
                     : u
                 ).ToList();
 
@@ -608,13 +610,12 @@ namespace BasicLibrary
             if (confirmation.ToLower() == "y")
             {
                 // Update the admin information if confirmed
-                //Admins = Admins.Select(a =>
-                //    a.Email.Equals(email, StringComparison.OrdinalIgnoreCase) ?
-                //    (a.Email,
-                //     string.IsNullOrWhiteSpace(newPassword) ? a.Password : newPassword,
-                //     string.IsNullOrWhiteSpace(newName) ? a.AName : newName)
-                //    : a
-                //).ToList();
+                Admins = Admins.Select(a =>
+                a.Email.Equals(email, StringComparison.OrdinalIgnoreCase)
+                ? (a.AID, string.IsNullOrWhiteSpace(newName) ? a.AName : newName,
+                a.Email, string.IsNullOrWhiteSpace(newPassword) ? a.Password : newPassword)
+                : a
+                ).ToList();
 
                 Console.WriteLine("Admin information updated successfully.");
             }
@@ -662,8 +663,8 @@ namespace BasicLibrary
                 }
 
                 Console.WriteLine($"Confirm removal of User ID {userId}:");
-                Console.WriteLine($"Email: {user.Email}");
                 Console.WriteLine($"Name: {user.Uname}");
+                Console.WriteLine($"Email: {user.Email}");
                 Console.WriteLine("Are you sure you want to remove this user? (y/n)");
                 string confirmation = Console.ReadLine();
 
@@ -704,6 +705,7 @@ namespace BasicLibrary
                 }
 
                 Console.WriteLine($"Confirm removal of Admin with Email {email}:");
+                Console.WriteLine($"ID: {admin.AID}");
                 Console.WriteLine($"Name: {admin.AName}");
                 Console.WriteLine("Are you sure you want to remove this admin? (y/n)");
                 string confirmation = Console.ReadLine();
@@ -745,9 +747,9 @@ namespace BasicLibrary
                 var admin = Admins[i];
                 sb.AppendFormat("\t{0,-" + idWidth + "} {1,-" + emailWidth + "} {2,-" + passwordWidth + "} {3,-" + nameWidth + "}",
                                 admin.AID,
+                                admin.AName,
                                 admin.Email,
-                                admin.Password,
-                                admin.AName);
+                                admin.Password);
                 sb.AppendLine();
             }
 
@@ -1915,7 +1917,7 @@ namespace BasicLibrary
                 {
                     foreach (var admin in Admins)
                     {
-                       writer.WriteLine($"{admin.AID}{admin.Email}|{admin.Password}|{admin.AName}");
+                       writer.WriteLine($"{admin.AID}|{admin.AName}|{admin.Email}|{admin.Password}");
                     }
                 }
                 Console.WriteLine("All users data saved to file successfully!!");
