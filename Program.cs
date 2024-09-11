@@ -772,10 +772,6 @@ namespace BasicLibrary
 
             Console.WriteLine(sb.ToString());
         }
-
-
-
-
         //........................Admin Functions.....................................//
         static void adminMenu(string name)
         {
@@ -1718,11 +1714,10 @@ namespace BasicLibrary
                 Console.WriteLine("An error occurred while borrowing a suggested book: " + ex.Message);
             }
         }
-
-
         //........................helper Functions.....................................//
         static void LoadAllFiles()
         {
+            // Load Books
             try
             {
                 if (File.Exists(filePath))
@@ -1739,14 +1734,19 @@ namespace BasicLibrary
                             }
                         }
                     }
-                    
+                    Console.WriteLine("Books loaded successfully from file.");
+                }
+                else
+                {
+                    Console.WriteLine("Books file not found.");
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error loading from file: {ex.Message}");
+                Console.WriteLine($"Error loading books from file: {ex.Message}");
             }
-            //-----------
+
+            // Load Users
             try
             {
                 if (File.Exists(userFilePath))
@@ -1755,22 +1755,27 @@ namespace BasicLibrary
                     {
                         string line;
                         while ((line = reader.ReadLine()) != null)
-                        { //int id,string email,string pw,string name
+                        {
                             var parts = line.Split('|');
                             if (parts.Length == 4)
                             {
-                                Users.Add((int.Parse(parts[0]),parts[1], parts[2], parts[3]));
+                                Users.Add((int.Parse(parts[0]), parts[1], parts[2], parts[3]));
                             }
                         }
                     }
+                    Console.WriteLine("Users loaded successfully from file.");
+                }
+                else
+                {
+                    Console.WriteLine("Users file not found.");
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error loading from file: {ex.Message}");
+                Console.WriteLine($"Error loading users from file: {ex.Message}");
             }
-            //-------------------
 
+            // Load Borrowings
             try
             {
                 if (File.Exists(borrowingFilePath))
@@ -1781,7 +1786,7 @@ namespace BasicLibrary
                         while ((line = reader.ReadLine()) != null)
                         {
                             var parts = line.Split('|');
-                            if (parts.Length == 7) // Ensure that all fields are present
+                            if (parts.Length == 7)
                             {
                                 int uid = int.Parse(parts[0]);
                                 int bid = int.Parse(parts[1]);
@@ -1804,9 +1809,10 @@ namespace BasicLibrary
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error loading from file: {ex.Message}");
+                Console.WriteLine($"Error loading borrowings from file: {ex.Message}");
             }
-            //---------------------
+
+            // Load Categories
             try
             {
                 if (File.Exists(CategoriesFile))
@@ -1819,22 +1825,27 @@ namespace BasicLibrary
                             var parts = line.Split('|');
                             if (parts.Length == 3)
                             {
-                                int uid = int.Parse(parts[0]);
-                                int bid = int.Parse(parts[1]);
-                                DateTime date = DateTime.Parse(parts[2]); // Parse the date
+                                int cid = int.Parse(parts[0]);
+                                string categoryName = parts[1];
+                                int numberOfBooks = int.Parse(parts[2]);
 
-                                //returnings.Add((uid, bid, date));
+                                Categories.Add((cid, categoryName, numberOfBooks));
                             }
                         }
                     }
+                    Console.WriteLine("Categories loaded successfully from file.");
+                }
+                else
+                {
+                    Console.WriteLine("Categories file not found.");
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error loading from file: {ex.Message}");
+                Console.WriteLine($"Error loading categories from file: {ex.Message}");
             }
 
-            //---------------
+            // Load Admins
             try
             {
                 if (File.Exists(adminFilePath))
@@ -1843,7 +1854,7 @@ namespace BasicLibrary
                     {
                         string line;
                         while ((line = reader.ReadLine()) != null)
-                        { 
+                        {
                             var parts = line.Split('|');
                             if (parts.Length == 4)
                             {
@@ -1851,15 +1862,19 @@ namespace BasicLibrary
                             }
                         }
                     }
+                    Console.WriteLine("Admins loaded successfully from file.");
+                }
+                else
+                {
+                    Console.WriteLine("Admins file not found.");
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error loading from file: {ex.Message}");
+                Console.WriteLine($"Error loading admins from file: {ex.Message}");
             }
 
-            Console.WriteLine("all loaded from files successfully...!");
-
+            Console.WriteLine("All data loaded successfully from files!");
         }
         static void SaveBooksToFile()
         {
