@@ -59,109 +59,7 @@ namespace BasicLibrary
                 string choice = Console.ReadLine();
                 switch (choice)
                 {
-                    case "0":
-                        Console.Clear();
-                        Console.Write("Enter Your Email: ");
-                        string rEmail = Console.ReadLine();
-
-                        // Validate email format
-                        if (!IsValidEmail(rEmail))
-                        {
-                            Console.WriteLine("Error: Invalid email format.");
-                            break;  // This will return to the menu instead of exiting the method.
-                        }
-
-                        if (rEmail == "eve.davis@example.com")
-                        {
-                            var admin = Admins.FirstOrDefault(a => a.Email.Equals(rEmail, StringComparison.OrdinalIgnoreCase));
-                            if (admin != default)
-                            {
-                                Console.Write("\nEnter Password: ");
-                                string enterPW = Console.ReadLine();
-
-                                // Validate password format
-                                // Validate password format
-                                string passwordValidationResult = IsValidPassword(enterPW);
-
-                                if (passwordValidationResult.StartsWith("Error"))
-                                {
-                                    Console.WriteLine(passwordValidationResult); // Show error message for invalid password
-                                    break; // Return to the menu instead of exiting.
-                                }
-                                else
-                                {
-
-                                    if (enterPW == admin.Password)
-                                    {
-                                        accountsManagement(admin.AName);
-                                    }
-                                    else
-                                    {
-                                        Console.WriteLine("Error: Incorrect password.");
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                Console.WriteLine("Error: Admin not found.");
-                            }
-                        }
-                        else
-                        {
-                            Console.WriteLine("Sorry! you are not allowed to access here...");
-                        }
-                        break;
-
-                    case "1":
-                        Console.Clear();
-                        Console.Write("Enter Your Email: ");
-                        string aEmail = Console.ReadLine();
-
-                        // Validate email format
-                        if (!IsValidEmail(aEmail))
-                        {
-                            Console.WriteLine("Error: Invalid email format.");
-                            break;  // Return to the menu instead of exiting.
-                        }
-
-                        if (aEmail != "registrar")
-                        {
-                            var admin = Admins.FirstOrDefault(a => a.Email.Equals(aEmail, StringComparison.OrdinalIgnoreCase));
-                            if (admin != default)
-                            {
-                                Console.Write("\nEnter Password: ");
-                                string enterPW = Console.ReadLine();
-
-                                // Validate password format
-                                string passwordValidationResult = IsValidPassword(enterPW);
-
-                                if (passwordValidationResult.StartsWith("Error"))
-                                {
-                                    Console.WriteLine(passwordValidationResult); // Show error message for invalid password
-                                    break; // Return to the menu instead of exiting.
-                                }
-                                {
-                                    if (enterPW == admin.Password)
-                                    {
-                                        adminMenu(admin.AName);
-                                    }
-                                    else
-                                    {
-                                        Console.WriteLine("Error: Incorrect password.");
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                Console.WriteLine("Error: Admin not found.");
-                            }
-                        }
-                        else
-                        {
-                            Console.WriteLine("Sorry! you are not allowed to access here...");
-                        }
-                        break;
-
+                    // Cases for user registration and admin login
                     case "2":
                         Console.Clear();
                         Console.Write("Enter Your Email: ");
@@ -171,33 +69,45 @@ namespace BasicLibrary
                         if (!IsValidEmail(uEmail))
                         {
                             Console.WriteLine("Error: Invalid email format.");
-                            break;  // Return to the menu instead of exiting.
+                            break;
                         }
 
                         var user = Users.FirstOrDefault(u => u.Email.Equals(uEmail, StringComparison.OrdinalIgnoreCase));
                         if (user != default)
                         {
-                            Console.Write("\nEnter Password: ");
-                            string enterPW = Console.ReadLine();
-
-                            // Validate password format
-                            string passwordValidationResult = IsValidPassword(enterPW);
-
-                            if (passwordValidationResult.StartsWith("Error"))
+                            bool incorrectPassword = true;
+                            while (incorrectPassword)
                             {
-                                Console.WriteLine(passwordValidationResult); // Show error message for invalid password
-                                break; // Return to the menu instead of exiting.
-                            }
-                            else
-                            {
+                                Console.Write("\nEnter Password: ");
+                                string enterPW = Console.ReadLine();
+
+                                // Validate password
+                                string passwordValidationResult = IsValidPassword(enterPW);
+
+                                if (passwordValidationResult.StartsWith("Error"))
+                                {
+                                    Console.WriteLine(passwordValidationResult);
+                                    break;
+                                }
 
                                 if (enterPW == user.Password)
                                 {
-                                    userMenu(user.UID, user.Uname);
+                                    userMenu(user.UID, user.Uname); // Access user menu on correct password
+                                    incorrectPassword = false;
                                 }
                                 else
                                 {
                                     Console.WriteLine("Error: Incorrect password.");
+                                    Console.WriteLine("1. Try again");
+                                    Console.WriteLine("2. Forgot password?");
+                                    string retryChoice = Console.ReadLine();
+
+                                    if (retryChoice == "2")
+                                    {
+                                        LogForgotPassword(user.Uname, user.Email);
+                                        Console.WriteLine("We have logged your request for a forgotten password.");
+                                        incorrectPassword = false;
+                                    }
                                 }
                             }
                         }
@@ -209,9 +119,9 @@ namespace BasicLibrary
 
                     case "3":
                         SaveBooksToFile();
-                        Console.WriteLine("\npress Enter key to exit out system");
-                        string outsystem = Console.ReadLine();
-                        ExitFlag = true;  // Set the exit flag to true to exit the loop.
+                        Console.WriteLine("\nPress Enter key to exit the system");
+                        Console.ReadLine();
+                        ExitFlag = true; // Exit the loop
                         break;
 
                     default:
@@ -222,19 +132,34 @@ namespace BasicLibrary
                 if (!ExitFlag)
                 {
                     Console.WriteLine("Press any key to continue to the Home Page");
-                    Console.ReadLine();  // Wait for user input before clearing.
+                    Console.ReadLine();
                     Console.Clear();
                 }
 
-            } while (!ExitFlag);  // Continue looping until the exit flag is true.
+            } while (!ExitFlag);
+        }
+
+        // Log forgot password request to an external file
+        static void LogForgotPassword(string username, string email)
+        {
+            string filePath = "C:\\Users\\Lenovo\\source\\repos\\azzaGitTest\\ForgotPasswordLog.txt";
+            string logEntry = $"{username}|{email}|{DateTime.Now}|Note: Forgot Password\n";
+
+            try
+            {
+                File.AppendAllText(filePath, logEntry);
+                Console.WriteLine("Forgot password request logged successfully.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error logging forgot password request: " + ex.Message);
+            }
         }
 
         // Function to validate email format
         static bool IsValidEmail(string email)
         {
-            // TLDs updated email style with case sensitivity and emphasis 
             var emailRegex = new Regex(@"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$");
-
             return emailRegex.IsMatch(email);
         }
 
@@ -243,28 +168,19 @@ namespace BasicLibrary
         {
             if (password.Length < 8)
             {
-                return "Error: Password must be at least 6 characters long.";
+                return "Error: Password must be at least 8 characters long.";
             }
 
-            // Regex patterns to check for uppercase, lowercase, numbers, and special characters
             bool hasUpperCase = password.Any(char.IsUpper);
             bool hasLowerCase = password.Any(char.IsLower);
             bool hasDigit = password.Any(char.IsDigit);
             bool hasSpecialChar = password.Any(ch => !char.IsLetterOrDigit(ch));
 
-            // Check password strength
-            int strengthScore = 0;
-            if (hasUpperCase) strengthScore++;
-            if (hasLowerCase) strengthScore++;
-            if (hasDigit) strengthScore++;
-            if (hasSpecialChar) strengthScore++;
-
-            // Determine password strength
-            if (strengthScore == 4)
+            if (hasUpperCase && hasLowerCase && hasDigit && hasSpecialChar)
             {
                 return "Strong password.";
             }
-            else if (strengthScore == 3)
+            else if ((hasUpperCase && hasLowerCase && hasDigit) || (hasLowerCase && hasDigit && hasSpecialChar))
             {
                 return "Medium password.";
             }
@@ -273,6 +189,7 @@ namespace BasicLibrary
                 return "Weak password.";
             }
         }
+
 
         //.........................registrar function.................................//
 
