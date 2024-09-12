@@ -25,6 +25,7 @@ namespace BasicLibrary
         static List<(int CID, string CName, int NOFBooks)> Categories = new List<(int CID, string CName, int NOFBooks)>();
         static List<(int PurchaseID, int UID, int BID, DateTime PurchaseDate, double Price)> Purchases = new List<(int PurchaseID, int UID, int BID, DateTime PurchaseDate, double Price)>();
        
+
         static string filePath = "C:\\Users\\Lenovo\\source\\repos\\azzaGitTest\\BooksFile.txt";
         static string userFilePath = "C:\\Users\\Lenovo\\source\\repos\\azzaGitTest\\UsersFile.txt";
         static string adminFilePath = "C:\\Users\\Lenovo\\source\\repos\\azzaGitTest\\AdminsFile.txt";
@@ -32,6 +33,8 @@ namespace BasicLibrary
         static string CategoriesFile = "C:\\Users\\Lenovo\\source\\repos\\azzaGitTest\\CategoriesFile.txt";
         static string AlertsFile = "C:\\Users\\Lenovo\\source\\repos\\azzaGitTest\\AlertsFile.txt";
         static string purchasesFilePath = "C:\\Users\\Lenovo\\source\\repos\\azzaGitTest\\purchasesFilePath.txt";
+        static string reservationFilePath = "C:\\Users\\Lenovo\\source\\repos\\azzaGitTest\\ReservationsFile.txt";
+
 
         static int index = -1;
         static int purchaseIdCounter = 1; // To track unique purchase IDs
@@ -1299,7 +1302,8 @@ namespace BasicLibrary
         //........................User Functions.....................................//
         static void userMenu(int id,string name)
         {
-            CheckOverdueBooks(id); // Check for overdue books before showing the men
+            CheckReservations(); // Check for available reservations before showing the menu
+            CheckOverdueBooks(id); // Check for overdue books before showing the menu
             bool ExitFlag = false;
             do
             {
@@ -1483,6 +1487,8 @@ namespace BasicLibrary
                 if (availableCopies <= 0)
                 {
                     Console.WriteLine("Sorry! All copies of this book are currently borrowed.");
+                    ReserveBook(userId, selectedBook);
+                    
                     return;
                 }
 
@@ -1517,6 +1523,81 @@ namespace BasicLibrary
                 Console.WriteLine("An error occurred while borrowing the book: " + ex.Message);
             }
         }
+        static void ReserveBook(int userId, (int BID, string BName, string BAuthor, int copies, int borrowedCopies, double Price, string catagory, int BorrowPeriod) book)
+        {
+            try
+            {
+                using (StreamWriter writer = new StreamWriter(reservationFilePath, true))
+                {
+                    // Save reservation details to the file
+                    writer.WriteLine($"{userId}|{book.BID}|{DateTime.Now.ToString("yyyy-MM-dd")}");
+                }
+                Console.WriteLine("The book is currently out of stock. Your reservation has been placed. You will be notified when the book becomes available.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error saving reservation to file: {ex.Message}");
+            }
+        }
+        static void CheckReservations()
+        {
+            try
+            {
+                if (File.Exists(reservationFilePath))
+                {
+                    using (StreamReader reader = new StreamReader(reservationFilePath))
+                    {
+                        string line;
+                        List<string> notifications = new List<string>();
+
+                        while ((line = reader.ReadLine()) != null)
+                        {
+                            var parts = line.Split('|');
+                            if (parts.Length == 3)
+                            {
+                                int userId = int.Parse(parts[0]);
+                                int bookId = int.Parse(parts[1]);
+                                DateTime reservationDate = DateTime.Parse(parts[2]);
+
+                                // Check if the reserved book is now available
+                                var book = Books.FirstOrDefault(b => b.BID == bookId);
+                                if (book != default)
+                                {
+                                    int availableCopies = book.copies - book.borrowedCopies;
+                                    if (availableCopies > 0)
+                                    {
+                                        // Notify the user
+                                        Console.WriteLine($"Notification for User {userId}: The book \"{book.BName}\" is now available for borrowing.");
+                                        Console.WriteLine("Press 'y' to acknowledge and remove this notification.");
+
+                                        // Wait for user input
+                                        string input = Console.ReadLine();
+                                        if (input.ToLower() == "y")
+                                        {
+                                            // Remove reservation from the file
+                                            notifications.Add(line);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+
+                        // Remove acknowledged reservations from the file
+                        if (notifications.Count > 0)
+                        {
+                            var allLines = File.ReadAllLines(reservationFilePath).ToList();
+                            allLines.RemoveAll(l => notifications.Contains(l));
+                            File.WriteAllLines(reservationFilePath, allLines);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error checking reservations: {ex.Message}");
+            }
+        }
+
         static void ReturnBook(int userId, int index = -1)
         {
             try
