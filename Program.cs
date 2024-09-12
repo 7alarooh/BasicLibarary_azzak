@@ -23,14 +23,18 @@ namespace BasicLibrary
 
         static List<(int uid, int bid, DateTime date,DateTime ReturnDate, DateTime? ActualReturnDate, int? Rating, bool ISReturned)> Borrowings = new List<(int uid, int bid, DateTime date, DateTime ReturnDate, DateTime? ActualReturnDate, int? Rating ,bool ISReturned)>();
         static List<(int CID, string CName, int NOFBooks)> Categories = new List<(int CID, string CName, int NOFBooks)>();
-        
+        static List<(int PurchaseID, int UID, int BID, DateTime PurchaseDate, double Price)> Purchases = new List<(int PurchaseID, int UID, int BID, DateTime PurchaseDate, double Price)>();
+       
         static string filePath = "C:\\Users\\Lenovo\\source\\repos\\azzaGitTest\\BooksFile.txt";
         static string userFilePath = "C:\\Users\\Lenovo\\source\\repos\\azzaGitTest\\UsersFile.txt";
         static string adminFilePath = "C:\\Users\\Lenovo\\source\\repos\\azzaGitTest\\AdminsFile.txt";
         static string borrowingFilePath = "C:\\Users\\Lenovo\\source\\repos\\azzaGitTest\\BorrowingFile.txt";
         static string CategoriesFile = "C:\\Users\\Lenovo\\source\\repos\\azzaGitTest\\CategoriesFile.txt";
         static string AlertsFile = "C:\\Users\\Lenovo\\source\\repos\\azzaGitTest\\AlertsFile.txt";
+        static string purchasesFilePath = "C:\\Users\\Lenovo\\source\\repos\\azzaGitTest\\purchasesFilePath.txt";
+
         static int index = -1;
+        static int purchaseIdCounter = 1; // To track unique purchase IDs
         //-----------------------------------------------------------------------------//
 
         static void Main(string[] args)
@@ -1305,8 +1309,9 @@ namespace BasicLibrary
                 Console.WriteLine("\n 2 .Borrow Book");
                 Console.WriteLine("\n 3 .Return Book");
                 Console.WriteLine("\n 4 .Suggestions For you");
-                Console.WriteLine("\n 5 .Show Your Profile");
-                Console.WriteLine("\n 6 .singOut");
+                Console.WriteLine("\n 5 .Book Store");
+                Console.WriteLine("\n 6 .Show Your Profile");
+                Console.WriteLine("\n 7 .singOut");
 
                 string choice = Console.ReadLine();
 
@@ -1328,9 +1333,12 @@ namespace BasicLibrary
                         suggestionsForUser(id);
                         break;
                     case "5":
-                        ShowProfile(id);
+                        BookStore(id);
                         break;
                     case "6":
+                        ShowProfile(id);
+                        break;
+                    case "7":
                         SaveBooksToFile();
                         saveAllActions();
                         Console.WriteLine("\npress Enter key to exit out system");
@@ -1659,6 +1667,122 @@ namespace BasicLibrary
                 Console.WriteLine("No previously returned books.\n");
             }
         }
+        static void BookStore(int userId)
+        {
+            // Step 1: View all books
+            ViewAllBooks();
+
+            // Step 2: Ask for the book ID
+            Console.Write("\nEnter the Book ID you want to purchase: ");
+            if (!int.TryParse(Console.ReadLine(), out int bookId))
+            {
+                Console.WriteLine("Invalid input. Please enter a valid Book ID.");
+                return;
+            }
+
+            // Step 3: Find the book by ID
+            var book = Books.FirstOrDefault(b => b.BID == bookId);
+
+            if (book.Equals(default))
+            {
+                Console.WriteLine("Error: Book not found.");
+                return;
+            }
+
+            // Show book details
+            Console.WriteLine($"\nBook Details:");
+            Console.WriteLine($"Title: {book.BName}");
+            Console.WriteLine($"Author: {book.BAuthor}");
+            Console.WriteLine($"Price: {book.Price.ToString("0.00")} OMR");
+            Console.WriteLine($"Available Copies: {book.copies - book.borrowedCopies}");
+
+            // Step 4: Ask if the user wants to buy the book
+            Console.Write("\nDo you want to buy this book? (yes/no): ");
+            string response = Console.ReadLine().Trim().ToLower();
+
+            if (response == "yes")
+            {
+                // Check if copies are available
+                if (book.copies - book.borrowedCopies <= 0)
+                {
+                    Console.WriteLine("Sorry, this book is out of stock.");
+                    return;
+                }
+
+                // Deduct a copy from available books
+                for (int i = 0; i < Books.Count; i++)
+                {
+                    if (Books[i].BID == book.BID)
+                    {
+                        Books[i] = (Books[i].BID, Books[i].BName, Books[i].BAuthor, Books[i].copies - 1, Books[i].borrowedCopies, Books[i].Price, Books[i].catagory, Books[i].BorrowPeriod);
+                        break;
+                    }
+                }
+
+                // Record the purchase in the Purchases list
+                Purchases.Add((purchaseIdCounter++, userId, book.BID, DateTime.Now, book.Price));
+                Console.WriteLine("Purchase successful! Thank you for buying the book.");
+
+                // Step 5: Call suggestions for additional purchases
+                SuggestionsForBuy(userId, book);
+            }
+            else
+            {
+                Console.WriteLine("Purchase cancelled.");
+            }
+        }
+
+        static void SuggestionsForBuy(int userId, (int BID, string BName, string BAuthor, int copies, int borrowedCopies, double Price, string catagory, int BorrowPeriod) purchasedBook)
+        {
+            var purchasedBookCategory = purchasedBook.catagory;
+
+            // Fetch all books in the same category
+            var booksInCategory = Books.Where(b => b.catagory == purchasedBookCategory).ToList();
+
+            if (!booksInCategory.Any())
+            {
+                Console.WriteLine("No other books available in this category.");
+                return;
+            }
+
+            // Find the most and least borrowed books in this category
+            var mostBorrowedBook = booksInCategory.OrderByDescending(b => Borrowings.Count(br => br.bid == b.BID)).FirstOrDefault();
+            var leastBorrowedBook = booksInCategory.OrderBy(b => Borrowings.Count(br => br.bid == b.BID)).FirstOrDefault();
+
+            // Suggest buying the least borrowed book with a discount
+            if (leastBorrowedBook != default)
+            {
+                double discount = 0.10; // 10% discount
+                double discountedPrice = leastBorrowedBook.Price * (1 - discount);
+                Console.WriteLine($"\nSpecial Offer: Buy '{leastBorrowedBook.BName}' by {leastBorrowedBook.BAuthor} at a 10% discount! Price: {discountedPrice.ToString("0.00")} OMR");
+            }
+
+            // Suggest the most borrowed book with a discount
+            if (mostBorrowedBook != default)
+            {
+                double discount = 0.05; // 5% discount
+                double discountedPrice = mostBorrowedBook.Price * (1 - discount);
+                Console.WriteLine($"\nRecommended: Buy '{mostBorrowedBook.BName}' by {mostBorrowedBook.BAuthor}' with a 5% discount! Price: {discountedPrice.ToString("0.00")} OMR");
+            }
+
+            // Show additional purchase suggestions
+            Console.WriteLine("\nAdditional Purchase Suggestions:");
+            var similarBooks = booksInCategory.Where(b => b.BID != purchasedBook.BID).ToList();
+
+            if (similarBooks.Any())
+            {
+                Console.WriteLine("Books you might also like:");
+                foreach (var similarBook in similarBooks)
+                {
+                    Console.WriteLine($"- '{similarBook.BName}' by {similarBook.BAuthor} ({similarBook.Price.ToString("0.00")} OMR)");
+                }
+            }
+            else
+            {
+                Console.WriteLine("No additional suggestions available.");
+            }
+        }
+
 
         static void DisplayYourBookBorrowed(int userId)     
         {
@@ -2184,6 +2308,50 @@ namespace BasicLibrary
             {
                 Console.WriteLine($"Error loading admins from file: {ex.Message}");
             }
+            // Load Purchases
+            try
+            {
+                if (File.Exists(purchasesFilePath))
+                {
+                    using (StreamReader reader = new StreamReader(purchasesFilePath))
+                    {
+                        string line;
+                        while ((line = reader.ReadLine()) != null)
+                        {
+                            var parts = line.Split('|');
+                            if (parts.Length == 5)
+                            {
+                                try
+                                {
+                                    int purchaseID = int.Parse(parts[0]);
+                                    int uid = int.Parse(parts[1]);
+                                    int bid = int.Parse(parts[2]);
+                                    DateTime purchaseDate = DateTime.Parse(parts[3]);
+                                    double price = double.Parse(parts[4]);
+
+                                    Purchases.Add((purchaseID, uid, bid, purchaseDate, price));
+                                }
+                                catch (FormatException fe)
+                                {
+                                    Console.WriteLine($"Error parsing line: {line}. Exception: {fe.Message}");
+                                }
+                            }
+                            else
+                            {
+                                Console.WriteLine($"Incorrect format in line: {line}");
+                            }
+                        }
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Purchases file not found.");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error loading purchases from file: {ex.Message}");
+            }
 
             Console.WriteLine("All data loaded successfully from files!");
         }
@@ -2268,11 +2436,27 @@ namespace BasicLibrary
                         writer.WriteLine($"{b.uid}|{b.bid}|{b.date.ToString("yyyy-MM-dd")}|{b.ReturnDate.ToString("yyyy-MM-dd")}|{actualReturnDate}|{rating}|{b.ISReturned}");
                     }
                 }
-                Console.WriteLine("saved successfully...!");
+                
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Error saving to file: {ex.Message}");
+            }
+            try
+            {
+                using (StreamWriter writer = new StreamWriter(purchasesFilePath))
+                {
+                    foreach (var purchase in Purchases)
+                    {
+                        // Format date and handle other values
+                        writer.WriteLine($"{purchase.PurchaseID}|{purchase.UID}|{purchase.BID}|{purchase.PurchaseDate:yyyy-MM-dd}|{purchase.Price:0.00}");
+                    }
+                }
+                Console.WriteLine("saved successfully...!");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error saving purchases to file: {ex.Message}");
             }
         }
 
