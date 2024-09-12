@@ -1136,9 +1136,13 @@ namespace BasicLibrary
             // List of tuples to track how many times each author has been borrowed: (authorName, count)
             List<(string authorName, int count)> authorBorrowCount = new List<(string authorName, int count)>();
 
+            // List of tuples to track how many times each user has borrowed: (userId, count)
+            List<(int userId, int count)> userBorrowCount = new List<(int userId, int count)>();
+
             foreach (var borrowing in Borrowings)
             {
                 int bookId = borrowing.bid;
+                int userId = borrowing.uid;
 
                 // Update book borrow count
                 bool bookFound = false;
@@ -1154,6 +1158,22 @@ namespace BasicLibrary
                 if (!bookFound)
                 {
                     bookBorrowCount.Add((bookId, 1));
+                }
+
+                // Update user borrow count
+                bool userFound = false;
+                for (int i = 0; i < userBorrowCount.Count; i++)
+                {
+                    if (userBorrowCount[i].userId == userId)
+                    {
+                        userBorrowCount[i] = (userBorrowCount[i].userId, userBorrowCount[i].count + 1);
+                        userFound = true;
+                        break;
+                    }
+                }
+                if (!userFound)
+                {
+                    userBorrowCount.Add((userId, 1));
                 }
 
                 // Find the book to get the author
@@ -1207,8 +1227,25 @@ namespace BasicLibrary
                 Console.WriteLine("No authors have been borrowed yet.");
             }
 
+            // Find the top 3 users who borrowed the most books
+            if (userBorrowCount.Count > 0)
+            {
+                Console.WriteLine("\nTop 3 Users Who Borrowed the Most Books:");
+                var topUsers = userBorrowCount.OrderByDescending(u => u.count).Take(3).ToList();
+                foreach (var topUser in topUsers)
+                {
+                    var user = Users.FirstOrDefault(u => u.UID == topUser.userId);
+                    Console.WriteLine($"- {user.Uname}: Borrowed {topUser.count} books");
+                }
+            }
+            else
+            {
+                Console.WriteLine("No users have borrowed any books yet.");
+            }
+
             Console.WriteLine("\n------\tEnd of Report\t-----");
         }
+
         static void alertsFile()
         {
             try
