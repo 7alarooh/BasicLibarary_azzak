@@ -992,7 +992,6 @@ namespace BasicLibrary
             Categories[categoryIndex] = (Categories[categoryIndex].CID, Categories[categoryIndex].CName, Categories[categoryIndex].NOFBooks + 1);
             Console.WriteLine($"Category '{category}' now has {Categories[categoryIndex].NOFBooks} books.");
         }
-
         static void ViewAllBooks()
         {
             StringBuilder sb = new StringBuilder();
@@ -1136,7 +1135,7 @@ namespace BasicLibrary
         {
             ViewAllBooks(); // Display all books before search
 
-            Console.WriteLine("\n Enter the book name or part of the book name you want to search for:");
+            Console.WriteLine("\nEnter the book name or part of the book name you want to search for:");
             string searchName = Console.ReadLine();
 
             // Check if the name is valid
@@ -1151,29 +1150,27 @@ namespace BasicLibrary
             {
                 string searchNameLower = searchName.ToLower();
 
+                // Create a header for the table with fixed-width columns
+                Console.WriteLine("+-----------------------------------------------------------------------------------------------+");
+                Console.WriteLine("| ID  | Book Name                             | Author        | Available Copies | Price (OMR) | Category   |");
+                Console.WriteLine("+-----------------------------------------------------------------------------------------------+");
+
                 // Iterate through the list of books and find those that contain the search word
                 for (int i = 0; i < Books.Count; i++)
                 {
                     if (Books[i].BName.ToLower().Contains(searchNameLower))
                     {
-                        // Display full details of the matching book
-                        Console.WriteLine($"\nBook ID: {Books[i].BID}");
-                        Console.WriteLine($"Book Name: {Books[i].BName}");
-                        Console.WriteLine($"Book Author: {Books[i].BAuthor}");
-                        Console.WriteLine($"Available Copies: {Books[i].copies- Books[i].borrowedCopies}");
-                        Console.WriteLine($"Book Price: {Books[i].Price} OMR");
-                        Console.WriteLine($"Book Category: {Books[i].catagory}");
-                        Console.WriteLine($"Borrow Period (days): {Books[i].BorrowPeriod}");
-
+                        // Display full details of the matching book in table format with consistent column widths
+                        Console.WriteLine($"| {Books[i].BID,-3} | {Books[i].BName,-36} | {Books[i].BAuthor,-12} | {(Books[i].copies - Books[i].borrowedCopies),-17} | {Books[i].Price,-10:F2} | {Books[i].catagory,-10} |");
                         found = true;
-                        index = i; // Update index with the latest match
                     }
                 }
 
+                Console.WriteLine("+-----------------------------------------------------------------------------------------------+");
+
                 if (!found)
                 {
-                    Console.WriteLine("No books found with the given name or keyword.");
-                    index = -1; // Reset index if no books are found
+                    Console.WriteLine("\nNo books found with the given name or keyword.");
                 }
             }
             catch (Exception ex)
@@ -1305,7 +1302,7 @@ namespace BasicLibrary
                 Console.WriteLine("\n 2 .Borrow Book");
                 Console.WriteLine("\n 3 .Return Book");
                 Console.WriteLine("\n 4 .Suggestions For you");
-                Console.WriteLine("\n 5 .ShowProfil");
+                Console.WriteLine("\n 5 .Show Your Profile");
                 Console.WriteLine("\n 6 .singOut");
 
                 string choice = Console.ReadLine();
@@ -1602,9 +1599,9 @@ namespace BasicLibrary
             Console.WriteLine("+-----------------------------------------------+");
             Console.WriteLine("|                 Profile Information           |");
             Console.WriteLine("+-----------------------------------------------+");
-            Console.WriteLine($"| ID:    {user.UID,-42}|");
-            Console.WriteLine($"| Name:  {user.Uname,-42}|");
-            Console.WriteLine($"| Email: {user.Email,-42}|");
+            Console.WriteLine($"| ID:    {user.UID,-42}");
+            Console.WriteLine($"| Name:  {user.Uname,-42}");
+            Console.WriteLine($"| Email: {user.Email,-42}");
             Console.WriteLine("+-----------------------------------------------+\n");
 
             // Currently borrowed books
@@ -1614,18 +1611,18 @@ namespace BasicLibrary
 
             if (currentBorrowings.Any())
             {
-                Console.WriteLine("+---------------------------------------------------------------+");
-                Console.WriteLine("|                  Currently Borrowed Books                      |");
-                Console.WriteLine("+---------------------------------------------------------------+");
-                Console.WriteLine("| Book Name                           | Author       | Due Date  |");
-                Console.WriteLine("+---------------------------------------------------------------+");
+                Console.WriteLine("+-------------------------------------------------------------------------+");
+                Console.WriteLine("|                         Currently Borrowed Books                        |");
+                Console.WriteLine("+-------------------------------------------------------------------------+");
+                Console.WriteLine("| Book Name                           | Author       | Due Date           |");
+                Console.WriteLine("+-------------------------------------------------------------------------+");
 
                 foreach (var borrow in currentBorrowings)
                 {
                     var book = Books.FirstOrDefault(b => b.BID == borrow.bid);
-                    Console.WriteLine($"| {book.BName,-35} | {book.BAuthor,-12} | {borrow.ReturnDate:dd/MM/yyyy} |");
+                    Console.WriteLine($"| {book.BName,-35} | {book.BAuthor,-12} | {borrow.ReturnDate:dd/MM/yyyy,-18} ");
                 }
-                Console.WriteLine("+---------------------------------------------------------------+\n");
+                Console.WriteLine("+-------------------------------------------------------------------------+\n");
             }
             else
             {
@@ -1639,26 +1636,27 @@ namespace BasicLibrary
 
             if (returnedBooks.Any())
             {
-                Console.WriteLine("+-----------------------------------------------------------------------------------+");
-                Console.WriteLine("|                         Previously Borrowed & Returned Books                      |");
-                Console.WriteLine("+-----------------------------------------------------------------------------------+");
-                Console.WriteLine("| Book Name                           | Author       | Borrowed On | Returned On | Status  |");
-                Console.WriteLine("+-----------------------------------------------------------------------------------+");
+                Console.WriteLine("+-----------------------------------------------------------------------------------------------------+");
+                Console.WriteLine("|                                Previously Borrowed & Returned Books                                  |");
+                Console.WriteLine("+-----------------------------------------------------------------------------------------------------+");
+                Console.WriteLine("| Book Name                           | Author       | Borrowed On  | Returned On  | Status            |");
+                Console.WriteLine("+-----------------------------------------------------------------------------------------------------+");
 
                 foreach (var borrow in returnedBooks)
                 {
                     var book = Books.FirstOrDefault(b => b.BID == borrow.bid);
                     string onTime = borrow.ActualReturnDate <= borrow.ReturnDate ? "On time" : "Overdue";
 
-                    Console.WriteLine($"| {book.BName,-35} | {book.BAuthor,-12} | {borrow.date:dd/MM/yyyy} | {borrow.ActualReturnDate?.ToString("dd/MM/yyyy"),-11} | {onTime,-7} |");
+                    Console.WriteLine($"| {book.BName,-35} | {book.BAuthor,-12} | {borrow.date:dd/MM/yyyy,-12} | {borrow.ActualReturnDate?.ToString("dd/MM/yyyy"),-12} | {onTime,-16} ");
                 }
-                Console.WriteLine("+-----------------------------------------------------------------------------------+\n");
+                Console.WriteLine("+-----------------------------------------------------------------------------------------------------+\n");
             }
             else
             {
                 Console.WriteLine("No previously returned books.\n");
             }
         }
+
         static void DisplayYourBookBorrowed(int userId)     
         {
             // Check if the user has borrowed any books
