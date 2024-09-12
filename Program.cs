@@ -29,6 +29,7 @@ namespace BasicLibrary
         static string adminFilePath = "C:\\Users\\Lenovo\\source\\repos\\azzaGitTest\\AdminsFile.txt";
         static string borrowingFilePath = "C:\\Users\\Lenovo\\source\\repos\\azzaGitTest\\BorrowingFile.txt";
         static string CategoriesFile = "C:\\Users\\Lenovo\\source\\repos\\azzaGitTest\\CategoriesFile.txt";
+        static string AlertsFile = "C:\\Users\\Lenovo\\source\\repos\\azzaGitTest\\AlertsFile.txt";
         static int index = -1;
         //-----------------------------------------------------------------------------//
 
@@ -142,12 +143,12 @@ namespace BasicLibrary
         // Log forgot password request to an external file
         static void LogForgotPassword(string username, string email)
         {
-            string filePath = "C:\\Users\\Lenovo\\source\\repos\\azzaGitTest\\ForgotPasswordLog.txt";
+            
             string logEntry = $"{username}|{email}|{DateTime.Now}|Note: Forgot Password\n";
 
             try
             {
-                File.AppendAllText(filePath, logEntry);
+                File.AppendAllText(AlertsFile, logEntry);
                 Console.WriteLine("Forgot password request logged successfully.");
             }
             catch (Exception ex)
@@ -706,8 +707,9 @@ namespace BasicLibrary
                 Console.WriteLine("\n 3 .Search for Book by Name");
                 Console.WriteLine("\n 4 .Edit a Book");
                 Console.WriteLine("\n 5 .Remove a Book");
-                Console.WriteLine("\n 6 .Report");
-                Console.WriteLine("\n 7 .singOut");
+                Console.WriteLine("\n 6 .Report"); 
+                Console.WriteLine("\n 7 .Alerts File");
+                Console.WriteLine("\n 8 .singOut");
 
                 string choice = Console.ReadLine();
 
@@ -734,6 +736,9 @@ namespace BasicLibrary
                         reporting();
                         break;
                     case "7":
+                        alertsFile();
+                        break;
+                    case "8":
                         SaveBooksToFile();
                         Console.WriteLine("\npress Enter key to exit out system");
                         string outsystem = Console.ReadLine();
@@ -1204,6 +1209,50 @@ namespace BasicLibrary
 
             Console.WriteLine("\n------\tEnd of Report\t-----");
         }
+        static void alertsFile()
+        {
+            try
+            {
+                if (File.Exists(AlertsFile))
+                {
+                    var lines = File.ReadAllLines(AlertsFile);
+
+                    // Header for the table
+                    Console.WriteLine("+-----+----------------------+----------------------------+-------------------+");
+                    Console.WriteLine("| ID  | Username              | Email                      | Message           |");
+                    Console.WriteLine("+-----+----------------------+----------------------------+-------------------+");
+
+                    int id = 1; // ID counter for the records
+                    foreach (var line in lines)
+                    {
+                        // Split the line by '|' and extract data
+                        var data = line.Split('|');
+                        if (data.Length >= 3)
+                        {
+                            string username = data[0].Trim();
+                            string email = data[1].Trim();
+                            string message = data[3].Trim();
+
+                            // Display data in a structured table format
+                            Console.WriteLine($"| {id,-3} | {username,-20} | {email,-26} | {message,-17} |");
+                            id++;
+                        }
+                    }
+
+                    // Closing the table
+                    Console.WriteLine("+-----+----------------------+----------------------------+-------------------+");
+                }
+                else
+                {
+                    Console.WriteLine("Alerts file not found.");
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error reading alerts file: " + ex.Message);
+            }
+        }
+
 
 
         //........................User Functions.....................................//
