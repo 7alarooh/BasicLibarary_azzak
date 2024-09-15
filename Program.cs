@@ -26,14 +26,14 @@ namespace BasicLibrary
         static List<(int PurchaseID, int UID, int BID, DateTime PurchaseDate, double Price)> Purchases = new List<(int PurchaseID, int UID, int BID, DateTime PurchaseDate, double Price)>();
        
 
-        static string filePath = "C:\\Users\\Lenovo\\source\\repos\\azzaGitTest\\BooksFile.txt";
-        static string userFilePath = "C:\\Users\\Lenovo\\source\\repos\\azzaGitTest\\UsersFile.txt";
-        static string adminFilePath = "C:\\Users\\Lenovo\\source\\repos\\azzaGitTest\\AdminsFile.txt";
-        static string borrowingFilePath = "C:\\Users\\Lenovo\\source\\repos\\azzaGitTest\\BorrowingFile.txt";
-        static string CategoriesFile = "C:\\Users\\Lenovo\\source\\repos\\azzaGitTest\\CategoriesFile.txt";
-        static string AlertsFile = "C:\\Users\\Lenovo\\source\\repos\\azzaGitTest\\AlertsFile.txt";
-        static string purchasesFilePath = "C:\\Users\\Lenovo\\source\\repos\\azzaGitTest\\purchasesFilePath.txt";
-        static string reservationFilePath = "C:\\Users\\Lenovo\\source\\repos\\azzaGitTest\\ReservationsFile.txt";
+        static string filePath = "C:\\Users\\azzaA\\source\\repos\\BooksFile.txt";
+        static string userFilePath = "C:\\Users\\azzaA\\source\\repos\\UsersFile.txt";
+        static string adminFilePath = "C:\\Users\\azzaA\\source\\repos\\AdminsFile.txt";
+        static string borrowingFilePath = "C:\\Users\\azzaA\\source\\repos\\BorrowingFile.txt";
+        static string CategoriesFile = "C:\\Users\\azzaA\\source\\repos\\CategoriesFile.txt";
+        static string AlertsFile = "C:\\Users\\azzaA\\source\\repos\\AlertsFile.txt";
+        static string purchasesFilePath = "C:\\Users\\azzaA\\source\\repos\\purchasesFile.txt";
+        static string reservationFilePath = "C:\\Users\\azzaA\\source\\repos\\ReservationsFile.txt";
 
 
         static int index = -1;
@@ -67,6 +67,108 @@ namespace BasicLibrary
                 string choice = Console.ReadLine();
                 switch (choice)
                 {
+                    case "0":
+                        Console.Clear();
+                        Console.Write("Enter Your Email: ");
+                        string rEmail = Console.ReadLine();
+
+                        // Validate email format
+                        if (!IsValidEmail(rEmail))
+                        {
+                            Console.WriteLine("Error: Invalid email format.");
+                            break;  // This will return to the menu instead of exiting the method.
+                        }
+
+                        if (rEmail == "eve.davis@example.com")
+                        {
+                            var admin = Admins.FirstOrDefault(a => a.Email.Equals(rEmail, StringComparison.OrdinalIgnoreCase));
+                            if (admin != default)
+                            {
+                                Console.Write("\nEnter Password: ");
+                                string enterPW = Console.ReadLine();
+
+                                // Validate password format
+                                string passwordValidationResult = IsValidPassword(enterPW);
+
+                                if (passwordValidationResult.StartsWith("Error"))
+                                {
+                                    Console.WriteLine(passwordValidationResult); // Show error message for invalid password
+                                    break; // Return to the menu instead of exiting.
+                                }
+                                else
+                                {
+
+                                    if (enterPW == admin.Password)
+                                    {
+                                        Console.Clear();
+                                        accountsManagement(admin.AName);
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine("Error: Incorrect password.");
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                Console.WriteLine("Error: Admin not found.");
+                            }
+                        }
+                        else
+                        {
+                            Console.WriteLine("Sorry! you are not allowed to access here...");
+                        }
+                        break;
+
+                    case "1":
+                        Console.Clear();
+                        Console.Write("Enter Your Email: ");
+                        string aEmail = Console.ReadLine();
+
+                        // Validate email format
+                        if (!IsValidEmail(aEmail))
+                        {
+                            Console.WriteLine("Error: Invalid email format.");
+                            break;  // Return to the menu instead of exiting.
+                        }
+
+                        if (aEmail != "registrar")
+                        {
+                            var admin = Admins.FirstOrDefault(a => a.Email.Equals(aEmail, StringComparison.OrdinalIgnoreCase));
+                            if (admin != default)
+                            {
+                                Console.Write("\nEnter Password: ");
+                                string enterPW = Console.ReadLine();
+
+                                // Validate password format
+                                string passwordValidationResult = IsValidPassword(enterPW);
+
+                                if (passwordValidationResult.StartsWith("Error"))
+                                {
+                                    Console.WriteLine(passwordValidationResult); // Show error message for invalid password
+                                    break; // Return to the menu instead of exiting.
+                                }
+                                {
+                                    if (enterPW == admin.Password)
+                                    {
+                                        adminMenu(admin.AName);
+                                    }
+                                    else
+                                    {
+                                        Console.WriteLine("Error: Incorrect password.");
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                Console.WriteLine("Error: Admin not found.");
+                            }
+                        }
+                        else
+                        {
+                            Console.WriteLine("Sorry! you are not allowed to access here...");
+                        }
+                        break;
                     // Cases for user registration and admin login
                     case "2":
                         Console.Clear();
@@ -218,15 +320,19 @@ namespace BasicLibrary
                 switch (choice)
                 {
                     case "1":
+                        Console.Clear();
                         AddNewUser();
                         break;
                     case "2":
+                        Console.Clear();
                         EditUserInformation();
                         break;
                     case "3":
+                        Console.Clear();
                         RemoveUserAccount();
                         break;
                     case "4":
+                        Console.Clear();
                         saveAllUsers();
                         Console.WriteLine("\npress Enter key to exit out system");
                         string outsystem = Console.ReadLine();
@@ -314,7 +420,7 @@ namespace BasicLibrary
             // Loop until passwords match and meet the validation criteria
             do
             {
-                Console.WriteLine("Enter User Password (at least 6 characters):");
+                Console.WriteLine("Enter User Password (at least 8 characters):");
                 password = Console.ReadLine();
 
                 // Check if password is valid
@@ -391,7 +497,7 @@ namespace BasicLibrary
             // Loop until passwords match and meet the validation criteria
             do
             {
-                Console.WriteLine("Enter Admin Password (at least 6 characters):");
+                Console.WriteLine("Enter Admin Password (at least 8 characters):");
                 password = Console.ReadLine();
 
                 // Check if password is valid
