@@ -1440,9 +1440,9 @@ namespace BasicLibrary
         //........................User Functions.....................................//
         static void userMenu(int id,string name)
         {
-            
-            CheckOverdueBooks(id); // Check for overdue books before showing the menu
+
             CheckReservations(); // Check for available reservations before showing the menu
+            CheckOverdueBooks(id); // Check for overdue books before showing the menu
             bool ExitFlag = false;
             do
             {
@@ -1892,7 +1892,7 @@ namespace BasicLibrary
                 foreach (var borrow in currentBorrowings)
                 {
                     var book = Books.FirstOrDefault(b => b.BID == borrow.bid);
-                    Console.WriteLine($"| {book.BName,-35} | {book.BAuthor,-12} | {borrow.ReturnDate:dd/MM/yyyy,-18} ");
+                    Console.WriteLine($"| {book.BName,-35} | {book.BAuthor,-12} | {borrow.ReturnDate:dd/MM/yyyy} ");
                 }
                 Console.WriteLine("+-------------------------------------------------------------------------+\n");
             }
@@ -1919,7 +1919,7 @@ namespace BasicLibrary
                     var book = Books.FirstOrDefault(b => b.BID == borrow.bid);
                     string onTime = borrow.ActualReturnDate <= borrow.ReturnDate ? "On time" : "Overdue";
 
-                    Console.WriteLine($"| {book.BName,-35} | {book.BAuthor,-12} | {borrow.date:dd/MM/yyyy,-12} | {borrow.ActualReturnDate?.ToString("dd/MM/yyyy"),-12} | {onTime,-16} ");
+                    Console.WriteLine($"| {book.BName,-35} | {book.BAuthor,-12} | {borrow.date:dd/MM/yyyy} | {borrow.ActualReturnDate?.ToString("dd/MM/yyyy"),-12} | {onTime,-16} ");
                 }
                 Console.WriteLine("+-----------------------------------------------------------------------------------------------------+\n");
             }
@@ -1944,7 +1944,7 @@ namespace BasicLibrary
                 foreach (var purchase in userPurchases)
                 {
                     var book = Books.FirstOrDefault(b => b.BID == purchase.BID);
-                    Console.WriteLine($"| {book.BName,-35} | {purchase.PurchaseDate:dd/MM/yyyy,-13} | {purchase.Price,7:0.00} OMR |");
+                    Console.WriteLine($"| {book.BName,-35} | {purchase.PurchaseDate:dd/MM/yyyy} | {purchase.Price,7:0.00} OMR |");
                 }
                 Console.WriteLine("+---------------------------------------------------------------+\n");
             }
