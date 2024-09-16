@@ -1135,6 +1135,8 @@ namespace BasicLibrary
             }
 
             bool found = false; // Track whether any books were found
+            List<int> validBookIds = new List<int>(); // To store valid book IDs for selection
+
             try
             {
                 string searchNameLower = searchName.ToLower();
@@ -1151,6 +1153,7 @@ namespace BasicLibrary
                     {
                         // Display full details of the matching book in table format with consistent column widths
                         Console.WriteLine($"| {Books[i].BID,-3} | {Books[i].BName,-36} | {Books[i].BAuthor,-17} | {(Books[i].copies - Books[i].borrowedCopies),-17} | {Books[i].Price,-11:F2} | {Books[i].catagory,-15} |");
+                        validBookIds.Add(Books[i].BID); // Add the book ID to the list of valid IDs
                         found = true;
                     }
                 }
@@ -1160,34 +1163,38 @@ namespace BasicLibrary
                 if (found)
                 {
                     // Ask the user to enter the book ID
-                    Console.WriteLine("\nEnter the book ID you want ...:");
+                    Console.WriteLine("\nEnter the book ID you want:");
+
                     string input = Console.ReadLine();
 
                     if (int.TryParse(input, out int bookId))
                     {
-                        // Find the book index using the ID
-                        index = Books.FindIndex(b => b.BID == bookId);
-                        if (index != -1)
+                        // Check if the entered ID is in the list of valid book IDs
+                        if (validBookIds.Contains(bookId))
                         {
-                            Console.WriteLine("\nID:" + Books[index].BID);
-                            Console.WriteLine("\nName Book:" + Books[index].BName);
-                            Console.WriteLine("\nAuthor:" + Books[index].BAuthor);
-                            Console.WriteLine("\nName Book:" + Books[index].catagory);
-                            Console.WriteLine("\nName Book:" + Books[index].copies);
+                            // Find the book index using the ID
+                            int index = Books.FindIndex(b => b.BID == bookId);
+                            if (index != -1)
+                            {
+                                Console.WriteLine("\nID: " + Books[index].BID);
+                                Console.WriteLine("Name Book: " + Books[index].BName);
+                                Console.WriteLine("Author: " + Books[index].BAuthor);
+                                Console.WriteLine("Category: " + Books[index].catagory);
+                                Console.WriteLine("Available Copies: " + (Books[index].copies - Books[index].borrowedCopies));
+                            }
+                            else
+                            {
+                                Console.WriteLine("Error: Book with the entered ID not found.");
+                            }
                         }
                         else
                         {
-                            Console.WriteLine("Error: Book with the entered ID not found.");
-                            return;
+                            Console.WriteLine("Error: The entered book ID is not from the search results.");
                         }
-
-
-
                     }
                     else
                     {
                         Console.WriteLine("Error: Invalid book ID.");
-                        index = -1;
                     }
                 }
                 else
@@ -1201,6 +1208,7 @@ namespace BasicLibrary
                 Console.WriteLine("An error occurred while searching for the book: " + ex.Message);
             }
         }
+
         static void reporting()
         {
             Console.Clear();
