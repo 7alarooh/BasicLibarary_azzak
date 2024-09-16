@@ -2387,6 +2387,15 @@ namespace BasicLibrary
             {
                 // Remove duplicate book IDs from suggestions
                 suggestedBookIds = suggestedBookIds.Distinct().ToList();
+                // Filter out books that the user has already borrowed and not returned
+                var borrowedBookIds = Borrowings
+                    .Where(b => b.uid == userId && !b.ISReturned)
+                    .Select(b => b.bid)
+                    .ToList();
+
+                suggestedBookIds = suggestedBookIds
+                    .Where(bookId => !borrowedBookIds.Contains(bookId))
+                    .ToList();
 
                 if (suggestedBookIds.Count == 0)
                 {
