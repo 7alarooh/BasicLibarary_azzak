@@ -59,7 +59,6 @@ namespace BasicLibrary
                 Console.WriteLine("------------Welcome to Library------------");
                 Console.WriteLine("\n----------------Login Page----------------");
                 Console.WriteLine("\n Enter the No what you are :");
-                Console.WriteLine("\n 0 . Users Register");
                 Console.WriteLine("\n 1 . Admin Access");
                 Console.WriteLine("\n 2 . User Access");
                 Console.WriteLine("\n 3 .Exit");
@@ -67,59 +66,6 @@ namespace BasicLibrary
                 string choice = Console.ReadLine();
                 switch (choice)
                 {
-                    /*case "0":
-                        Console.Clear();
-                        Console.Write("Enter Your Email: ");
-                        string rEmail = Console.ReadLine();
-
-                        // Validate email format
-                        if (!IsValidEmail(rEmail))
-                        {
-                            Console.WriteLine("Error: Invalid email format.");
-                            break;  // This will return to the menu instead of exiting the method.
-                        }
-
-                        if (rEmail == "eve.davis@example.com")
-                        {
-                            var admin = Admins.FirstOrDefault(a => a.Email.Equals(rEmail, StringComparison.OrdinalIgnoreCase));
-                            if (admin != default)
-                            {
-                                Console.Write("\nEnter Password: ");
-                                string enterPW = Console.ReadLine();
-
-                                // Validate password format
-                                string passwordValidationResult = IsValidPassword(enterPW);
-
-                                if (passwordValidationResult.StartsWith("Error"))
-                                {
-                                    Console.WriteLine(passwordValidationResult); // Show error message for invalid password
-                                    break; // Return to the menu instead of exiting.
-                                }
-                                else
-                                {
-
-                                    if (enterPW == admin.Password)
-                                    {
-                                        Console.Clear();
-                                        accountsManagement(admin.AName);
-                                    }
-                                    else
-                                    {
-                                        Console.WriteLine("Error: Incorrect password.");
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                Console.WriteLine("Error: Admin not found.");
-                            }
-                        }
-                        else
-                        {
-                            Console.WriteLine("Sorry! you are not allowed to access here...");
-                        }
-                        break;
-                    */
                     case "1":
                         Console.Clear();
                         Console.Write("Enter Your Email: ");
@@ -314,7 +260,8 @@ namespace BasicLibrary
                 Console.WriteLine("\n 1 .Add new user");
                 Console.WriteLine("\n 2 .Edit user information");
                 Console.WriteLine("\n 3 .Remove user account");
-                Console.WriteLine("\n 4 .singOut");
+                Console.WriteLine("\n 4 .Sub Admin Meun");
+                Console.WriteLine("\n 5 .singOut");
 
                 string choice = Console.ReadLine();
 
@@ -333,6 +280,11 @@ namespace BasicLibrary
                         RemoveUserAccount();
                         break;
                     case "4":
+                        Console.Clear();
+                        subAdminMenu(name);
+                        break;
+
+                    case "5":
                         Console.Clear();
                         saveAllUsers();
                         Console.WriteLine("\npress Enter key to exit out system");
@@ -817,7 +769,8 @@ namespace BasicLibrary
             }
         }
 
-    static void subAdminMenu(string name) 
+    
+        static void subAdminMenu(string name) 
         {
             bool ExitFlag = false;
             do { 
