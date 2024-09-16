@@ -26,14 +26,14 @@ namespace BasicLibrary
         static List<(int PurchaseID, int UID, int BID, DateTime PurchaseDate, double Price)> Purchases = new List<(int PurchaseID, int UID, int BID, DateTime PurchaseDate, double Price)>();
        
 
-        static string filePath = "C:\\Users\\azzaA\\source\\repos\\BooksFile.txt";
-        static string userFilePath = "C:\\Users\\azzaA\\source\\repos\\UsersFile.txt";
-        static string adminFilePath = "C:\\Users\\azzaA\\source\\repos\\AdminsFile.txt";
-        static string borrowingFilePath = "C:\\Users\\azzaA\\source\\repos\\BorrowingFile.txt";
-        static string CategoriesFile = "C:\\Users\\azzaA\\source\\repos\\CategoriesFile.txt";
-        static string AlertsFile = "C:\\Users\\azzaA\\source\\repos\\AlertsFile.txt";
-        static string purchasesFilePath = "C:\\Users\\azzaA\\source\\repos\\purchasesFile.txt";
-        static string reservationFilePath = "C:\\Users\\azzaA\\source\\repos\\ReservationsFile.txt";
+        static string filePath = "C:\\Users\\Lenovo\\source\\repos\\azzaGit\\BooksFile.txt";
+        static string userFilePath = "C:\\Users\\Lenovo\\source\\repos\\azzaGit\\UsersFile.txt";
+        static string adminFilePath = "C:\\Users\\Lenovo\\source\\repos\\azzaGit\\AdminsFile.txt";
+        static string borrowingFilePath = "C:\\Users\\Lenovo\\source\\repos\\azzaGit\\BorrowingFile.txt";
+        static string CategoriesFile = "C:\\Users\\Lenovo\\source\\repos\\azzaGit\\CategoriesFile.txt";
+        static string AlertsFile = "C:\\Users\\Lenovo\\source\\repos\\azzaGit\\AlertsFile.txt";
+        static string purchasesFilePath = "C:\\Users\\Lenovo\\source\\repos\\azzaGit\\purchasesFile.txt";
+        static string reservationFilePath = "C:\\Users\\Lenovo\\source\\repos\\azzaGit\\ReservationsFile.txt";
 
 
         static int index = -1;
@@ -67,7 +67,7 @@ namespace BasicLibrary
                 string choice = Console.ReadLine();
                 switch (choice)
                 {
-                    case "0":
+                    /*case "0":
                         Console.Clear();
                         Console.Write("Enter Your Email: ");
                         string rEmail = Console.ReadLine();
@@ -119,7 +119,7 @@ namespace BasicLibrary
                             Console.WriteLine("Sorry! you are not allowed to access here...");
                         }
                         break;
-
+                    */
                     case "1":
                         Console.Clear();
                         Console.Write("Enter Your Email: ");
@@ -152,7 +152,7 @@ namespace BasicLibrary
                                     if (enterPW == admin.Password)
                                     {
                                         Console.Clear();
-                                        adminMenu(admin.AName);
+                                        adminMenu(admin.AName,admin.Email);
                                     }
                                     else
                                     {
@@ -803,10 +803,24 @@ namespace BasicLibrary
             Console.WriteLine(sb.ToString());
         }
         //........................Admin Functions.....................................//
-        static void adminMenu(string name)
-        {   bool ExitFlag = false;
-            do
+        static void adminMenu(string name,string aEmail)
+        {   
+            if (aEmail == "eve.davis@example.com")
             {
+                Console.Clear();
+                accountsManagement(name);
+            }
+            else
+            {
+                Console.Clear();
+                subAdminMenu(name);
+            }
+        }
+
+    static void subAdminMenu(string name) 
+        {
+            bool ExitFlag = false;
+            do { 
                 Console.WriteLine("Welcome Admin in Library");
                 Console.WriteLine("\n Enter the No. of operation you need :");
                 Console.WriteLine("\n 1 .Add New Book");
@@ -814,12 +828,12 @@ namespace BasicLibrary
                 Console.WriteLine("\n 3 .Search for Book by Name");
                 Console.WriteLine("\n 4 .Edit a Book");
                 Console.WriteLine("\n 5 .Remove a Book");
-                Console.WriteLine("\n 6 .Report"); 
+                Console.WriteLine("\n 6 .Report");
                 Console.WriteLine("\n 7 .Alerts File");
                 Console.WriteLine("\n 8 .singOut");
-
+                
                 string choice = Console.ReadLine();
-
+                
                 switch (choice)
                 {
                     case "1":
@@ -853,26 +867,22 @@ namespace BasicLibrary
                         alertsFile();
                         break;
                     case "8":
-                        Console.Clear();
                         SaveBooksToFile();
                         Console.WriteLine("\npress Enter key to exit out system");
                         string outsystem = Console.ReadLine();
                         ExitFlag = true;
                         break;
-                        
                     default:
                         Console.WriteLine("Sorry your choice was wrong !!");
                         break;
-
                 }
 
-                Console.WriteLine("press Enter key to continue");
-                string cont = Console.ReadLine();
+                    Console.WriteLine("press Enter key to continue");
+                    string cont = Console.ReadLine();
 
-                Console.Clear();
-
-
-            } while (ExitFlag != true);
+                    Console.Clear();
+            }
+            while (ExitFlag != true) ;
         }
         static void AddNewBook()
         {
