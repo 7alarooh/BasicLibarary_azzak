@@ -838,34 +838,35 @@ namespace BasicLibrary
         }
         static void AddNewBook()
         {
-            string name;
-            string author;
-            int copies = 0;
+            string name, author, category;
+            int copies = 0, DaysAllowedForBorrowing = 0, newID;
             double price = 0;
-            string category;
-            int DaysAllowedForBorrowing = 0;
+
             Console.WriteLine("|------------ Add New Book ------------|");
-            Console.WriteLine("\nEnter Book Name:");
-            name = Console.ReadLine();
-            if (string.IsNullOrWhiteSpace(name)) // to handle the book name
+
+            // Input book name
+            while (true)
             {
+                Console.WriteLine("\nEnter Book Name:");
+                name = Console.ReadLine();
+                if (!string.IsNullOrWhiteSpace(name)) break;
                 Console.WriteLine("Error: Book name cannot be empty.");
-                return;
             }
 
-            Console.WriteLine("Enter Book Author:");
-            author = Console.ReadLine();
-            if (string.IsNullOrWhiteSpace(author)) // to handle the book author
+            // Input book author
+            while (true)
             {
+                Console.WriteLine("Enter Book Author:");
+                author = Console.ReadLine();
+                if (!string.IsNullOrWhiteSpace(author)) break;
                 Console.WriteLine("Error: Author name cannot be empty.");
-                return;
             }
 
-            // Check if a book with the same name already exists
+            // Check if a book with the same name and author already exists
             var existingBook = Books.FirstOrDefault(b => b.BName.ToLower() == name.ToLower());
-            if (existingBook != default) // If a book with the same name exists
+            if (existingBook != default)
             {
-                if (existingBook.BAuthor.ToLower() == author.ToLower()) // Check if the author is the same
+                if (existingBook.BAuthor.ToLower() == author.ToLower())
                 {
                     Console.WriteLine("Error: A book with the same name and author already exists.");
                     return;
@@ -876,112 +877,103 @@ namespace BasicLibrary
                 }
             }
 
-            // Manually generate the next book ID by checking the IDs in the Books list
-            int newID = Books.Count > 0 ? Books.Max(b => b.BID) + 1 : 1;
+            // Generate the next book ID
+            newID = Books.Count > 0 ? Books.Max(b => b.BID) + 1 : 1;
 
-            // Handle the book quantity
-            Console.WriteLine("Enter the Book Quantity:");
-            try
+            // Input book quantity
+            while (true)
             {
-                copies = int.Parse(Console.ReadLine());
-                if (copies < 0)
+                Console.WriteLine("Enter the Book Quantity:");
+                try
                 {
+                    copies = int.Parse(Console.ReadLine());
+                    if (copies >= 0) break;
                     Console.WriteLine("Error: Quantity cannot be negative.");
-                    return;
                 }
-            }
-            catch (FormatException)
-            {
-                Console.WriteLine("Error: Please enter a valid number for the Book Quantity.");
-                return;
-            }
-            catch (OverflowException)
-            {
-                Console.WriteLine("Error: The number for the Book Quantity is too large.");
-                return;
-            }
-
-            // Handle the book price
-            Console.WriteLine("Enter the Book Price:");
-            try
-            {
-                price = double.Parse(Console.ReadLine());
-                if (price < 0)
+                catch (FormatException)
                 {
-                    Console.WriteLine("Error: Price cannot be negative.");
-                    return;
+                    Console.WriteLine("Error: Please enter a valid number for the Book Quantity.");
+                }
+                catch (OverflowException)
+                {
+                    Console.WriteLine("Error: The number for the Book Quantity is too large.");
                 }
             }
-            catch (FormatException)
+
+            // Input book price
+            while (true)
             {
-                Console.WriteLine("Error: Please enter a valid number for the Book Price.");
-                return;
-            }
-            catch (OverflowException)
-            {
-                Console.WriteLine("Error: The number for the Book Price is too large.");
-                return;
+                Console.WriteLine("Enter the Book Price:");
+                try
+                {
+                    price = double.Parse(Console.ReadLine());
+                    if (price >= 0) break;
+                    Console.WriteLine("Error: Price cannot be negative.");
+                }
+                catch (FormatException)
+                {
+                    Console.WriteLine("Error: Please enter a valid number for the Book Price.");
+                }
+                catch (OverflowException)
+                {
+                    Console.WriteLine("Error: The number for the Book Price is too large.");
+                }
             }
 
-            // Show all categories and let the user select one
+            // Select book category
             if (Categories.Count == 0)
             {
                 Console.WriteLine("Error: No categories available. Please add categories before adding a book.");
                 return;
             }
 
-            Console.WriteLine("Select Book Category:");
-            for (int i = 0; i < Categories.Count; i++)
+            int categoryIndex = -1;
+            while (true)
             {
-                Console.WriteLine($"{i + 1}. {Categories[i].CName}");
-            }
-            Console.WriteLine("Enter No. Categories:");
-            int categoryIndex = 0;
-            try
-            {
-                categoryIndex = int.Parse(Console.ReadLine()) - 1;
-                if (categoryIndex < 0 || categoryIndex >= Categories.Count)
+                Console.WriteLine("Select Book Category:");
+                for (int i = 0; i < Categories.Count; i++)
                 {
+                    Console.WriteLine($"{i + 1}. {Categories[i].CName}");
+                }
+                Console.WriteLine("Enter No. of Category:");
+                try
+                {
+                    categoryIndex = int.Parse(Console.ReadLine()) - 1;
+                    if (categoryIndex >= 0 && categoryIndex < Categories.Count) break;
                     Console.WriteLine("Error: Invalid category selection.");
-                    return;
+                }
+                catch (FormatException)
+                {
+                    Console.WriteLine("Error: Please enter a valid number for the category selection.");
+                }
+                catch (OverflowException)
+                {
+                    Console.WriteLine("Error: The number for the category selection is too large.");
                 }
             }
-            catch (FormatException)
-            {
-                Console.WriteLine("Error: Please enter a valid number for the category selection.");
-                return;
-            }
-            catch (OverflowException)
-            {
-                Console.WriteLine("Error: The number for the category selection is too large.");
-                return;
-            }
-
             category = Categories[categoryIndex].CName;
 
-            // Handle the borrowing period
-            Console.WriteLine("Enter the Number of Days Allowed for Borrowing:");
-            try
+            // Input number of days allowed for borrowing
+            while (true)
             {
-                DaysAllowedForBorrowing = int.Parse(Console.ReadLine());
-                if (DaysAllowedForBorrowing <= 0)
+                Console.WriteLine("Enter the Number of Days Allowed for Borrowing:");
+                try
                 {
+                    DaysAllowedForBorrowing = int.Parse(Console.ReadLine());
+                    if (DaysAllowedForBorrowing > 0) break;
                     Console.WriteLine("Error: Borrowing period must be positive.");
-                    return;
+                }
+                catch (FormatException)
+                {
+                    Console.WriteLine("Error: Please enter a valid number for the borrowing period.");
+                }
+                catch (OverflowException)
+                {
+                    Console.WriteLine("Error: The number for the borrowing period is too large.");
                 }
             }
-            catch (FormatException)
-            {
-                Console.WriteLine("Error: Please enter a valid number for the borrowing period.");
-                return;
-            }
-            catch (OverflowException)
-            {
-                Console.WriteLine("Error: The number for the borrowing period is too large.");
-                return;
-            }
 
-            // Add the book if everything is valid
+            // Add the book if all inputs are valid
             Books.Add((newID, name, author, copies, 0, price, category, DaysAllowedForBorrowing));
             Console.WriteLine($"Book added successfully with ID: {newID}!");
 
