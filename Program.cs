@@ -1406,6 +1406,67 @@ namespace BasicLibrary
             {
                 Console.WriteLine("No users have borrowed any books yet.");
             }
+            // High ratings (4-5) and low ratings (1-2)
+            Console.WriteLine("\n--- Ratings Report ---");
+
+            // Calculate average ratings
+            var bookRatings = Borrowings
+                .Where(b => b.Rating.HasValue)
+                .GroupBy(b => b.bid)
+                .Select(g => new
+                {
+                    BookId = g.Key,
+                    AvgRating = g.Average(b => b.Rating.Value)
+                }).ToList();
+
+            // High ratings (4-5)
+            var highRatings = bookRatings
+                .Where(b => b.AvgRating >= 4)
+                .Select(b => Books.FirstOrDefault(book => book.BID == b.BookId))
+                .Where(b => b != default)
+                .ToList();
+
+            Console.WriteLine("Books with High Ratings (4-5):");
+            foreach (var book in highRatings)
+            {
+                Console.WriteLine($"- {book.BName} by {book.BAuthor} (Average Rating: {bookRatings.First(b => b.BookId == book.BID).AvgRating:F1})");
+            }
+
+            // Low ratings (1-2)
+            var lowRatings = bookRatings
+                .Where(b => b.AvgRating <= 2)
+                .Select(b => Books.FirstOrDefault(book => book.BID == b.BookId))
+                .Where(b => b != default)
+                .ToList();
+
+            Console.WriteLine("Books with Low Ratings (1-2):");
+            foreach (var book in lowRatings)
+            {
+                Console.WriteLine($"- {book.BName} by {book.BAuthor} (Average Rating: {bookRatings.First(b => b.BookId == book.BID).AvgRating:F1})");
+            }
+
+            // Sales report
+            Console.WriteLine("\n--- Sales Report ---");
+
+            var salesReport = Purchases
+    .GroupBy(p => new { p.BID, p.Price })
+    .Select(g => {
+        var book = Books.FirstOrDefault(b => b.BID == g.Key.BID);
+        return new
+        {
+            BookId = g.Key.BID,
+            BookName = book != default ? book.BName : "Unknown",
+            TotalPurchased = g.Count(),
+            TotalAmount = g.Sum(p => p.Price)
+        };
+    }).ToList();
+
+
+            Console.WriteLine("Books Sold:");
+            foreach (var sale in salesReport)
+            {
+                Console.WriteLine($"- {sale.BookId}: {sale.BookName} (Purchased {sale.TotalPurchased} times, Total Amount: {sale.TotalAmount:F2} OMR)");
+            }
 
             Console.WriteLine("\n------\tEnd of Report\t-----");
         }
