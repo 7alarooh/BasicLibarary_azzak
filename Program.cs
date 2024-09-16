@@ -1066,6 +1066,7 @@ namespace BasicLibrary
         }
         static void editBook()
         {
+            Console.WriteLine("|------------ Edit Book ------------|");
             // Check if there are books to edit
             if (Books.Count == 0)
             {
@@ -1138,6 +1139,7 @@ namespace BasicLibrary
         }
         static void removeBook()
         {
+            Console.WriteLine("|------------ Remove Book ------------|\n");
             SearchForBook();
             // If a valid book index is found
             if (index != -1)
@@ -1398,6 +1400,7 @@ namespace BasicLibrary
                 {
                     var lines = File.ReadAllLines(AlertsFile);
 
+                    Console.WriteLine("|------------ Alerts File ------------|\n");
                     // Header for the table
                     Console.WriteLine("+-----+----------------------+----------------------------+---------------------+-------------------------+");
                     Console.WriteLine("| ID  | Username             | Email                      | Date                | Message                 |");
@@ -1434,14 +1437,12 @@ namespace BasicLibrary
                 Console.WriteLine("Error reading alerts file: " + ex.Message);
             }
         }
-
-
-
         //........................User Functions.....................................//
         static void userMenu(int id,string name)
         {
-            CheckReservations(); // Check for available reservations before showing the menu
+            
             CheckOverdueBooks(id); // Check for overdue books before showing the menu
+            CheckReservations(); // Check for available reservations before showing the menu
             bool ExitFlag = false;
             do
             {
@@ -1460,27 +1461,34 @@ namespace BasicLibrary
                 switch (choice)
                 {
                     case "1":
+                        Console.Clear();
                         SearchForBook();
                         break;
 
                     case "2":
+                        Console.Clear();
                         BorrowBook(id);
                         break;
 
                     case "3":
+                        Console.Clear();
                         ReturnBook(id);
                         break;
 
                     case "4":
+                        Console.Clear();
                         suggestionsForUser(id);
                         break;
                     case "5":
+                        Console.Clear();
                         BookStore(id);
                         break;
                     case "6":
+                        Console.Clear();
                         ShowProfile(id);
                         break;
                     case "7":
+                        Console.Clear();
                         SaveBooksToFile();
                         saveAllActions();
                         Console.WriteLine("\npress Enter key to exit out system");
@@ -1739,46 +1747,81 @@ namespace BasicLibrary
         {
             try
             {
-                DisplayYourBookBorrowed(userId);
+                // Display books borrowed by the user
+                Console.WriteLine("Books you have borrowed:");
+                var borrowedBooks = Borrowings.Where(b => b.uid == userId && !b.ISReturned).ToList();
 
-                if (index == -1 || index >= Books.Count)
+                if (borrowedBooks.Count == 0)
                 {
-                    Console.WriteLine("Error: Invalid book index.");
+                    Console.WriteLine("You have not borrowed any books.");
                     return;
                 }
 
-                var book = Books[index];
-                int borrowedCopies = book.borrowedCopies;
-                int copies = book.copies;
+                Console.WriteLine("+-----+---------------------------+----------------------+");
+                Console.WriteLine("| ID  | Book Name                 | Borrow Date          |");
+                Console.WriteLine("+-----+---------------------------+----------------------+");
 
-                // Check if the user has borrowed this book
-                var borrowingRecord = Borrowings.FirstOrDefault(b => b.uid == userId && b.bid == book.BID && !b.ISReturned);
+                foreach (var record in borrowedBooks)
+                {
+                    var book = Books.FirstOrDefault(b => b.BID == record.bid);
+                    if (book != default)
+                    {
+                        Console.WriteLine($"| {book.BID,-3} | {book.BName,-25} | {record.date.ToShortDateString(),-20} |");
+                    }
+                }
+                Console.WriteLine("+-----+---------------------------+----------------------+\n");
+
+                // Prompt the user to enter the ID of the book to return
+                Console.Write("Enter the ID of the book you want to return: ");
+                if (!int.TryParse(Console.ReadLine(), out int bookId))
+                {
+                    Console.WriteLine("Invalid input. Please enter a valid book ID.");
+                    return;
+                }
+
+                // Find the borrowing record for the specified book
+                var borrowingRecord = Borrowings.FirstOrDefault(b => b.uid == userId && b.bid == bookId && !b.ISReturned);
 
                 if (borrowingRecord == default)
                 {
-                    Console.WriteLine("Error: You have not borrowed this book.");
+                    Console.WriteLine("Error: You have not borrowed this book or it has already been returned.");
                     return;
                 }
 
-                Console.WriteLine("Do you want to return the Book? Press 'y' to confirm:");
+                var bookToReturn = Books.FirstOrDefault(b => b.BID == bookId);
+                if (bookToReturn.Equals(default))
+                {
+                    Console.WriteLine("Error: Book not found.");
+                    return;
+                }
+
+                // Ask the user if they want to return the book
+                Console.WriteLine($"Do you want to return '{bookToReturn.BName}'? Press 'y' to confirm:");
                 string selected = Console.ReadLine();
 
-                if (selected != "y")
+                if (selected.ToLower() != "y")
                 {
-                    Console.WriteLine("Sorry! Cannot return this " + book.BName);
+                    Console.WriteLine($"Return process for '{bookToReturn.BName}' has been cancelled.");
                     return;
                 }
 
-                // Check if the book has already been returned
-                if (borrowedCopies <= 0)
+                // Check if there are borrowed copies to return
+                if (bookToReturn.borrowedCopies <= 0)
                 {
                     Console.WriteLine("Error: No borrowed copies to return.");
                     return;
                 }
 
-                // Increment the number of copies available (return one book)
-                borrowedCopies++;
-                Books[index] = (book.BID, book.BName, book.BAuthor, book.copies, borrowedCopies, book.Price, book.catagory, book.BorrowPeriod);
+                // Update the book's borrowedCopies
+                int newBorrowedCopies = bookToReturn.borrowedCopies - 1;
+                for (int i = 0; i < Books.Count; i++)
+                {
+                    if (Books[i].BID == bookId)
+                    {
+                        Books[i] = (Books[i].BID, Books[i].BName, Books[i].BAuthor, Books[i].copies, newBorrowedCopies, Books[i].Price, Books[i].catagory, Books[i].BorrowPeriod);
+                        break;
+                    }
+                }
 
                 // Ask the user to rate the book before finalizing the return
                 int rating = 0;
@@ -1801,14 +1844,14 @@ namespace BasicLibrary
                 // Update the borrowing record to reflect the return
                 for (int i = 0; i < Borrowings.Count; i++)
                 {
-                    if (Borrowings[i].uid == userId && Borrowings[i].bid == book.BID && !Borrowings[i].ISReturned)
+                    if (Borrowings[i].uid == userId && Borrowings[i].bid == bookId && !Borrowings[i].ISReturned)
                     {
                         Borrowings[i] = (Borrowings[i].uid, Borrowings[i].bid, Borrowings[i].date, Borrowings[i].ReturnDate, DateTime.Now, rating, true);
                         break; // Exit the loop once the record is updated
                     }
                 }
 
-                Console.WriteLine($"'{book.BName}' has been returned successfully!");
+                Console.WriteLine($"'{bookToReturn.BName}' has been returned successfully!");
             }
             catch (Exception ex)
             {
@@ -1835,7 +1878,7 @@ namespace BasicLibrary
 
             // Currently borrowed books
             var currentBorrowings = Borrowings
-                .Where(b => b.uid == userId && b.ISReturned == false)
+                .Where(b => b.uid == userId && !b.ISReturned)
                 .ToList();
 
             if (currentBorrowings.Any())
@@ -1860,7 +1903,7 @@ namespace BasicLibrary
 
             // Previously returned books
             var returnedBooks = Borrowings
-                .Where(b => b.uid == userId && b.ISReturned == true)
+                .Where(b => b.uid == userId && b.ISReturned)
                 .ToList();
 
             if (returnedBooks.Any())
@@ -1884,6 +1927,31 @@ namespace BasicLibrary
             {
                 Console.WriteLine("No previously returned books.\n");
             }
+
+            // User purchases
+            var userPurchases = Purchases
+                .Where(p => p.UID == userId)
+                .ToList();
+
+            if (userPurchases.Any())
+            {
+                Console.WriteLine("+---------------------------------------------------------------+");
+                Console.WriteLine("|                         Purchased Books                       |");
+                Console.WriteLine("+---------------------------------------------------------------+");
+                Console.WriteLine("| Book Name                           | Purchase Date | Price   |");
+                Console.WriteLine("+---------------------------------------------------------------+");
+
+                foreach (var purchase in userPurchases)
+                {
+                    var book = Books.FirstOrDefault(b => b.BID == purchase.BID);
+                    Console.WriteLine($"| {book.BName,-35} | {purchase.PurchaseDate:dd/MM/yyyy,-13} | {purchase.Price,7:0.00} OMR |");
+                }
+                Console.WriteLine("+---------------------------------------------------------------+\n");
+            }
+            else
+            {
+                Console.WriteLine("No purchases made.\n");
+            }
         }
         static void BookStore(int userId)
         {
@@ -1904,6 +1972,14 @@ namespace BasicLibrary
             if (book.Equals(default))
             {
                 Console.WriteLine("Error: Book not found.");
+                return;
+            }
+
+            // Check if the user has borrowed this book and not returned it
+            var existingBorrowing = Borrowings.FirstOrDefault(b => b.uid == userId && b.bid == bookId && !b.ISReturned);
+            if (existingBorrowing != default)
+            {
+                Console.WriteLine("Error: You have already borrowed this book and need to return it before purchasing.");
                 return;
             }
 
@@ -1949,6 +2025,7 @@ namespace BasicLibrary
                 Console.WriteLine("Purchase cancelled.");
             }
         }
+
         static void SuggestionsForBuy(int userId, (int BID, string BName, string BAuthor, int copies, int borrowedCopies, double Price, string catagory, int BorrowPeriod) purchasedBook)
         {
             var purchasedBookCategory = purchasedBook.catagory;
@@ -2295,7 +2372,6 @@ namespace BasicLibrary
                 // Remove duplicate book IDs from suggestions
                 suggestedBookIds = suggestedBookIds.Distinct().ToList();
 
-                
                 if (suggestedBookIds.Count == 0)
                 {
                     Console.WriteLine("No books are available to borrow from the suggestions.");
@@ -2322,6 +2398,7 @@ namespace BasicLibrary
 
                     if (bookToBorrow != default)
                     {
+                        // Check if the user has already borrowed this book and not returned it
                         var existingBorrowing = Borrowings.FirstOrDefault(b => b.uid == userId && b.bid == bookToBorrow.BID && !b.ISReturned);
 
                         if (existingBorrowing != default)
@@ -2330,11 +2407,18 @@ namespace BasicLibrary
                             return;
                         }
 
-                        if (bookToBorrow.borrowedCopies > 0)
+                        if (bookToBorrow.copies > bookToBorrow.borrowedCopies)
                         {
-                            Console.WriteLine($"You have successfully borrowed {bookToBorrow.BName}.");
-                            Books[Books.IndexOf(bookToBorrow)] = (bookToBorrow.BID, bookToBorrow.BName, bookToBorrow.BAuthor,  bookToBorrow.copies, bookToBorrow.borrowedCopies - 1, bookToBorrow.Price, bookToBorrow.catagory, bookToBorrow.BorrowPeriod);
-                            //Borrowings.Add((userId, bookToBorrow.BID, DateTime.Now, false));
+                            // Update the book's borrowed copies count
+                            int bookIndex = Books.IndexOf(bookToBorrow);
+                            Books[bookIndex] = (bookToBorrow.BID, bookToBorrow.BName, bookToBorrow.BAuthor, bookToBorrow.copies, bookToBorrow.borrowedCopies + 1, bookToBorrow.Price, bookToBorrow.catagory, bookToBorrow.BorrowPeriod);
+
+                            // Add a new borrowing entry
+                            DateTime currentDate = DateTime.Now;
+                            DateTime returnDate = currentDate.AddDays(bookToBorrow.BorrowPeriod);
+                            Borrowings.Add((userId, bookToBorrow.BID, currentDate, returnDate, null, null, false));
+
+                            Console.WriteLine($"You have successfully borrowed {bookToBorrow.BName}. Please return it by {returnDate.ToShortDateString()}.");
                         }
                         else
                         {
@@ -2352,6 +2436,7 @@ namespace BasicLibrary
                 Console.WriteLine("An error occurred while borrowing a suggested book: " + ex.Message);
             }
         }
+
         //........................helper Functions.....................................//
         static void LoadAllFiles()
         {
