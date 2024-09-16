@@ -13,27 +13,27 @@ using System.Xml.Linq;
 namespace BasicLibrary
 {
     internal class Program
-    {// start to TEST 
+    {// start to TEST 1
      //........................Necessary variables and path files.....................................//
         static List<(int AID, string AName, string Email, string Password)> Admins = new List<(int AID, string AName, string Email, string Password)>();
-        
-        static List<(int UID, string Uname, string Email, string Password)> Users =new List<(int UID, string Uname, string Email, string Password)>();
-       
-        static List<(int BID,string BName, string BAuthor, int copies, int borrowedCopies, double Price, string catagory, int BorrowPeriod)> Books = new List<(int BID,string BName, string BAuthor, int copies, int borrowedCopies, double Price, string catagory, int BorrowPeriod)>();
 
-        static List<(int uid, int bid, DateTime date,DateTime ReturnDate, DateTime? ActualReturnDate, int? Rating, bool ISReturned)> Borrowings = new List<(int uid, int bid, DateTime date, DateTime ReturnDate, DateTime? ActualReturnDate, int? Rating ,bool ISReturned)>();
+        static List<(int UID, string Uname, string Email, string Password)> Users = new List<(int UID, string Uname, string Email, string Password)>();
+
+        static List<(int BID, string BName, string BAuthor, int copies, int borrowedCopies, double Price, string catagory, int BorrowPeriod)> Books = new List<(int BID, string BName, string BAuthor, int copies, int borrowedCopies, double Price, string catagory, int BorrowPeriod)>();
+
+        static List<(int uid, int bid, DateTime date, DateTime ReturnDate, DateTime? ActualReturnDate, int? Rating, bool ISReturned)> Borrowings = new List<(int uid, int bid, DateTime date, DateTime ReturnDate, DateTime? ActualReturnDate, int? Rating, bool ISReturned)>();
         static List<(int CID, string CName, int NOFBooks)> Categories = new List<(int CID, string CName, int NOFBooks)>();
         static List<(int PurchaseID, int UID, int BID, DateTime PurchaseDate, double Price)> Purchases = new List<(int PurchaseID, int UID, int BID, DateTime PurchaseDate, double Price)>();
-       
 
-        static string filePath = "C:\\Users\\azzaA\\source\\repos\\BooksFile.txt";
-        static string userFilePath = "C:\\Users\\azzaA\\source\\repos\\UsersFile.txt";
-        static string adminFilePath = "C:\\Users\\azzaA\\source\\repos\\AdminsFile.txt";
-        static string borrowingFilePath = "C:\\Users\\azzaA\\source\\repos\\BorrowingFile.txt";
-        static string CategoriesFile = "C:\\Users\\azzaA\\source\\repos\\CategoriesFile.txt";
-        static string AlertsFile = "C:\\Users\\azzaA\\source\\repos\\AlertsFile.txt";
-        static string purchasesFilePath = "C:\\Users\\azzaA\\source\\repos\\purchasesFile.txt";
-        static string reservationFilePath = "C:\\Users\\azzaA\\source\\repos\\ReservationsFile.txt";
+
+        static string filePath = "C:\\Users\\Lenovo\\source\\repos\\azzaGit\\BooksFile.txt";
+        static string userFilePath = "C:\\Users\\Lenovo\\source\\repos\\azzaGit\\UsersFile.txt";
+        static string adminFilePath = "C:\\Users\\Lenovo\\source\\repos\\azzaGit\\AdminsFile.txt";
+        static string borrowingFilePath = "C:\\Users\\Lenovo\\source\\repos\\azzaGit\\BorrowingFile.txt";
+        static string CategoriesFile = "C:\\Users\\Lenovo\\source\\repos\\azzaGit\\CategoriesFile.txt";
+        static string AlertsFile = "C:\\Users\\Lenovo\\source\\repos\\azzaGit\\AlertsFile.txt";
+        static string purchasesFilePath = "C:\\Users\\Lenovo\\source\\repos\\azzaGit\\purchasesFile.txt";
+        static string reservationFilePath = "C:\\Users\\Lenovo\\source\\repos\\azzaGit\\ReservationsFile.txt";
 
 
         static int index = -1;
@@ -42,7 +42,7 @@ namespace BasicLibrary
 
         static void Main(string[] args)
         {
-            
+
             LoadAllFiles();
             loginPage();
 
@@ -59,7 +59,6 @@ namespace BasicLibrary
                 Console.WriteLine("------------Welcome to Library------------");
                 Console.WriteLine("\n----------------Login Page----------------");
                 Console.WriteLine("\n Enter the No what you are :");
-                Console.WriteLine("\n 0 . Users Register");
                 Console.WriteLine("\n 1 . Admin Access");
                 Console.WriteLine("\n 2 . User Access");
                 Console.WriteLine("\n 3 .Exit");
@@ -67,59 +66,6 @@ namespace BasicLibrary
                 string choice = Console.ReadLine();
                 switch (choice)
                 {
-                    case "0":
-                        Console.Clear();
-                        Console.Write("Enter Your Email: ");
-                        string rEmail = Console.ReadLine();
-
-                        // Validate email format
-                        if (!IsValidEmail(rEmail))
-                        {
-                            Console.WriteLine("Error: Invalid email format.");
-                            break;  // This will return to the menu instead of exiting the method.
-                        }
-
-                        if (rEmail == "eve.davis@example.com")
-                        {
-                            var admin = Admins.FirstOrDefault(a => a.Email.Equals(rEmail, StringComparison.OrdinalIgnoreCase));
-                            if (admin != default)
-                            {
-                                Console.Write("\nEnter Password: ");
-                                string enterPW = Console.ReadLine();
-
-                                // Validate password format
-                                string passwordValidationResult = IsValidPassword(enterPW);
-
-                                if (passwordValidationResult.StartsWith("Error"))
-                                {
-                                    Console.WriteLine(passwordValidationResult); // Show error message for invalid password
-                                    break; // Return to the menu instead of exiting.
-                                }
-                                else
-                                {
-
-                                    if (enterPW == admin.Password)
-                                    {
-                                        Console.Clear();
-                                        accountsManagement(admin.AName);
-                                    }
-                                    else
-                                    {
-                                        Console.WriteLine("Error: Incorrect password.");
-                                    }
-                                }
-                            }
-                            else
-                            {
-                                Console.WriteLine("Error: Admin not found.");
-                            }
-                        }
-                        else
-                        {
-                            Console.WriteLine("Sorry! you are not allowed to access here...");
-                        }
-                        break;
-
                     case "1":
                         Console.Clear();
                         Console.Write("Enter Your Email: ");
@@ -152,7 +98,7 @@ namespace BasicLibrary
                                     if (enterPW == admin.Password)
                                     {
                                         Console.Clear();
-                                        adminMenu(admin.AName);
+                                        adminMenu(admin.AName, admin.Email);
                                     }
                                     else
                                     {
@@ -239,7 +185,7 @@ namespace BasicLibrary
                         Console.WriteLine("Sorry, your choice was wrong!!");
                         break;
                 }
-                
+
                 if (!ExitFlag)
                 {
                     Console.WriteLine("Press any key to continue to the Home Page");
@@ -249,11 +195,10 @@ namespace BasicLibrary
 
             } while (!ExitFlag);
         }
-
         // Log forgot password request to an external file
         static void LogForgotPassword(string username, string email)
         {
-            
+
             string logEntry = $"{username}|{email}|{DateTime.Now}|Note: Forgot Password\n";
 
             try
@@ -266,14 +211,12 @@ namespace BasicLibrary
                 Console.WriteLine("Error logging forgot password request: " + ex.Message);
             }
         }
-
         // Function to validate email format
         static bool IsValidEmail(string email)
         {
             var emailRegex = new Regex(@"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$");
             return emailRegex.IsMatch(email);
         }
-
         // Function to validate password format
         static string IsValidPassword(string password)
         {
@@ -301,7 +244,6 @@ namespace BasicLibrary
             }
         }
 
-
         //.........................registrar function.................................//
 
         static void accountsManagement(string name)
@@ -314,7 +256,8 @@ namespace BasicLibrary
                 Console.WriteLine("\n 1 .Add new user");
                 Console.WriteLine("\n 2 .Edit user information");
                 Console.WriteLine("\n 3 .Remove user account");
-                Console.WriteLine("\n 4 .singOut");
+                Console.WriteLine("\n 4 .Sub Admin Meun");
+                Console.WriteLine("\n 5 .singOut");
 
                 string choice = Console.ReadLine();
 
@@ -334,6 +277,11 @@ namespace BasicLibrary
                         break;
                     case "4":
                         Console.Clear();
+                        subAdminMenu(name);
+                        break;
+
+                    case "5":
+                        Console.Clear();
                         saveAllUsers();
                         Console.WriteLine("\npress Enter key to exit out system");
                         string outsystem = Console.ReadLine();
@@ -352,7 +300,7 @@ namespace BasicLibrary
         }
         static void AddNewUser()
         {
-            
+
             Console.WriteLine("Would you like to add a new User or Admin?");
             Console.WriteLine("Enter '1' for User or '2' for Admin:");
             string choice = Console.ReadLine();
@@ -454,7 +402,7 @@ namespace BasicLibrary
             string name = Console.ReadLine();
 
             // Add new user to the Users list with the auto-generated ID
-            Users.Add((nextID, name ,email, password));
+            Users.Add((nextID, name, email, password));
             Console.WriteLine($"New user added successfully with ID: {nextID}");
         }
         static void AddAdmin()
@@ -720,7 +668,7 @@ namespace BasicLibrary
                 Console.WriteLine("Enter the email of the admin you want to remove:");
                 string email = Console.ReadLine();
                 // Prevent the removal of the "registrar" admin
-                if (email.Equals("registrar", StringComparison.OrdinalIgnoreCase))
+                if (email.Equals("eve.davis@example.com", StringComparison.OrdinalIgnoreCase))
                 {
                     Console.WriteLine("Error: The 'registrar' admin cannot be removed.");
                     return;
@@ -764,6 +712,8 @@ namespace BasicLibrary
             int nameWidth = 25;
             int emailWidth = 30;
             int passwordWidth = 20;
+            // Clear StringBuilder to ensure no previous content is repeated
+            sb.Clear();
 
             // Print Admins
             sb.AppendLine("\n \t--- All Users in Library System ---");
@@ -783,6 +733,7 @@ namespace BasicLibrary
                 sb.AppendLine();
             }
 
+
             // Print Users
             sb.AppendLine("\n\n \t--- Users ---");
             sb.AppendFormat("\t{0,-" + idWidth + "} {1,-" + nameWidth + "} {2,-" + emailWidth + "} {3,-" + passwordWidth + "}",
@@ -799,12 +750,28 @@ namespace BasicLibrary
                                 user.Password);
                 sb.AppendLine();
             }
-
             Console.WriteLine(sb.ToString());
+
         }
+
         //........................Admin Functions.....................................//
-        static void adminMenu(string name)
-        {   bool ExitFlag = false;
+
+        static void adminMenu(string name, string aEmail)
+        {
+            if (aEmail == "eve.davis@example.com")
+            {
+                Console.Clear();
+                accountsManagement(name);
+            }
+            else
+            {
+                Console.Clear();
+                subAdminMenu(name);
+            }
+        }
+        static void subAdminMenu(string name)
+        {
+            bool ExitFlag = false;
             do
             {
                 Console.WriteLine("Welcome Admin in Library");
@@ -814,7 +781,7 @@ namespace BasicLibrary
                 Console.WriteLine("\n 3 .Search for Book by Name");
                 Console.WriteLine("\n 4 .Edit a Book");
                 Console.WriteLine("\n 5 .Remove a Book");
-                Console.WriteLine("\n 6 .Report"); 
+                Console.WriteLine("\n 6 .Report");
                 Console.WriteLine("\n 7 .Alerts File");
                 Console.WriteLine("\n 8 .singOut");
 
@@ -853,57 +820,54 @@ namespace BasicLibrary
                         alertsFile();
                         break;
                     case "8":
-                        Console.Clear();
                         SaveBooksToFile();
                         Console.WriteLine("\npress Enter key to exit out system");
                         string outsystem = Console.ReadLine();
                         ExitFlag = true;
                         break;
-                        
                     default:
                         Console.WriteLine("Sorry your choice was wrong !!");
                         break;
-
                 }
 
                 Console.WriteLine("press Enter key to continue");
                 string cont = Console.ReadLine();
 
                 Console.Clear();
-
-
-            } while (ExitFlag != true);
+            }
+            while (ExitFlag != true);
         }
         static void AddNewBook()
         {
-            string name;
-            string author;
-            int copies = 0;
+            string name, author, category;
+            int copies = 0, DaysAllowedForBorrowing = 0, newID;
             double price = 0;
-            string category;
-            int DaysAllowedForBorrowing = 0;
+
             Console.WriteLine("|------------ Add New Book ------------|");
-            Console.WriteLine("\nEnter Book Name:");
-            name = Console.ReadLine();
-            if (string.IsNullOrWhiteSpace(name)) // to handle the book name
+
+            // Input book name
+            while (true)
             {
+                Console.WriteLine("\nEnter Book Name:");
+                name = Console.ReadLine();
+                if (!string.IsNullOrWhiteSpace(name)) break;
                 Console.WriteLine("Error: Book name cannot be empty.");
-                return;
             }
 
-            Console.WriteLine("Enter Book Author:");
-            author = Console.ReadLine();
-            if (string.IsNullOrWhiteSpace(author)) // to handle the book author
+            // Input book author
+            while (true)
             {
+                Console.WriteLine("Enter Book Author:");
+                author = Console.ReadLine();
+                if (!string.IsNullOrWhiteSpace(author)) break;
                 Console.WriteLine("Error: Author name cannot be empty.");
-                return;
             }
 
-            // Check if a book with the same name already exists
+            // Check if a book with the same name and author already exists
             var existingBook = Books.FirstOrDefault(b => b.BName.ToLower() == name.ToLower());
-            if (existingBook != default) // If a book with the same name exists
+            if (existingBook != default)
             {
-                if (existingBook.BAuthor.ToLower() == author.ToLower()) // Check if the author is the same
+                if (existingBook.BAuthor.ToLower() == author.ToLower())
                 {
                     Console.WriteLine("Error: A book with the same name and author already exists.");
                     return;
@@ -914,112 +878,103 @@ namespace BasicLibrary
                 }
             }
 
-            // Manually generate the next book ID by checking the IDs in the Books list
-            int newID = Books.Count > 0 ? Books.Max(b => b.BID) + 1 : 1;
+            // Generate the next book ID
+            newID = Books.Count > 0 ? Books.Max(b => b.BID) + 1 : 1;
 
-            // Handle the book quantity
-            Console.WriteLine("Enter the Book Quantity:");
-            try
+            // Input book quantity
+            while (true)
             {
-                copies = int.Parse(Console.ReadLine());
-                if (copies < 0)
+                Console.WriteLine("Enter the Book Quantity:");
+                try
                 {
+                    copies = int.Parse(Console.ReadLine());
+                    if (copies >= 0) break;
                     Console.WriteLine("Error: Quantity cannot be negative.");
-                    return;
                 }
-            }
-            catch (FormatException)
-            {
-                Console.WriteLine("Error: Please enter a valid number for the Book Quantity.");
-                return;
-            }
-            catch (OverflowException)
-            {
-                Console.WriteLine("Error: The number for the Book Quantity is too large.");
-                return;
-            }
-
-            // Handle the book price
-            Console.WriteLine("Enter the Book Price:");
-            try
-            {
-                price = double.Parse(Console.ReadLine());
-                if (price < 0)
+                catch (FormatException)
                 {
-                    Console.WriteLine("Error: Price cannot be negative.");
-                    return;
+                    Console.WriteLine("Error: Please enter a valid number for the Book Quantity.");
+                }
+                catch (OverflowException)
+                {
+                    Console.WriteLine("Error: The number for the Book Quantity is too large.");
                 }
             }
-            catch (FormatException)
+
+            // Input book price
+            while (true)
             {
-                Console.WriteLine("Error: Please enter a valid number for the Book Price.");
-                return;
-            }
-            catch (OverflowException)
-            {
-                Console.WriteLine("Error: The number for the Book Price is too large.");
-                return;
+                Console.WriteLine("Enter the Book Price:");
+                try
+                {
+                    price = double.Parse(Console.ReadLine());
+                    if (price >= 0) break;
+                    Console.WriteLine("Error: Price cannot be negative.");
+                }
+                catch (FormatException)
+                {
+                    Console.WriteLine("Error: Please enter a valid number for the Book Price.");
+                }
+                catch (OverflowException)
+                {
+                    Console.WriteLine("Error: The number for the Book Price is too large.");
+                }
             }
 
-            // Show all categories and let the user select one
+            // Select book category
             if (Categories.Count == 0)
             {
                 Console.WriteLine("Error: No categories available. Please add categories before adding a book.");
                 return;
             }
 
-            Console.WriteLine("Select Book Category:");
-            for (int i = 0; i < Categories.Count; i++)
+            int categoryIndex = -1;
+            while (true)
             {
-                Console.WriteLine($"{i + 1}. {Categories[i].CName}");
-            }
-            Console.WriteLine("Enter No. Categories:");
-            int categoryIndex = 0;
-            try
-            {
-                categoryIndex = int.Parse(Console.ReadLine()) - 1;
-                if (categoryIndex < 0 || categoryIndex >= Categories.Count)
+                Console.WriteLine("Select Book Category:");
+                for (int i = 0; i < Categories.Count; i++)
                 {
+                    Console.WriteLine($"{i + 1}. {Categories[i].CName}");
+                }
+                Console.WriteLine("Enter No. of Category:");
+                try
+                {
+                    categoryIndex = int.Parse(Console.ReadLine()) - 1;
+                    if (categoryIndex >= 0 && categoryIndex < Categories.Count) break;
                     Console.WriteLine("Error: Invalid category selection.");
-                    return;
+                }
+                catch (FormatException)
+                {
+                    Console.WriteLine("Error: Please enter a valid number for the category selection.");
+                }
+                catch (OverflowException)
+                {
+                    Console.WriteLine("Error: The number for the category selection is too large.");
                 }
             }
-            catch (FormatException)
-            {
-                Console.WriteLine("Error: Please enter a valid number for the category selection.");
-                return;
-            }
-            catch (OverflowException)
-            {
-                Console.WriteLine("Error: The number for the category selection is too large.");
-                return;
-            }
-
             category = Categories[categoryIndex].CName;
 
-            // Handle the borrowing period
-            Console.WriteLine("Enter the Number of Days Allowed for Borrowing:");
-            try
+            // Input number of days allowed for borrowing
+            while (true)
             {
-                DaysAllowedForBorrowing = int.Parse(Console.ReadLine());
-                if (DaysAllowedForBorrowing <= 0)
+                Console.WriteLine("Enter the Number of Days Allowed for Borrowing:");
+                try
                 {
+                    DaysAllowedForBorrowing = int.Parse(Console.ReadLine());
+                    if (DaysAllowedForBorrowing > 0) break;
                     Console.WriteLine("Error: Borrowing period must be positive.");
-                    return;
+                }
+                catch (FormatException)
+                {
+                    Console.WriteLine("Error: Please enter a valid number for the borrowing period.");
+                }
+                catch (OverflowException)
+                {
+                    Console.WriteLine("Error: The number for the borrowing period is too large.");
                 }
             }
-            catch (FormatException)
-            {
-                Console.WriteLine("Error: Please enter a valid number for the borrowing period.");
-                return;
-            }
-            catch (OverflowException)
-            {
-                Console.WriteLine("Error: The number for the borrowing period is too large.");
-                return;
-            }
 
-            // Add the book if everything is valid
+            // Add the book if all inputs are valid
             Books.Add((newID, name, author, copies, 0, price, category, DaysAllowedForBorrowing));
             Console.WriteLine($"Book added successfully with ID: {newID}!");
 
@@ -1039,6 +994,9 @@ namespace BasicLibrary
             int priceWidth = 10;
             int categoryWidth = 15;
             int periodWidth = 10;
+
+            // Clear StringBuilder to ensure no previous content is repeated
+            sb.Clear();
 
             sb.AppendLine("\n \t--- All Books in Library ---");
 
@@ -1215,7 +1173,8 @@ namespace BasicLibrary
                     {
                         // Find the book index using the ID
                         index = Books.FindIndex(b => b.BID == bookId);
-                        if (index != -1) {
+                        if (index != -1)
+                        {
                             Console.WriteLine("\nID:" + Books[index].BID);
                             Console.WriteLine("\nName Book:" + Books[index].BName);
                             Console.WriteLine("\nAuthor:" + Books[index].BAuthor);
@@ -1228,7 +1187,7 @@ namespace BasicLibrary
                             return;
                         }
 
-                        
+
 
                     }
                     else
@@ -1437,8 +1396,10 @@ namespace BasicLibrary
                 Console.WriteLine("Error reading alerts file: " + ex.Message);
             }
         }
+
         //........................User Functions.....................................//
-        static void userMenu(int id,string name)
+
+        static void userMenu(int id, string name)
         {
 
             CheckReservations(); // Check for available reservations before showing the menu
@@ -1583,7 +1544,7 @@ namespace BasicLibrary
                     }
 
                     Console.WriteLine("All overdue books have been returned.");
-                    string press= Console.ReadLine();
+                    string press = Console.ReadLine();
                     Console.Clear();
                 }
                 else
@@ -1634,7 +1595,7 @@ namespace BasicLibrary
                 {
                     Console.WriteLine("Sorry! All copies of this book are currently borrowed.");
                     ReserveBook(userId, selectedBook);
-                    
+
                     return;
                 }
 
@@ -2025,7 +1986,6 @@ namespace BasicLibrary
                 Console.WriteLine("Purchase cancelled.");
             }
         }
-
         static void SuggestionsForBuy(int userId, (int BID, string BName, string BAuthor, int copies, int borrowedCopies, double Price, string catagory, int BorrowPeriod) purchasedBook)
         {
             var purchasedBookCategory = purchasedBook.catagory;
@@ -2076,7 +2036,7 @@ namespace BasicLibrary
                 Console.WriteLine("No additional suggestions available.");
             }
         }
-        static void DisplayYourBookBorrowed(int userId)     
+        static void DisplayYourBookBorrowed(int userId)
         {
             // Check if the user has borrowed any books
             var userBorrowings = Borrowings.Where(b => b.uid == userId).ToList();
@@ -2094,7 +2054,7 @@ namespace BasicLibrary
                 // Find the book details based on the book ID
                 var book = Books.FirstOrDefault(b => b.BID == borrowing.bid);
 
-                if (book != default && borrowing.ISReturned !=true)
+                if (book != default && borrowing.ISReturned != true)
                 {
                     Console.WriteLine($"- '{book.BName}' by {book.BAuthor} (Borrowed on: {borrowing.date.ToShortDateString()})");
                 }
@@ -2124,7 +2084,7 @@ namespace BasicLibrary
                 index = -1; // No book selected for return
             }
         }
-        static void suggestionsForUser(int userID,int BookID=0)
+        static void suggestionsForUser(int userID, int BookID = 0)
         {
             List<int> suggestedBookIds = new List<int>();
             if (BookID == 0)
@@ -2219,14 +2179,15 @@ namespace BasicLibrary
 
                     // Output the name of the best author
                     Console.WriteLine($"Best Author: {bestAuthor}\n");
-                    foreach (var book in Books) 
-                    {if (book.BAuthor == bestAuthor)
+                    foreach (var book in Books)
+                    {
+                        if (book.BAuthor == bestAuthor)
                         { suggestedBookIds.Add(book.BID); }
                     }
 
 
-                        // List to keep track of book IDs borrowed along with the most borrowed book
-                        List<int> borrowedWithMostBorrowedBook = new List<int>();
+                    // List to keep track of book IDs borrowed along with the most borrowed book
+                    List<int> borrowedWithMostBorrowedBook = new List<int>();
 
                     // Find the book IDs borrowed by the same users who borrowed the most borrowed book
                     foreach (var borrowing in Borrowings)
@@ -2261,7 +2222,7 @@ namespace BasicLibrary
                         }
                         Console.WriteLine(bookId + ": " + bookn);
                     }
-                   borrowingAfterSuggestions(userID, suggestedBookIds);
+                    borrowingAfterSuggestions(userID, suggestedBookIds);
                 }
                 catch (Exception ex)
                 {
@@ -2358,10 +2319,10 @@ namespace BasicLibrary
                     if (book != default)
                     {
                         Console.WriteLine($"{book.BName} by {book.BAuthor}");
-                        suggestedBookIds.Add(book.BID );
+                        suggestedBookIds.Add(book.BID);
                     }
                 }
-                borrowingAfterSuggestions(userID,suggestedBookIds);
+                borrowingAfterSuggestions(userID, suggestedBookIds);
             }
         }
         static void borrowingAfterSuggestions(int userId, List<int> suggestedBookIds)
@@ -2438,6 +2399,7 @@ namespace BasicLibrary
         }
 
         //........................helper Functions.....................................//
+
         static void LoadAllFiles()
         {
             // Load Books
@@ -2496,7 +2458,7 @@ namespace BasicLibrary
                             }
                         }
                     }
-                    
+
                 }
                 else
                 {
@@ -2710,7 +2672,7 @@ namespace BasicLibrary
                 {
                     foreach (var admin in Admins)
                     {
-                       writer.WriteLine($"{admin.AID}|{admin.AName}|{admin.Email}|{admin.Password}");
+                        writer.WriteLine($"{admin.AID}|{admin.AName}|{admin.Email}|{admin.Password}");
                     }
                 }
                 Console.WriteLine("All users data saved to file successfully!!");
@@ -2736,7 +2698,7 @@ namespace BasicLibrary
                         writer.WriteLine($"{b.uid}|{b.bid}|{b.date.ToString("yyyy-MM-dd")}|{b.ReturnDate.ToString("yyyy-MM-dd")}|{actualReturnDate}|{rating}|{b.ISReturned}");
                     }
                 }
-                
+
             }
             catch (Exception ex)
             {
@@ -2759,7 +2721,6 @@ namespace BasicLibrary
                 Console.WriteLine($"Error saving purchases to file: {ex.Message}");
             }
         }
-
 
     }
 }
