@@ -1737,7 +1737,7 @@ namespace BasicLibrary
                                         if (input.ToLower() == "y")
                                         {
                                             // Remove reservation from the file
-                                            notifications.Add(line);
+                                            notifications.Add("");
                                         }
                                     }
                                 }
