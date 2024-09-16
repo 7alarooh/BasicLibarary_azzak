@@ -151,6 +151,7 @@ namespace BasicLibrary
                                 {
                                     if (enterPW == admin.Password)
                                     {
+                                        Console.Clear();
                                         adminMenu(admin.AName);
                                     }
                                     else
@@ -803,14 +804,7 @@ namespace BasicLibrary
         }
         //........................Admin Functions.....................................//
         static void adminMenu(string name)
-        {
-            //{
-            //     accountsManagement();
-            //  }
-            //  else
-            //  {
-           // if (name != "registrar") { 
-                bool ExitFlag = false;
+        {   bool ExitFlag = false;
             do
             {
                 Console.WriteLine("Welcome Admin in Library");
@@ -829,29 +823,37 @@ namespace BasicLibrary
                 switch (choice)
                 {
                     case "1":
+                        Console.Clear();
                         AddNewBook();
                         break;
 
                     case "2":
+                        Console.Clear();
                         ViewAllBooks();
                         break;
 
                     case "3":
+                        Console.Clear();
                         SearchForBook();
                         break;
                     case "4":
+                        Console.Clear();
                         editBook();
                         break;
                     case "5":
+                        Console.Clear();
                         removeBook();
                         break;
                     case "6":
+                        Console.Clear();
                         reporting();
                         break;
                     case "7":
+                        Console.Clear();
                         alertsFile();
                         break;
                     case "8":
+                        Console.Clear();
                         SaveBooksToFile();
                         Console.WriteLine("\npress Enter key to exit out system");
                         string outsystem = Console.ReadLine();
@@ -871,8 +873,6 @@ namespace BasicLibrary
 
 
             } while (ExitFlag != true);
-       // }
-          
         }
         static void AddNewBook()
         {
@@ -882,8 +882,8 @@ namespace BasicLibrary
             double price = 0;
             string category;
             int DaysAllowedForBorrowing = 0;
-
-            Console.WriteLine("Enter Book Name:");
+            Console.WriteLine("|------------ Add New Book ------------|");
+            Console.WriteLine("\nEnter Book Name:");
             name = Console.ReadLine();
             if (string.IsNullOrWhiteSpace(name)) // to handle the book name
             {
@@ -1033,7 +1033,7 @@ namespace BasicLibrary
 
             // Define column widths
             int nameWidth = 30;
-            int authorWidth = 30;
+            int authorWidth = 25;
             int idWidth = 5;
             int copiesWidth = 16;
             int priceWidth = 10;
@@ -1186,9 +1186,9 @@ namespace BasicLibrary
                 string searchNameLower = searchName.ToLower();
 
                 // Create a header for the table with fixed-width columns
-                Console.WriteLine("+-----------------------------------------------------------------------------------------------+");
-                Console.WriteLine("| ID  | Book Name                             | Author        | Available Copies | Price (OMR) | Category   |");
-                Console.WriteLine("+-----------------------------------------------------------------------------------------------+");
+                Console.WriteLine("+----------------------------------------------------------------------------------------------------------------------+");
+                Console.WriteLine("| ID  | Book Name                             | Author             | Available Copies | Price (OMR) | Category        |");
+                Console.WriteLine("+----------------------------------------------------------------------------------------------------------------------+");
 
                 // Iterate through the list of books and find those that contain the search word
                 for (int i = 0; i < Books.Count; i++)
@@ -1196,14 +1196,46 @@ namespace BasicLibrary
                     if (Books[i].BName.ToLower().Contains(searchNameLower))
                     {
                         // Display full details of the matching book in table format with consistent column widths
-                        Console.WriteLine($"| {Books[i].BID,-3} | {Books[i].BName,-36} | {Books[i].BAuthor,-12} | {(Books[i].copies - Books[i].borrowedCopies),-17} | {Books[i].Price,-10:F2} | {Books[i].catagory,-10} |");
+                        Console.WriteLine($"| {Books[i].BID,-3} | {Books[i].BName,-36} | {Books[i].BAuthor,-17} | {(Books[i].copies - Books[i].borrowedCopies),-17} | {Books[i].Price,-11:F2} | {Books[i].catagory,-15} |");
                         found = true;
                     }
                 }
 
-                Console.WriteLine("+-----------------------------------------------------------------------------------------------+");
+                Console.WriteLine("+----------------------------------------------------------------------------------------------------------------------+");
 
-                if (!found)
+                if (found)
+                {
+                    // Ask the user to enter the book ID
+                    Console.WriteLine("\nEnter the book ID you want ...:");
+                    string input = Console.ReadLine();
+
+                    if (int.TryParse(input, out int bookId))
+                    {
+                        // Find the book index using the ID
+                        index = Books.FindIndex(b => b.BID == bookId);
+                        if (index != -1) {
+                            Console.WriteLine("\nID:" + Books[index].BID);
+                            Console.WriteLine("\nName Book:" + Books[index].BName);
+                            Console.WriteLine("\nAuthor:" + Books[index].BAuthor);
+                            Console.WriteLine("\nName Book:" + Books[index].catagory);
+                            Console.WriteLine("\nName Book:" + Books[index].copies);
+                        }
+                        else
+                        {
+                            Console.WriteLine("Error: Book with the entered ID not found.");
+                            return;
+                        }
+
+                        
+
+                    }
+                    else
+                    {
+                        Console.WriteLine("Error: Invalid book ID.");
+                        index = -1;
+                    }
+                }
+                else
                 {
                     Console.WriteLine("\nNo books found with the given name or keyword.");
                 }
@@ -1358,7 +1390,6 @@ namespace BasicLibrary
 
             Console.WriteLine("\n------\tEnd of Report\t-----");
         }
-
         static void alertsFile()
         {
             try
@@ -1368,29 +1399,30 @@ namespace BasicLibrary
                     var lines = File.ReadAllLines(AlertsFile);
 
                     // Header for the table
-                    Console.WriteLine("+-----+----------------------+----------------------------+-------------------+");
-                    Console.WriteLine("| ID  | Username              | Email                      | Message           |");
-                    Console.WriteLine("+-----+----------------------+----------------------------+-------------------+");
+                    Console.WriteLine("+-----+----------------------+----------------------------+---------------------+-------------------------+");
+                    Console.WriteLine("| ID  | Username             | Email                      | Date                | Message                 |");
+                    Console.WriteLine("+-----+----------------------+----------------------------+---------------------+-------------------------+");
 
                     int id = 1; // ID counter for the records
                     foreach (var line in lines)
                     {
                         // Split the line by '|' and extract data
                         var data = line.Split('|');
-                        if (data.Length >= 3)
+                        if (data.Length >= 4)
                         {
                             string username = data[0].Trim();
                             string email = data[1].Trim();
+                            string date = data[2].Trim();
                             string message = data[3].Trim();
 
                             // Display data in a structured table format
-                            Console.WriteLine($"| {id,-3} | {username,-20} | {email,-26} | {message,-17} |");
+                            Console.WriteLine($"| {id,-3} | {username,-20} | {email,-26} | {date,-19} | {message,-25} |");
                             id++;
                         }
                     }
 
                     // Closing the table
-                    Console.WriteLine("+-----+----------------------+----------------------------+-------------------+");
+                    Console.WriteLine("+-----+----------------------+----------------------------+---------------------+-------------------------+");
                 }
                 else
                 {
@@ -1703,7 +1735,6 @@ namespace BasicLibrary
                 Console.WriteLine($"Error checking reservations: {ex.Message}");
             }
         }
-
         static void ReturnBook(int userId, int index = -1)
         {
             try
@@ -1918,7 +1949,6 @@ namespace BasicLibrary
                 Console.WriteLine("Purchase cancelled.");
             }
         }
-
         static void SuggestionsForBuy(int userId, (int BID, string BName, string BAuthor, int copies, int borrowedCopies, double Price, string catagory, int BorrowPeriod) purchasedBook)
         {
             var purchasedBookCategory = purchasedBook.catagory;
@@ -1969,8 +1999,6 @@ namespace BasicLibrary
                 Console.WriteLine("No additional suggestions available.");
             }
         }
-
-
         static void DisplayYourBookBorrowed(int userId)     
         {
             // Check if the user has borrowed any books
