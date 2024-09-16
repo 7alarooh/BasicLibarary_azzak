@@ -668,7 +668,7 @@ namespace BasicLibrary
                 Console.WriteLine("Enter the email of the admin you want to remove:");
                 string email = Console.ReadLine();
                 // Prevent the removal of the "registrar" admin
-                if (email.Equals("registrar", StringComparison.OrdinalIgnoreCase))
+                if (email.Equals("eve.davis@example.com", StringComparison.OrdinalIgnoreCase))
                 {
                     Console.WriteLine("Error: The 'registrar' admin cannot be removed.");
                     return;
@@ -989,7 +989,7 @@ namespace BasicLibrary
             Categories[categoryIndex] = (Categories[categoryIndex].CID, Categories[categoryIndex].CName, Categories[categoryIndex].NOFBooks + 1);
             Console.WriteLine($"Category '{category}' now has {Categories[categoryIndex].NOFBooks} books.");
         }
-        static void ViewAllBooks()
+        static void ViewAllBooks() 
         {
             StringBuilder sb = new StringBuilder();
 
