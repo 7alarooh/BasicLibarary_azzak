@@ -195,7 +195,6 @@ namespace BasicLibrary
 
             } while (!ExitFlag);
         }
-
         // Log forgot password request to an external file
         static void LogForgotPassword(string username, string email)
         {
@@ -212,14 +211,12 @@ namespace BasicLibrary
                 Console.WriteLine("Error logging forgot password request: " + ex.Message);
             }
         }
-
         // Function to validate email format
         static bool IsValidEmail(string email)
         {
             var emailRegex = new Regex(@"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$");
             return emailRegex.IsMatch(email);
         }
-
         // Function to validate password format
         static string IsValidPassword(string password)
         {
@@ -246,7 +243,6 @@ namespace BasicLibrary
                 return "Weak password.";
             }
         }
-
 
         //.........................registrar function.................................//
 
@@ -716,6 +712,8 @@ namespace BasicLibrary
             int nameWidth = 25;
             int emailWidth = 30;
             int passwordWidth = 20;
+            // Clear StringBuilder to ensure no previous content is repeated
+            sb.Clear();
 
             // Print Admins
             sb.AppendLine("\n \t--- All Users in Library System ---");
@@ -735,6 +733,7 @@ namespace BasicLibrary
                 sb.AppendLine();
             }
 
+            
             // Print Users
             sb.AppendLine("\n\n \t--- Users ---");
             sb.AppendFormat("\t{0,-" + idWidth + "} {1,-" + nameWidth + "} {2,-" + emailWidth + "} {3,-" + passwordWidth + "}",
@@ -751,10 +750,12 @@ namespace BasicLibrary
                                 user.Password);
                 sb.AppendLine();
             }
-
             Console.WriteLine(sb.ToString());
+            
         }
+
         //........................Admin Functions.....................................//
+
         static void adminMenu(string name,string aEmail)
         {   
             if (aEmail == "eve.davis@example.com")
@@ -768,8 +769,6 @@ namespace BasicLibrary
                 subAdminMenu(name);
             }
         }
-
-    
         static void subAdminMenu(string name) 
         {
             bool ExitFlag = false;
@@ -1002,6 +1001,9 @@ namespace BasicLibrary
             int priceWidth = 10;
             int categoryWidth = 15;
             int periodWidth = 10;
+
+            // Clear StringBuilder to ensure no previous content is repeated
+            sb.Clear();
 
             sb.AppendLine("\n \t--- All Books in Library ---");
 
@@ -1400,7 +1402,9 @@ namespace BasicLibrary
                 Console.WriteLine("Error reading alerts file: " + ex.Message);
             }
         }
+
         //........................User Functions.....................................//
+
         static void userMenu(int id,string name)
         {
 
@@ -1988,7 +1992,6 @@ namespace BasicLibrary
                 Console.WriteLine("Purchase cancelled.");
             }
         }
-
         static void SuggestionsForBuy(int userId, (int BID, string BName, string BAuthor, int copies, int borrowedCopies, double Price, string catagory, int BorrowPeriod) purchasedBook)
         {
             var purchasedBookCategory = purchasedBook.catagory;
@@ -2401,6 +2404,7 @@ namespace BasicLibrary
         }
 
         //........................helper Functions.....................................//
+
         static void LoadAllFiles()
         {
             // Load Books
@@ -2722,7 +2726,6 @@ namespace BasicLibrary
                 Console.WriteLine($"Error saving purchases to file: {ex.Message}");
             }
         }
-
 
     }
 }
