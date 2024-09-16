@@ -753,8 +753,15 @@ namespace BasicLibrary
         }
 
         //........................Admin Functions.....................................//
-        static void adminMenu(string name)
-        {   bool ExitFlag = false;
+        static void adminMenu(string name,string aEmail)
+        {
+            if (aEmail== "eve.davis@example.com") {
+                accountsManagement(name);
+            }
+            else { subAdminMenu(name); }
+        }
+        static void subAdminMenu(string aName) {
+            bool ExitFlag = false;
             do
             {
                 Console.WriteLine("Welcome Admin in Library");
@@ -767,9 +774,9 @@ namespace BasicLibrary
                 Console.WriteLine("\n 6 .Report");
                 Console.WriteLine("\n 7 .Alerts File");
                 Console.WriteLine("\n 8 .singOut");
-                
+
                 string choice = Console.ReadLine();
-                
+
                 switch (choice)
                 {
                     case "1":
@@ -813,8 +820,8 @@ namespace BasicLibrary
                         break;
                 }
 
-                    Console.WriteLine("press Enter key to continue");
-                    string cont = Console.ReadLine();
+                Console.WriteLine("press Enter key to continue");
+                string cont = Console.ReadLine();
 
                 Console.Clear();
 
