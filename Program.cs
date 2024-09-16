@@ -24,6 +24,8 @@ namespace BasicLibrary
         static List<(int uid, int bid, DateTime date, DateTime ReturnDate, DateTime? ActualReturnDate, int? Rating, bool ISReturned)> Borrowings = new List<(int uid, int bid, DateTime date, DateTime ReturnDate, DateTime? ActualReturnDate, int? Rating, bool ISReturned)>();
         static List<(int CID, string CName, int NOFBooks)> Categories = new List<(int CID, string CName, int NOFBooks)>();
         static List<(int PurchaseID, int UID, int BID, DateTime PurchaseDate, double Price)> Purchases = new List<(int PurchaseID, int UID, int BID, DateTime PurchaseDate, double Price)>();
+        // Define a tuple for reservation data
+        static List<(int UserId, int BookId, DateTime ReservationDate)> Reservations = new List<(int UserId, int BookId, DateTime ReservationDate)>();
 
 
         static string filePath = "C:\\Users\\Lenovo\\source\\repos\\azzaGit\\BooksFile.txt";
@@ -34,7 +36,7 @@ namespace BasicLibrary
         static string AlertsFile = "C:\\Users\\Lenovo\\source\\repos\\azzaGit\\AlertsFile.txt";
         static string purchasesFilePath = "C:\\Users\\Lenovo\\source\\repos\\azzaGit\\purchasesFile.txt";
         static string reservationFilePath = "C:\\Users\\Lenovo\\source\\repos\\azzaGit\\ReservationsFile.txt";
-
+        
 
         static int index = -1;
         static int purchaseIdCounter = 1; // To track unique purchase IDs
@@ -1689,69 +1691,60 @@ namespace BasicLibrary
         {
             try
             {
-                using (StreamWriter writer = new StreamWriter(reservationFilePath, true))
-                {
-                    // Save reservation details to the file
-                    writer.WriteLine($"{userId}|{book.BID}|{DateTime.Now.ToString("yyyy-MM-dd")}");
-                }
+                // Add reservation to the list
+                Reservations.Add((userId, book.BID, DateTime.Now));
+
+                // Save reservations to the file
+                SaveReservationsToFile();
+
                 Console.WriteLine("The book is currently out of stock. Your reservation has been placed. You will be notified when the book becomes available.");
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error saving reservation to file: {ex.Message}");
+                Console.WriteLine($"Error saving reservation: {ex.Message}");
             }
         }
         static void CheckReservations()
         {
             try
             {
-                if (File.Exists(reservationFilePath))
+                // Load reservations from the file if it's not already loaded
+                if (!File.Exists(reservationFilePath))
                 {
-                    using (StreamReader reader = new StreamReader(reservationFilePath))
+                    Console.WriteLine("No reservations file found.");
+                    return;
+                }
+
+                LoadReservationsFromFile();
+
+                List<(int UserId, int BookId, DateTime ReservationDate)> notifications = new List<(int UserId, int BookId, DateTime ReservationDate)>();
+
+                foreach (var reservation in Reservations)
+                {
+                    int bookId = reservation.BookId;
+                    var book = Books.FirstOrDefault(b => b.BID == bookId);
+                    if (book != default)
                     {
-                        string line;
-                        List<string> notifications = new List<string>();
-
-                        while ((line = reader.ReadLine()) != null)
+                        int availableCopies = book.copies - book.borrowedCopies;
+                        if (availableCopies > 0)
                         {
-                            var parts = line.Split('|');
-                            if (parts.Length == 3)
+                            Console.WriteLine($"Notification for User {reservation.UserId}: The book \"{book.BName}\" is now available for borrowing.");
+                            Console.WriteLine("Press 'y' to acknowledge and remove this notification.");
+
+                            string input = Console.ReadLine();
+                            if (input.ToLower() == "y")
                             {
-                                int userId = int.Parse(parts[0]);
-                                int bookId = int.Parse(parts[1]);
-                                DateTime reservationDate = DateTime.Parse(parts[2]);
-
-                                // Check if the reserved book is now available
-                                var book = Books.FirstOrDefault(b => b.BID == bookId);
-                                if (book != default)
-                                {
-                                    int availableCopies = book.copies - book.borrowedCopies;
-                                    if (availableCopies > 0)
-                                    {
-                                        // Notify the user
-                                        Console.WriteLine($"Notification for User {userId}: The book \"{book.BName}\" is now available for borrowing.");
-                                        Console.WriteLine("Press 'y' to acknowledge and remove this notification.");
-
-                                        // Wait for user input
-                                        string input = Console.ReadLine();
-                                        if (input.ToLower() == "y")
-                                        {
-                                            // Remove reservation from the file
-                                            notifications.Add("");
-                                        }
-                                    }
-                                }
+                                notifications.Add(reservation);
                             }
                         }
-
-                        // Remove acknowledged reservations from the file
-                        if (notifications.Count > 0)
-                        {
-                            var allLines = File.ReadAllLines(reservationFilePath).ToList();
-                            allLines.RemoveAll(l => notifications.Contains(l));
-                            File.WriteAllLines(reservationFilePath, allLines);
-                        }
                     }
+                }
+
+                // Remove acknowledged reservations from the list
+                if (notifications.Count > 0)
+                {
+                    Reservations = Reservations.Except(notifications).ToList();
+                    SaveReservationsToFile();
                 }
             }
             catch (Exception ex)
@@ -1759,6 +1752,55 @@ namespace BasicLibrary
                 Console.WriteLine($"Error checking reservations: {ex.Message}");
             }
         }
+        static void SaveReservationsToFile()
+        {
+            try
+            {
+                using (FileStream fs = new FileStream(reservationFilePath, FileMode.Create, FileAccess.Write, FileShare.None))
+                using (StreamWriter writer = new StreamWriter(fs))
+                {
+                    foreach (var reservation in Reservations)
+                    {
+                        writer.WriteLine($"{reservation.UserId}|{reservation.BookId}|{reservation.ReservationDate:yyyy-MM-dd}");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error saving reservations to file: {ex.Message}");
+            }
+        }
+
+        static void LoadReservationsFromFile()
+        {
+            try
+            {
+                Reservations.Clear(); // Clear the list before loading new data
+
+                using (FileStream fs = new FileStream(reservationFilePath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite))
+                using (StreamReader reader = new StreamReader(fs))
+                {
+                    string line;
+                    while ((line = reader.ReadLine()) != null)
+                    {
+                        var parts = line.Split('|');
+                        if (parts.Length == 3)
+                        {
+                            int userId = int.Parse(parts[0]);
+                            int bookId = int.Parse(parts[1]);
+                            DateTime reservationDate = DateTime.Parse(parts[2]);
+
+                            Reservations.Add((userId, bookId, reservationDate));
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error loading reservations from file: {ex.Message}");
+            }
+        }
+
         static void ReturnBook(int userId, int index = -1)
         {
             try
