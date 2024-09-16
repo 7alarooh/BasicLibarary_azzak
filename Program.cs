@@ -733,7 +733,6 @@ namespace BasicLibrary
                 sb.AppendLine();
             }
 
-
             // Print Users
             sb.AppendLine("\n\n \t--- Users ---");
             sb.AppendFormat("\t{0,-" + idWidth + "} {1,-" + nameWidth + "} {2,-" + emailWidth + "} {3,-" + passwordWidth + "}",
@@ -751,27 +750,11 @@ namespace BasicLibrary
                 sb.AppendLine();
             }
             Console.WriteLine(sb.ToString());
-
         }
 
         //........................Admin Functions.....................................//
-
-        static void adminMenu(string name, string aEmail)
-        {
-            if (aEmail == "eve.davis@example.com")
-            {
-                Console.Clear();
-                accountsManagement(name);
-            }
-            else
-            {
-                Console.Clear();
-                subAdminMenu(name);
-            }
-        }
-        static void subAdminMenu(string name)
-        {
-            bool ExitFlag = false;
+        static void adminMenu(string name)
+        {   bool ExitFlag = false;
             do
             {
                 Console.WriteLine("Welcome Admin in Library");
@@ -784,9 +767,9 @@ namespace BasicLibrary
                 Console.WriteLine("\n 6 .Report");
                 Console.WriteLine("\n 7 .Alerts File");
                 Console.WriteLine("\n 8 .singOut");
-
+                
                 string choice = Console.ReadLine();
-
+                
                 switch (choice)
                 {
                     case "1":
@@ -830,12 +813,13 @@ namespace BasicLibrary
                         break;
                 }
 
-                Console.WriteLine("press Enter key to continue");
-                string cont = Console.ReadLine();
+                    Console.WriteLine("press Enter key to continue");
+                    string cont = Console.ReadLine();
 
                 Console.Clear();
-            }
-            while (ExitFlag != true);
+
+
+            } while (ExitFlag != true);
         }
         static void AddNewBook()
         {
@@ -982,7 +966,7 @@ namespace BasicLibrary
             Categories[categoryIndex] = (Categories[categoryIndex].CID, Categories[categoryIndex].CName, Categories[categoryIndex].NOFBooks + 1);
             Console.WriteLine($"Category '{category}' now has {Categories[categoryIndex].NOFBooks} books.");
         }
-        static void ViewAllBooks()
+        static void ViewAllBooks() 
         {
             StringBuilder sb = new StringBuilder();
 
@@ -1398,8 +1382,7 @@ namespace BasicLibrary
         }
 
         //........................User Functions.....................................//
-
-        static void userMenu(int id, string name)
+        static void userMenu(int id,string name)
         {
 
             CheckReservations(); // Check for available reservations before showing the menu
