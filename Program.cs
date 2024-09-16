@@ -983,8 +983,9 @@ namespace BasicLibrary
             // Define column widths
             int nameWidth = 30;
             int authorWidth = 25;
-            int idWidth = 5;
-            int copiesWidth = 16;
+            int idWidth = 5; 
+            int totalCopiesWidth = 13;
+            int availableCopiesWidth = 18;
             int priceWidth = 10;
             int categoryWidth = 15;
             int periodWidth = 10;
@@ -995,19 +996,20 @@ namespace BasicLibrary
             sb.AppendLine("\n \t--- All Books in Library ---");
 
             // Use interpolation to format headers
-            sb.AppendFormat("\t{0,-" + nameWidth + "} {1,-" + authorWidth + "} {2,-" + idWidth + "} {3,-" + copiesWidth + "}  {4,-" + priceWidth + "} {5,-" + categoryWidth + "} {6,-" + periodWidth + "}",
-                            "Name", "Author", "ID", "Available Copies", "Price", "Category", "Borrow Period");
+            sb.AppendFormat("\t{0,-" + idWidth + "} {1,-" + nameWidth + "} {2,-" + authorWidth + "} {3,-" + totalCopiesWidth + "} {4,-" + availableCopiesWidth + "} {5,-" + priceWidth + "} {6,-" + categoryWidth + "} {7,-" + periodWidth + "}",
+                   "ID", "Name", "Author", "Total Copies", "Available Copies", "Price", "Category", "Borrow Period");
             sb.AppendLine();
-            sb.AppendLine(new string('-', nameWidth + authorWidth + idWidth + copiesWidth + priceWidth + categoryWidth + periodWidth + 24)); // 24 for padding
+            sb.AppendLine(new string('-', idWidth + nameWidth + authorWidth + totalCopiesWidth + availableCopiesWidth + priceWidth + categoryWidth + periodWidth + 24)); // 24 for padding
 
             for (int i = 0; i < Books.Count; i++)
             {
                 var book = Books[i];
-                sb.AppendFormat("\t{0,-" + nameWidth + "} {1,-" + authorWidth + "} {2,-" + idWidth + "} {3,-" + copiesWidth + "}  {4,-" + priceWidth + "} {5,-" + categoryWidth + "} {6,-" + periodWidth + "}",
+                sb.AppendFormat("\t{0,-" + idWidth + "} {1,-" + nameWidth + "} {2,-" + authorWidth + "} {3,-" + totalCopiesWidth + "} {4,-" + availableCopiesWidth + "} {5,-" + priceWidth + "} {6,-" + categoryWidth + "} {7,-" + periodWidth + "}",
+                                book.BID, // Book ID as the first column
                                 book.BName,
                                 book.BAuthor,
-                                book.BID,
-                                book.copies - book.borrowedCopies,
+                                book.copies, // Total copies
+                                book.copies - book.borrowedCopies, // Available copies
                                 book.Price.ToString("0.00") + " OMR", // Format as OMR currency
                                 book.catagory,
                                 book.BorrowPeriod);
@@ -1036,7 +1038,15 @@ namespace BasicLibrary
             }
 
             var book = Books[index];
-
+            // Display current book details before editing
+            Console.WriteLine($"\nEditing Book ID: {book.BID}");
+            Console.WriteLine($"Current Name: {book.BName}");
+            Console.WriteLine($"Current Author: {book.BAuthor}");
+            Console.WriteLine($"Current Quantity: {book.copies}");
+            Console.WriteLine($"Currently Borrowed Copies: {book.borrowedCopies}");
+            Console.WriteLine($"Current Price: {book.Price.ToString("0.00")} OMR");
+            Console.WriteLine($"Current Category: {book.catagory}");
+            Console.WriteLine($"Current Borrow Period: {book.BorrowPeriod} days");
             Console.WriteLine($"Editing Book: {book.BName} by {book.BAuthor}");
 
             // Edit Book Name
@@ -1084,6 +1094,50 @@ namespace BasicLibrary
                     return;
                 }
             }
+
+            // Edit Book Price
+            Console.WriteLine("Enter new Book Price (or press Enter to skip):");
+            string priceInput = Console.ReadLine();
+            if (!string.IsNullOrWhiteSpace(priceInput))
+            {
+                try
+                {
+                    double newPrice = double.Parse(priceInput);
+                    if (newPrice < 0)
+                    {
+                        Console.WriteLine("Error: Price cannot be negative.");
+                        return;
+                    }
+                    book.Price = newPrice;
+                }
+                catch (FormatException)
+                {
+                    Console.WriteLine("Error: Please enter a valid number for the price.");
+                    return;
+                }
+            }
+            // Edit Borrow Period
+            Console.WriteLine("Enter new Borrow Period in days (or press Enter to skip):");
+            string periodInput = Console.ReadLine();
+            if (!string.IsNullOrWhiteSpace(periodInput))
+            {
+                try
+                {
+                    int newPeriod = int.Parse(periodInput);
+                    if (newPeriod <= 0)
+                    {
+                        Console.WriteLine("Error: Borrow period must be a positive number.");
+                        return;
+                    }
+                    book.BorrowPeriod = newPeriod;
+                }
+                catch (FormatException)
+                {
+                    Console.WriteLine("Error: Please enter a valid number for the borrow period.");
+                    return;
+                }
+            }
+
 
             // Update the book in the list
             Books[index] = book;
