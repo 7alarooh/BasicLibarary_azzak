@@ -931,7 +931,11 @@ namespace BasicLibrary
                 try
                 {
                     categoryIndex = int.Parse(Console.ReadLine()) - 1;
-                    if (categoryIndex >= 0 && categoryIndex < Categories.Count) break;
+                    if (categoryIndex >= 0 && categoryIndex < Categories.Count)
+                    {
+                        category = Categories[categoryIndex].CName;
+                        break; // Exit the loop once a valid category is selected
+                    }
                     Console.WriteLine("Error: Invalid category selection.");
                 }
                 catch (FormatException)
@@ -943,7 +947,6 @@ namespace BasicLibrary
                     Console.WriteLine("Error: The number for the category selection is too large.");
                 }
             }
-            category = Categories[categoryIndex].CName;
 
             // Input number of days allowed for borrowing
             while (true)
