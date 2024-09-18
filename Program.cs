@@ -82,6 +82,7 @@ namespace BasicLibrary
 
                         if (aEmail != "registrar")
                         {
+                            // Find the first admin in the list with an email matching the provided email (case-insensitive)
                             var admin = Admins.FirstOrDefault(a => a.Email.Equals(aEmail, StringComparison.OrdinalIgnoreCase));
                             if (admin != default)
                             {
@@ -302,7 +303,7 @@ namespace BasicLibrary
         }
         static void AddNewUser()
         {
-
+            Console.WriteLine("--------Add New User---------\n");
             Console.WriteLine("Would you like to add a new User or Admin?");
             Console.WriteLine("Enter '1' for User or '2' for Admin:");
             string choice = Console.ReadLine();
@@ -486,6 +487,8 @@ namespace BasicLibrary
         }
         static void EditUserInformation()
         {
+
+            Console.WriteLine("Edit User Information");
             ViewAllUsers();
             Console.WriteLine("Enter the type of account to edit (user/admin):");
             string accountType = Console.ReadLine().ToLower();
